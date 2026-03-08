@@ -81,7 +81,7 @@ AI Agent (Co-Author + 技术执行 + 跨领域关联 + 批判性审视)
 
 | 阶段 | AI 的角色隐喻 | 核心行为 |
 |------|-------------|----------|
-| 论文阅读 | 共同学习者 | 一起读、一起想、主动发现关联 |
+| 论文发现与阅读 | 自主调研员 + 共同学习者 | 自主搜索、筛选、深读、主动发现关联 |
 | 项目启动 | 联合创始人 | 帮助将直觉变为方案，评估可行性 |
 | 方法设计 | 技术合伙人 | 共同探索方案空间，指出风险 |
 | 独立审查 | 挑剔的 Reviewer 2 | 上下文解耦，冷眼审视，不留情面 |
@@ -123,7 +123,7 @@ Review Phase 的关键特性：
 
 | 产品开发 | 科研对应 | AI 角色 |
 |---------|---------|--------|
-| 市场调研 | 文献调研 & Gap 分析 | 共同学习者 |
+| 市场调研 | 自主文献发现 & 知识积累 | 自主调研员 + 共同学习者 |
 | 需求分析 + 评审 | RQ 定义 + Gap 审查 | 联合创始人 → 独立审稿人 |
 | 产品设计 + 评审 | 方法设计 + 方法审查 | 技术合伙人 → 独立审稿人 |
 | 测试方案 + 评审 | 实验设计 + 实验审查 | 质量把关者 → 独立审稿人 |
@@ -136,8 +136,8 @@ Review Phase 的关键特性：
 
 ```
 ═══════════════════════════════════════════════════════════════════════════════════
-Phase 0: Paper Reading (持续性，知识库积累)                            [持续运行]
-    论文 → 知识库 (Methods Bank, Gaps, Patterns, Connections)
+Phase 0: Paper Discovery & Reading (Agent 自主驱动，知识库积累)       [持续运行]
+    研究方向 → 论文发现 → Quick Scan → 深读 → 知识库 + NotebookLM + 领域地图
 ═══════════════════════════════════════════════════════════════════════════════════
          │ 积累触发
          ▼
@@ -270,7 +270,7 @@ Phase 0: Paper Reading (持续性，知识库积累)                            
          │ 知识库更新
          ▼
 ═══════════════════════════════════════════════════════════════════════════════
-Phase 0: Paper Reading (知识库持续积累)                      [闭环 — 复利效应]
+Phase 0: Paper Discovery & Reading (知识库持续积累)          [闭环 — 复利效应]
 ═══════════════════════════════════════════════════════════════════════════════
 ```
 
@@ -300,6 +300,20 @@ L2-4 退出时产出 `iteration-log.md`（追加模式），作为目标 Phase �
 **4. 迭代输入接口**
 
 Phase 的函数签名区分首次和迭代：首次只需 Base Input；Review Revise 回调携带 review 报告；Phase 8 L2-4 回调携带 iteration-log.md + 当前版本文档。
+
+**5. 流程自进化 (Pipeline Self-Evolution)**
+
+Pipeline 本身是一份"活文档"，随着项目经验的积累而持续进化。自进化采用**两层机制**：
+
+| 层次 | 时机 | 行为 | 产出 |
+|------|------|------|------|
+| **第一层：观察收集** | 每个 Phase 的 Skill 完成后 | 执行 `/reflect-pipeline`，记录流程反思观察 | `pipeline-evolution-log.md`（追加 Entry） |
+| **第二层：综合进化** | Phase 11 Retrospective | 综合所有观察，识别高置信度改进，经用户确认后正式修改 | pipeline.md / skills / templates 更新 |
+
+为什么分两层？
+- **第一层低成本、零风险**——只记录观察，不改任何文件，保证流程执行期间的稳定性
+- **第二层高质量、有把关**——在项目完成后有完整经验时综合判断，且需用户确认
+- 避免单个项目的个例经验过早改变流程——多个项目的重复观察才构成可靠的改进信号
 
 ### 文档流转图
 
@@ -342,7 +356,10 @@ project/
 ├── experiment-review.md       ← Phase 7 产出
 ├── contribution.md            ← 跨阶段维护
 ├── iteration-log.md           ← Phase 8 迭代退出时产出（追加模式）
-├── retrospective.md           ← Phase 11 产出（项目回顾与知识回收）
+├── pipeline-evolution-log.md  ← 各 Phase 执行后的流程反思记录（追加模式）
+├── pipeline-status.json       ← 自动化运行器状态（当前阶段、历史记录）
+├── phase-outcomes/            ← 各阶段 fork subagent 写入的 outcome JSON
+├── retrospective.md           ← Phase 11 产出（项目回顾与知识回收 + Pipeline 进化）
 │
 ├── Code/                      ← 代码实现 & 实验运行 (Phase 8)
 │   ├── code-todo.md           ← 代码实现清单
@@ -360,11 +377,105 @@ project/
 
 **CLAUDE.md 结构**：项目级 CLAUDE.md 包含三个区域——项目概览（所有 Phase 读）+ Code/ 子节（Phase 8 填写）+ Papers/ 子节（Phase 9 填写），统一在一个文件中管理。参见 `templates/project-claude-md.md`。
 
+### Git 管理约定
+
+ResearchFlow 使用**双仓库**架构：
+
+| 仓库 | 内容 | 职责 |
+|------|------|------|
+| **ResearchFlow repo** | `pipeline.md` + `skills/` + `templates/` | 方法论框架，跨项目共享，版本化演进 |
+| **Project repo** | 项目文档 + 知识库 + `Code/` + `Papers/` | 单个研究项目的全部产出 |
+
+#### ResearchFlow 框架同步
+
+**何时 Pull**（开始任何实质工作前检查）:
+- 启动新项目（`/project-startup`）之前
+- 启动新一轮 Paper Discovery/Reading 之前
+- 距上次执行超过 1 周时
+
+**何时 Push**（框架有改动时）:
+- Phase 11 Retrospective 的 Pipeline 进化步骤（Step 6d）完成后
+- `/reflect-pipeline` 识别出 `[URGENT]` 级问题并立即修复后
+
+```bash
+# Pull（进入任何工作前检查更新）
+cd [ResearchFlow路径] && git pull origin main
+
+# Push（框架进化后）
+git add pipeline.md skills/ templates/
+git commit -m "pipeline: [简要描述改进]"
+git push origin main
+```
+
+#### Project Repo 分支约定
+
+| 分支 | 命名规则 | 用途 |
+|------|---------|------|
+| `main` | — | 稳定状态（已完成的 Phase 产出） |
+| `phase/[X]-[brief]` | `phase/2-gap-discovery` | 单个 Phase 的活跃工作 |
+| `kb/[arxiv-id]` | `kb/2312.00001` | Phase 0 并行论文阅读（每篇一个分支） |
+| `exp/[name]` | `exp/ablation-component-A` | Phase 8 并行实验 |
+
+**常规提交时机**:
+
+| 时机 | 涉及文件 | Commit 粒度 |
+|------|---------|------------|
+| Phase N 完成 | `[phase-N].md`, `contribution.md` | 一次提交 + push |
+| 深读一篇论文 | `kb/[paper].md`, `kb-index.md` | 一次提交 |
+| 发现一批论文 | `reading-queue.md` | 一次提交 |
+| 实验批次完成 | `experiments/[batch]/`, `experiment-todo.md` | 一次提交 + push |
+
+#### 多 Agent / 多服务器并行（Git Worktree）
+
+**适用场景**:
+- Phase 0：多个 Agent 同时阅读不同论文
+- Phase 8：多个 Agent 并行运行不同实验
+
+**同一机器多 Agent（Worktree 隔离）**:
+
+```bash
+# 主工作树（main 分支）
+/projects/my-paper/
+
+# 为每个并行 Agent 创建独立工作树
+git worktree add ../my-paper-wt/paper-2312.00001 -b kb/2312.00001
+git worktree add ../my-paper-wt/paper-2401.00002 -b kb/2401.00002
+
+# Agent 完成后，合并回 main 并清理
+git checkout main
+git merge kb/2312.00001
+git worktree remove ../my-paper-wt/paper-2312.00001
+git branch -d kb/2312.00001
+```
+
+**跨服务器协作（Branch + Push）**:
+
+```bash
+# Server A：负责一组实验
+git checkout -b exp/ablation-A && git push -u origin exp/ablation-A
+
+# Server B：负责另一组实验
+git fetch origin && git checkout -b exp/baseline-compare && git push -u origin exp/baseline-compare
+
+# 主节点汇总：逐步合并各 Server 结果
+git merge exp/ablation-A
+git merge exp/baseline-compare
+```
+
+**冲突预防原则**:
+- 每个 Agent 只写自己负责的文件（论文笔记文件唯一，实验结果目录唯一）
+- `kb-index.md` 和 `reading-queue.md` 是共享文件，合并时人工 review 冲突段
+- Phase 0 并行阅读结束后，由主 Agent 统一更新 `kb-index.md` 汇总条目
+
 ### 关键文档清单
 
 | 文档 | 创建阶段 | 主要使用阶段 | 内容 |
 |------|---------|------------|------|
+| `research-directions.md` | Phase 0 (配置) | Phase 0 (论文发现) | 研究方向、关键词、种子论文、目标 venue |
+| `reading-queue.md` | Phase 0 (发现) | Phase 0 (深读) | 论文阅读队列（Quick Scan 评分 + 优先级） |
+| `kb-index.md` | Phase 0 (深读) | Phase 0-9 | 知识库总索引（已读论文 + 五类资产索引） |
 | 知识库 (论文笔记) | Phase 0 | Phase 1, 2, 4, 6, 9 | 持续积累的可复用研究资产 |
+| `domain-landscape.md` | Phase 0 (≥5篇时) | Phase 1 (项目启动决策) | 方向级全景：现状、SOTA、饱和度、方向信号、资源汇总 |
 | `project-startup.md` | Phase 1 | Phase 2, 4, 9 | 项目知识基础 |
 | `gap-analysis.md` | Phase 2 | Phase 3-9 | Gap 陈述 + 根因 + RQ |
 | `gap-review.md` | Phase 3 | Phase 2 (如需修改) | Gap 审查报告 |
@@ -378,57 +489,250 @@ project/
 | `Code/code-todo.md` | Phase 8 | Phase 8 | 代码实现清单 |
 | `Code/experiment-todo.md` | Phase 8 | Phase 8 | 实验执行清单 |
 | `iteration-log.md` | Phase 8 (L2-4退出时) | Phase 2/4 (迭代时), Exit Gate | 失败诊断 + 约束传递 + 迭代历史 |
-| `retrospective.md` | Phase 11 | Phase 0 (知识库更新) | 项目回顾 + 知识回收 |
+| `pipeline-evolution-log.md` | 各 Phase (反思时) | Phase 11 (综合进化) | 流程反思观察记录（追加模式） |
+| `retrospective.md` | Phase 11 | Phase 0 (知识库更新) | 项目回顾 + 知识回收 + Pipeline 进化记录 |
+
+---
+
+## 一·五、自动化运行器（Pipeline Orchestrator）
+
+> **核心理念**：Phase 1 启动后，P1→P11 是一条线性的、文档驱动的流水线。除 Phase 8（代码/实验执行）需要人工确认外，其余阶段可由状态机全程自动推进。
+
+### 架构概览
+
+```
+ResearchFlow/
+├── orchestrator/
+│   └── state_machine.py        ← Python 状态机（纯计算，不执行任何 Skill）
+└── plugin/
+    └── commands/
+        ├── researchflow-run/   ← /researchflow:run  自动化运行器（主循环）
+        └── researchflow-status/ ← /researchflow:status 项目状态查看
+```
+
+**两层架构**（模仿 Sibyl System 设计）：
+
+| 层次 | 职责 |
+|------|------|
+| `state_machine.py` | 纯函数状态机：读 `pipeline-status.json` → 返回下一个 action JSON |
+| `researchflow-run` Skill | 执行主循环：调用状态机 → 生成 fork subagent 执行 Skill → 读取 outcome → 推进状态机 |
+
+### 快速启动
+
+```bash
+# 加载 ResearchFlow 插件（一次性配置）
+# 在 ~/.claude/settings.json 中添加：
+# { "pluginDirs": ["/path/to/ResearchFlow/plugin"] }
+
+# 查看当前项目状态
+/researchflow:status /path/to/project
+
+# 从当前阶段自动推进流水线
+/researchflow:run /path/to/project
+```
+
+### 状态文件：`pipeline-status.json`
+
+自动创建在项目根目录，格式：
+
+```json
+{
+  "phase": "P4",
+  "last_updated": "2026-03-09T12:00:00",
+  "history": [
+    {"phase": "P1", "outcome": "done", "timestamp": "..."},
+    {"phase": "P2", "outcome": "done", "timestamp": "..."},
+    {"phase": "P3", "outcome": "pass", "timestamp": "..."}
+  ],
+  "iter_P2": 1,
+  "iter_P3": 1
+}
+```
+
+若文件不存在，状态机会扫描已有文档**自动推断当前阶段**。
+
+### Outcome 协议
+
+每个 fork subagent 执行完 Skill 后，必须将结果写入：
+
+```
+<project_path>/phase-outcomes/<phase>.json
+```
+
+格式：
+```json
+{
+  "outcome": "pass",
+  "notes": "Gap 审查通过，创新性和重要性均满足要求"
+}
+```
+
+有效的 outcome 值由阶段类型决定：
+
+| Outcome 类型 | 有效值 |
+|-------------|--------|
+| 工作阶段 | `done` |
+| 审查阶段 | `pass` \| `revise` \| `continue_P1/P2/P4` \| `abandon` |
+| 实现验证 | `pass` \| `L1` \| `continue_P4` \| `continue_P2` \| `abandon` |
+| 完整实验 | `done` \| `continue_P4` \| `continue_P2` \| `abandon` |
+
+### 人工检查点
+
+以下阶段在启动前需要人工确认（涉及代码执行/GPU 实验）：
+
+- **P8a** — 实现环境搭建
+- **P8a_validate** — 核心实现与 Dim 0 快速验证
+- **P8b** — 完整实验（Dim 1-4）
+
+其余阶段（P1-P7、P9、P11）可全自动推进。
+
+### 项目 CLAUDE.md 配置
+
+在项目 CLAUDE.md 中添加以下字段，供运行器读取：
+
+```yaml
+researchflow_path: /home/jinxulin/ResearchFlow
+```
 
 ---
 
 ## 二、各阶段详细方法
 
-### Phase 0: Paper Reading & Knowledge Accumulation (论文阅读与知识积累)
+### Phase 0: Paper Discovery, Reading & Knowledge Accumulation (论文发现、阅读与知识积累)
 
-> **Input**: 论文 PDF / arXiv / 论文内容
-> **Output**: 单篇论文笔记 + 知识库更新（Methods Bank, Gaps & Assumptions, Experimental Patterns, Cross-Paper Connections）
+> **Input**: 研究方向配置 (`research-directions.md`) + 论文来源 (arXiv / Semantic Scholar / 研究者直接提供)
+> **Output**: 阅读队列 + 论文笔记 + 知识库更新 (五类资产 + 索引) + NotebookLM notebook + 领域地图
 
-**本质**: 持续性的"市场调研"。不绑定任何特定项目，是研究者日常知识积累的过程。
+**本质**: 持续性的"市场调研"，由 **AI Agent 自主驱动**。不绑定任何特定项目，是研究知识的系统性积累。
 
 **与 Phase 1 的关系**:
 ```
-Phase 0 (持续性) ——积累触发——> Phase 1 (触发性)
-论文阅读是土壤，研究洞察是从土壤中长出的种子。
+Phase 0 (持续性，Agent 自主驱动)
+    ├── 论文发现 (Paper Discovery) ──→ 阅读队列
+    ├── 深度阅读 (Paper Reading)   ──→ 知识库 (五类资产)
+    ├── Cross-paper connections 涌现 ──→ 研究种子
+    └── 领域地图 (Domain Landscape) ──→ 方向级全景 + 研究方向信号
+                                           ↓
+Phase 1 (触发性) ←── 知识库积累到临界点，领域地图显示蓝海方向
 ```
 
-**论文阅读的两层产出**:
+**Phase 0 的两个子流程**:
 
-| 层次 | 内容 | 价值 |
-|------|------|------|
-| 论文级 | 单篇论文的完整理解 (storyline, method, experiments) | 当下理解 |
-| 知识库级 | 可复用资产提取 | 长期复利 |
+```
+研究方向 (人类设定，一次性)
+    ↓
+┌─ Paper Discovery (论文发现) ──── /paper-discovery ─────┐
+│  arXiv API + Semantic Scholar API + WebSearch           │
+│  ├─ 关键词搜索                                          │
+│  ├─ 引用链追踪                                          │
+│  ├─ 作者追踪                                            │
+│  ├─ Venue 追踪                                          │
+│  └─ 争议与反面证据搜索                                    │
+│       ↓                                                │
+│  Quick Scan (Tier 1)                                   │
+│  title + abstract → 相关性评分 → 过滤                    │
+│       ↓                                                │
+│  reading-queue.md (阅读队列)                             │
+└────────────────────────────────┼────────────────────────┘
+                                 ↓
+┌─ Paper Reading (深度阅读) ──── /paper-reading ──────────┐
+│  从阅读队列取论文 / 研究者直接提供                         │
+│       ↓                                                │
+│  Deep Read (Tier 2)                                    │
+│  全文阅读 → 论文笔记 → 五类资产提取                       │
+│       ↓                                                │
+│  ┌─ 本地知识库: kb-index.md + 论文笔记                   │
+│  ├─ NotebookLM: 论文上传至研究方向 notebook               │
+│  └─ 领域地图: domain-landscape.md (≥5篇时生成/更新)      │
+└────────────────────────────────────────────────────────┘
+```
 
-**四类可复用资产**:
-1. **Methods Bank** — 核心方法/技术，含适用条件和局限
-2. **Gaps & Assumptions** — 未解决的问题 + 可被质疑的隐式假设 (最高价值)
-3. **Experimental Patterns** — baselines, metrics, 消融设计模式
+**两级阅读系统**:
+
+| 级别 | 输入 | 成本 | 产出 | 决策 |
+|------|------|------|------|------|
+| **Tier 1: Quick Scan** | title + abstract + intro/conclusion | 低 | 相关性评分 + 一句话摘要 | 跳过 / 加入深读队列 |
+| **Tier 2: Deep Read** | 全文 | 高 | 完整笔记 + 五类资产 + NotebookLM 上传 | 入库 |
+
+Quick Scan 的筛选标准（综合评分 1-5）:
+- 研究方向相关性（权重最高）
+- 方法可复用性（核心方法/组件有迁移潜力）
+- 知识库互补性（填补 KB 空白区域）
+- 隐式假设潜力（是否存在可质疑的假设——高价值 Gap 来源）
+
+**五类可复用资产**:
+1. **Methods Bank** — 核心方法/技术，含适用条件、局限和**组件级可解耦性分析**
+2. **Gaps & Assumptions** — 未解决的问题 + 可被质疑的隐式假设 (最高价值) + **可攻击性评估** + **争议与反面证据**（负面结果、复现失败、社区争论）
+3. **Experimental Patterns** — baselines, metrics, 消融设计模式, 可复用评估 pipeline
 4. **Cross-Paper Connections** — 论文间的关联 (互补/矛盾/延伸/可结合)
+5. **Reusable Resources** — 开源代码仓库 (GitHub)、公开数据集（名称+获取方式）、预训练模型 (HuggingFace等)、可直接复用的评估脚本/pipeline —— 为 Phase 8 实现阶段提供工程起点
+
+**双层知识库**:
+
+| 层次 | 工具 | 职责 | 消费者 |
+|------|------|------|--------|
+| **结构化层** | 本地 Markdown (`kb-index.md` + 论文笔记) | 五类资产的结构化索引，可被 Pipeline 各 Phase 直接消费 | Phase 1-9 |
+| **语义层** | NotebookLM | 论文原文上传，支持跨论文语义查询和关联发现 | Phase 2 Gap Discovery, Phase 4 Method Design |
+
+两层互补：结构化层保证精确检索和 Pipeline 集成，语义层提供"大海捞针"式的跨论文关联发现。
 
 **AI 的独特价值**:
+- **自主论文发现**——Agent 主动搜索、筛选，不依赖人类逐篇喂入
 - 不仅是记录员，更是**共同思考者**
 - 主动识别隐式假设（作者自己没意识到的局限）
+- **主动搜索反面证据**——负面结果和复现失败往往揭示真正的瓶颈，比正面结果更有价值
 - 随着知识库增长，主动发现 cross-paper connections，提示潜在研究方向
 - 知识库的价值随积累量**指数增长**
+- **组件级分析**——为 Phase 4 方法设计提供可直接复用的组件库
+- **资源追踪**——系统性追踪开源代码、数据集、预训练模型，为 Phase 8 提供工程起点
 
 **关键原则**:
 - 隐式假设 > 显式 future work（后者所有人都能看到，前者是差异化来源）
 - 结构化存储 > 自由笔记（结构化才能被 AI 跨论文检索和关联）
-- 每篇论文阅读后都应更新知识库索引，而非孤立存放
+- 每篇论文阅读后都应更新 `kb-index.md`，而非孤立存放
+- Quick Scan 要诚实评分——不因数量压力降低深读门槛
+- 优先顶会论文，但不排斥高质量预印本
 
-**Exit Criteria**:
+**论文发现策略**:
+
+| 策略 | 实现 | 适用时机 |
+|------|------|---------|
+| 关键词搜索 | arXiv API + Semantic Scholar API | 每次执行 |
+| 引用链追踪 | Semantic Scholar citation API (前向+后向) | 有新种子论文时 |
+| 作者追踪 | Semantic Scholar author API | 识别出关键研究者后 |
+| Venue 追踪 | 搜索目标 venue 最新论文 | 每次执行 |
+| 争议与反面证据 | WebSearch: "X + negative results / failure analysis / replication" | 每个研究方向至少执行一次 |
+
+**领域地图** (`domain-landscape.md`):
+
+当某个研究方向的已读论文积累到一定数量（建议 ≥ 5 篇）时，生成或更新该方向的**领域地图**——一份方向级的全景综述，包含：
+1. **领域现状摘要** — 当前发展阶段、主流范式、关键里程碑（2-3 段）
+2. **SOTA 方法与基准** — 当前最优方法、主流数据集、评估指标、公开 leaderboard
+3. **方向饱和度评估** — 哪些子方向已高度饱和（红海）、哪些仍有空间（蓝海）
+4. **研究方向信号** — 从 Cross-Paper Connections 中涌现的显式方向建议：有前景的方向、值得警惕的陷阱、跨领域启发
+5. **可用资源汇总** — 聚合该方向下所有论文的 Reusable Resources
+
+领域地图是**知识库的高层视图**，帮助 Phase 1 Project Startup 判断何时启动、从哪个方向切入。它不属于任何项目，而是 Phase 0 知识积累的自然产物。
+
+**Exit Criteria (Paper Discovery)**:
+- [ ] 至少使用了 2 种以上发现策略
+- [ ] 对该研究方向执行了至少一次"争议与反面证据"搜索
+- [ ] 所有发现论文经过去重和质量过滤
+- [ ] 通过 Quick Scan 的论文有评分和摘要
+- [ ] `reading-queue.md` 已更新
+
+**Exit Criteria (Paper Reading)**:
 - [ ] 论文级理解完整（能说清 storyline、核心方法、实验设计）
-- [ ] 至少提取了 1 个 Methods Bank 条目
-- [ ] 至少识别了 1 个 Gap/隐式假设
-- [ ] 知识库索引已更新
+- [ ] 至少提取了 1 个 Methods Bank 条目（含组件级分析）
+- [ ] 至少识别了 1 个 Gap/隐式假设（含可攻击性评估）
+- [ ] 已提取 Reusable Resources（开源代码/数据集/预训练模型，如有）
+- [ ] 已与 `kb-index.md` 中已有论文建立 connections（如有）
+- [ ] 论文已上传至 NotebookLM
+- [ ] `kb-index.md` 已更新
+- [ ] 如该方向已读论文 ≥ 5 篇，`domain-landscape.md` 已生成或更新
 
-**对应 Skill**: `/paper-reading` (`skills/paper-reading-skill.md`)
-**对应模板**: `templates/paper-reading-note.md`
+**对应 Skill**: `/paper-discovery` (`skills/paper-discovery-skill.md`) + `/paper-reading` (`skills/paper-reading-skill.md`)
+**对应模板**: `templates/paper-reading-note.md`, `templates/research-directions.md`, `templates/reading-queue.md`, `templates/kb-index.md`, `templates/domain-landscape.md`
 
 ---
 
@@ -453,7 +757,7 @@ Phase 0 (持续性) ——积累触发——> Phase 1 (触发性)
 | 问题驱动型 | 从未解决的问题出发 | "现有方法都无法处理XX场景" |
 | 现象启发型 | 从实验观察/直觉出发 | "我发现XX现象，背后一定有规律" |
 
-**流程**: 识别种子类型 -> 深度理解源材料 -> 知识综合与Gap分析 -> 生成Startup文档 -> 与研究者确认
+**流程**: 识别种子类型 → 深度理解源材料 → 知识综合与Gap分析 → 生成Startup文档 → 与研究者确认
 
 **产出**: `project-startup.md` — 项目全周期的知识基础文档
 
@@ -477,12 +781,12 @@ Phase 0 (持续性) ——积累触发——> Phase 1 (触发性)
 
 ### Phase 2: Gap Discovery (研究空白发现)
 
-> **Input (首次)**: `project-startup.md` + 知识库 (Gaps & Assumptions, Cross-Paper Connections)
+> **Input (首次)**: `project-startup.md` + 知识库 (`kb-index.md` + 论文笔记中的 Gaps & Assumptions, Cross-Paper Connections) + NotebookLM 语义查询
 > **Input (迭代 — Phase 3 Revise)**: + `gap-review.md`（审查意见，需针对性修改）
 > **Input (迭代 — Phase 8 L4 Pivot)**: + `iteration-log.md` + 当前 `gap-analysis.md`（上一轮 Gap 方向走不通，需换方向）
 > **Output**: `gap-analysis.md` + `contribution.md` (初始化)
 
-**本质**: 从知识库中**组合推导**出有价值的研究空白。这不是灵感闪现，而是系统性搜索。
+**本质**: 从知识库中**组合推导**出有价值的研究空白。这不是灵感闪现，而是系统性搜索。利用 `kb-index.md` 的结构化索引做精确检索，利用 NotebookLM 做跨论文语义查询发现隐含关联。
 
 **为什么独立成阶段？**
 Gap 是稳定的锚点，Method 可以迭代。两者必须解耦——好的 gap 不应因为第一个 method 失败而被放弃。
@@ -586,7 +890,7 @@ Gap 不是"看到一篇论文就有了"，而是知识库中多个条目的**交
 
 ### Phase 4: Method Design (方法设计)
 
-> **Input (首次)**: `gap-analysis.md` + `project-startup.md` + 知识库 (Methods Bank)
+> **Input (首次)**: `gap-analysis.md` + `project-startup.md` + 知识库 (`kb-index.md` Methods Bank 索引 + NotebookLM 语义查询)
 > **Input (迭代 — Phase 5 Revise)**: + `method-review.md`（审查意见，需针对性修改）
 > **Input (迭代 — Phase 8 L2 Swap)**: + `iteration-log.md` + 当前 `method-design.md`（定位到失败组件，需替换）
 > **Input (迭代 — Phase 8 L3 Redesign)**: + `iteration-log.md` + 当前 `method-design.md`（方法框架需重新设计）
@@ -709,7 +1013,7 @@ Gap 根因 (来自 gap-analysis.md)
 
 ### Phase 6: Experiment Design (实验设计)
 
-> **Input (首次)**: `gap-analysis.md` + `method-design.md` + 知识库 (Experimental Patterns)
+> **Input (首次)**: `gap-analysis.md` + `method-design.md` + 知识库 (`kb-index.md` Experimental Patterns 索引)
 > **Input (迭代 — Phase 7 Revise)**: + `experiment-review.md`（审查意见，需针对性修改）
 > **Output**: `experiment-design.md` (high-level 实验 spec)
 
@@ -1159,6 +1463,7 @@ Related Work 不是简单的文献罗列。它需要：
 3. **迭代历史总结** — 如果有 iteration-log.md，总结迭代历程和每次迭代的教训
 4. **知识库资产提取** — 将项目经验转化为四类可复用资产（见下方）
 5. **写入 retrospective.md** — 结构化的项目回顾文档
+6. **Pipeline 进化** — 综合 `pipeline-evolution-log.md` 中积累的流程反思，识别高置信度改进，经用户确认后正式修改 pipeline.md 和 Skills（详见核心机制第5条）
 
 **知识库更新（回馈 Phase 0）**:
 
@@ -1182,6 +1487,7 @@ Related Work 不是简单的文献罗列。它需要：
 - 成败分析（what worked / what didn't / why）
 - 迭代历史总结（如有）
 - 知识库更新清单（新增/修改了哪些知识库条目）
+- Pipeline 进化记录（本次修改了哪些流程文档）
 - 对未来相关项目的建议
 
 **AI Co-Author 在此阶段的关键行为**:
@@ -1196,6 +1502,7 @@ Related Work 不是简单的文献罗列。它需要：
 - [ ] 失败项目：失败根因已清晰记录，已排除方案已标注
 - [ ] 成功项目：关键成功因素已提炼，可复用模式已识别
 - [ ] 对未来相关项目的建议已记录
+- [ ] Pipeline 进化：pipeline-evolution-log.md 已审阅，高置信度改进已执行或记录
 
 **对应 Skill**: `/retrospective` (`skills/retrospective-skill.md`)
 **对应模板**: `templates/retrospective.md`
@@ -1207,7 +1514,7 @@ Related Work 不是简单的文献罗列。它需要：
 ### 已识别的模式
 
 1. **Phase 即纯函数** — 每个 Phase 是 `f(Input Docs) → Output Docs`，上下文无关，输出不重叠
-2. **知识库驱动的组合推导** — Gap 和 Method 都不是灵感闪现，而是从知识库中系统性组合推导出来的
+2. **知识库驱动的组合推导** — Gap 和 Method 都不是灵感闪现，而是从知识库（本地结构化索引 + NotebookLM 语义层）中系统性组合推导出来的
 3. **组件化方法设计** — 方法 = 可插拔组件的框架，组件可独立审查和替换
 4. **双 Todo 交替执行** — code-todo.md (写什么代码) + experiment-todo.md (跑什么实验)，交替推进
 5. **五维实验设计** — Dim 0 快速验证 + Dim 1-3 核心验证 + Dim 4 科学发现
@@ -1220,6 +1527,9 @@ Related Work 不是简单的文献罗列。它需要：
 12. **迭代输入接口** — Phase 签名 `f(Base [, Iteration Context]) → Output`，回调时携带 review 报告或 iteration-log.md，避免从零开始或重蹈覆辙
 13. **Exit Assessment Gate** — Agent 驱动的退出评估，嵌入在 L2-4 回调和 Review Block 中，只要有合理可能就不放弃
 14. **知识闭环** — Phase 11 Retrospective 将项目经验（含失败）沉淀回 Phase 0 知识库，形成复利效应
+15. **流程自进化** — 两层机制：每个 Phase 后轻量反思（观察收集），Phase 11 综合进化（正式修改）。pipeline.md 是活文档，随项目经验持续改进
+16. **Agent 自主论文发现** — 两级阅读系统（Quick Scan 筛选 + Deep Read 入库），Agent 自主搜索论文而非等待人类喂入，知识库规模决定 Gap Discovery 的天花板
+17. **双层知识库** — 本地结构化 Markdown（精确检索 + Pipeline 集成）+ NotebookLM 语义层（跨论文关联发现），两层互补
 
 ### 待探索的优化方向
 - Related Work 的自动化文献调研流程
@@ -1234,7 +1544,10 @@ Related Work 不是简单的文献罗列。它需要：
 ### 模板
 | 模板 | 文件 | 用于 |
 |------|------|------|
-| 论文阅读笔记 | `templates/paper-reading-note.md` | Phase 0 |
+| 研究方向配置 | `templates/research-directions.md` | Phase 0 (论文发现) |
+| 阅读队列 | `templates/reading-queue.md` | Phase 0 (论文发现 → 深读) |
+| 知识库索引 | `templates/kb-index.md` | Phase 0 (跨论文索引) |
+| 论文阅读笔记 | `templates/paper-reading-note.md` | Phase 0 (深读产出) |
 | 项目启动文档 | `templates/project-startup.md` | Phase 1 |
 | Gap 分析 | `templates/gap-analysis.md` | Phase 2 |
 | 方法设计 | `templates/method-design.md` | Phase 4 |
@@ -1243,6 +1556,7 @@ Related Work 不是简单的文献罗列。它需要：
 | 贡献跟踪 | `templates/contribution.md` | Phase 2, 4, 8 |
 | 迭代日志 | `templates/iteration-log.md` | Phase 8 (L2-4退出时) |
 | 项目回顾 | `templates/retrospective.md` | Phase 11 |
+| Pipeline 进化日志 | `templates/pipeline-evolution-log.md` | 各 Phase (反思时) |
 | 项目 CLAUDE.md | `templates/project-claude-md.md` | Phase 8 |
 
 ### Skills
@@ -1250,7 +1564,8 @@ Related Work 不是简单的文献罗列。它需要：
 #### 工作 Phase Skills
 | Skill | 文件 | Phase | 触发场景 |
 |-------|------|-------|---------|
-| `/paper-reading` | `skills/paper-reading-skill.md` | Phase 0 | 阅读并沉淀论文 |
+| `/paper-discovery` | `skills/paper-discovery-skill.md` | Phase 0 | 自主发现论文 + Quick Scan 筛选 |
+| `/paper-reading` | `skills/paper-reading-skill.md` | Phase 0 | 深度阅读 + 知识资产提取 + NotebookLM 上传 |
 | `/project-startup` | `skills/project-startup-skill.md` | Phase 1 | 启动新研究项目 |
 | `/gap-discovery` | `skills/gap-discovery-skill.md` | Phase 2 | 系统性发现研究空白 |
 | `/method-design` | `skills/method-design-skill.md` | Phase 4 | 设计解决 Gap 的方法 |
@@ -1260,7 +1575,12 @@ Related Work 不是简单的文献罗列。它需要：
 | `/impl-full` | `skills/impl-full-skill.md` | Phase 8b | 补全实现 + Dim 1-4 完整实验 |
 | `/paper-writing` | `skills/paper-writing-skill.md` | Phase 9 | 论文撰写 |
 | `/rebuttal` | — | Phase 10 | 投稿与 Rebuttal（暂缓） |
-| `/retrospective` | `skills/retrospective-skill.md` | Phase 11 | 项目回顾与知识回收 |
+| `/retrospective` | `skills/retrospective-skill.md` | Phase 11 | 项目回顾与知识回收 + Pipeline 进化 |
+
+#### 跨阶段 Skill
+| Skill | 文件 | 触发场景 |
+|-------|------|---------|
+| `/reflect-pipeline` | `skills/reflect-pipeline-skill.md` | 任何 Phase Skill 完成后，反思流程改进点 |
 
 #### Review Skill（通用框架 + 配置）
 | Skill | 文件 | Phase | 触发场景 |
