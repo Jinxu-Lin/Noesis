@@ -1,4 +1,4 @@
-# ResearchFlow: AI-Agent 协作科研方法论
+# Noesis: AI-Agent 协作科研方法论
 
 ## 愿景
 将科研全流程产品化，研究者作为"产品经理"，AI Agent 作为"工程团队"，
