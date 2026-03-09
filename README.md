@@ -95,6 +95,21 @@ cp ~/Documents/Noesis/Logos/templates/research-directions.md $KB/
 /praxis-research ~/Documents/MyProject   # 热重启，自动跳过已排除方向
 ```
 
+### 同化已有项目
+
+```bash
+/praxis-assimilate ~/Documents/ExistingProject
+# 重建阶段文档 + 运行真实 R2/R4/R6 评审，使其可被 /praxis-research 或 /praxis-paper 接管
+```
+
+### 生成进展演示
+
+```bash
+/praxis-present ~/Documents/MyProject
+# 生成 presentation.md，用于与导师/合作者的进展汇报
+# 支持热启动：已有 presentation.md 时增量更新，保留人工编辑
+```
+
 ## 环境
 
 ```
