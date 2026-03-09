@@ -83,23 +83,46 @@ Phase 7 Experiment Review 判定 Pass，开始代码实现阶段的第一步：�
 - 常用运行命令
 - 数据路径和格式说明
 
-### Step 4.5: Git 多 Agent 并行实验准备（如需）
+### Step 4.5: 远程服务器环境配置
 
-如果计划让多个 Agent 并行运行不同实验，在进入 Step 5 之前设置分支结构：
+本地写代码，远程跑实验。在项目根目录创建 `env.json`（已 .gitignore，每台机器独立）：
+
+```json
+{
+  "remote": {
+    "host": "gpu-server-alias",
+    "project_path": "/home/user/projects/<项目名>",
+    "conda_env": "research",
+    "gpu": "A100"
+  }
+}
+```
+
+**远程环境初始化**（通过 SSH MCP）：
+```bash
+# 在远程服务器上 clone 项目
+ssh <host> "cd /home/user/projects && git clone <repo_url>"
+
+# 安装依赖
+ssh <host> "cd <project_path>/Code && conda activate <env> && pip install -r requirements.txt"
+
+# 验证环境
+ssh <host> "cd <project_path>/Code && python -c 'import torch; print(torch.cuda.is_available())'"
+```
+
+**工作流**：本地写代码 → `git push` → SSH MCP 到服务器 `git pull` → 运行实验 → 结果 `git commit + push` → 本地 `git pull` 取回结果。
+
+### Step 4.6: Git 多 Agent 并行实验准备（如需）
+
+如果计划让多个 Agent 并行运行不同实验：
 
 **同一机器多 Agent（Worktree）**:
 ```bash
-# 主工作树负责 main 分支和协调
-# 为每个并行实验 Agent 创建独立 worktree
 git worktree add ../[项目名]-wt/exp-[名称] -b exp/[名称]
-# 例如：
-git worktree add ../my-paper-wt/exp-ablation-A -b exp/ablation-A
-git worktree add ../my-paper-wt/exp-baseline-full -b exp/baseline-full
 ```
 
 **跨服务器（Branch + Push）**:
 ```bash
-# 各服务器分别 checkout 独立分支
 git checkout -b exp/[名称] && git push -u origin exp/[名称]
 ```
 

@@ -6,7 +6,7 @@
 
 - **一句话描述**: [本项目做什么]
 - **目标会议/期刊**: [如有]
-- **ResearchFlow 路径**: `[ResearchFlow 中央仓库的绝对路径]`
+- **Noesis 路径**: `~/Documents/Noesis`（跨机器自动适配，勿硬编码用户名）
 
 ## 当前状态
 
@@ -67,9 +67,23 @@ Code/
 
 ### 环境配置
 
+**本地**：
 ```bash
 # 依赖安装
 # 数据准备
+```
+
+**远程服务器**（P8 实验执行）：
+```yaml
+# 在项目根目录创建 env.json（已加入 .gitignore，每台机器独立配置）
+# {
+#   "remote": {
+#     "host": "gpu-server-alias",
+#     "project_path": "/home/user/projects/<项目名>",
+#     "conda_env": "research",
+#     "gpu": "A100"
+#   }
+# }
 ```
 
 ### 运行命令

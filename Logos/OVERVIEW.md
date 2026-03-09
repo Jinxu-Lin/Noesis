@@ -1,30 +1,30 @@
-# PaperReading 子系统
+# Logos 子系统
 
-> 独立于 ResearchFlow 研究流程的**持续知识积累系统**。在项目启动之前、期间和之后均可独立运行。
+> 独立于 Praxis 研究流程的**持续知识积累系统**。在项目启动之前、期间和之后均可独立运行。
 
 ---
 
 ## 这是什么
 
-PaperReading 是 ResearchFlow 生态的前置子系统，负责持续扩充**领域知识库 (Knowledge Base)**，为未来的研究项目提供知识储备。
+Logos 是 Noesis 生态的知识积累子系统，负责持续扩充**领域知识库 (Knowledge Base)**，为未来的研究项目提供知识储备。
 
-与 ResearchFlow（P1-P11 线性研究流程）不同，PaperReading **没有固定的起止点**——它是一个循环运行的知识积累引擎。
+与 Praxis（P1-P11 线性研究流程）不同，Logos **没有固定的起止点**——它是一个循环运行的知识积累引擎。
 
 ---
 
 ## 两个子系统的关系
 
 ```
-PaperReading（知识积累）
+Logos（知识积累）
     │
     ├── 论文发现 (/paper-reading:discover)
     │       ↓
     ├── 深度阅读 (/paper-reading:read)
     │       ↓
-    └── 知识库 (kb/)
+    └── 知识库 (LogosBase/)
             │
             ↓  知识注入
-    ResearchFlow（研究执行）
+    Praxis（研究执行）
     P1 → P2 → P3 → P4 → P5 → P6 → P7 → P8 → P9 → P11
 ```
 
@@ -34,25 +34,40 @@ PaperReading（知识积累）
 
 ---
 
+## 路径约定
+
+| 路径 | 说明 |
+|------|------|
+| Noesis 根目录 | `~/Documents/Noesis` |
+| Logos 子系统 | `~/Documents/Noesis/Logos/` |
+| 知识库产出 (LogosBase) | `~/Documents/LogosBase` |
+
+Logos 系统代码与知识库产出**分离存放**：系统本身在 Noesis 仓库中，产出在 LogosBase 中。两者均通过 GitHub 跨 Mac 同步。
+
+---
+
 ## 子系统文件结构
 
 ```
-paper-reading/
-├── OVERVIEW.md              ← 本文件
+Logos/                               ← Noesis 仓库内
+├── OVERVIEW.md                      ← 本文件
 ├── skills/
-│   ├── paper-discovery-skill.md   ← 论文发现与筛选
-│   └── paper-reading-skill.md     ← 深度阅读与知识沉淀
-└── templates/
-    ├── research-directions.md     ← 研究方向配置（搜索参数）
-    ├── reading-queue.md           ← 论文阅读队列
-    ├── kb-index.md                ← 知识库总索引
-    └── paper-reading-note.md      ← 单篇论文笔记模板
+│   ├── paper-discovery-skill.md     ← 论文发现与筛选
+│   └── paper-reading-skill.md       ← 深度阅读与知识沉淀
+├── templates/
+│   ├── research-directions.md       ← 研究方向配置（搜索参数）
+│   ├── reading-queue.md             ← 阅读队列
+│   ├── kb-index.md                  ← 知识库总索引
+│   └── paper-reading-note.md        ← 单篇论文笔记模板
+└── plugin/commands/
+    ├── paper-reading-discover/      ← /paper-reading:discover 命令
+    └── paper-reading-read/          ← /paper-reading:read 命令
 ```
 
-**知识库目录结构**（在具体项目或共享知识库目录中）：
+**知识库产出目录**（LogosBase）：
 
 ```
-kb/
+LogosBase/
 ├── kb-index.md              ← 从 templates/ 初始化
 ├── reading-queue.md         ← 从 templates/ 初始化
 ├── research-directions.md   ← 从 templates/ 初始化
@@ -63,38 +78,43 @@ kb/
 
 ## 快速开始
 
-### 1. 初始化知识库
+### 1. 配置 Plugin
 
-在你的项目目录或共享知识库目录中，复制模板文件：
+Logos 的 slash commands 通过 `.claude/skills/` 注册（项目级），在 Noesis 仓库目录下使用 Claude Code 即可直接调用，无需额外配置。
+
+### 2. 初始化知识库
 
 ```bash
-KB_DIR=/path/to/your/kb
-mkdir -p $KB_DIR
-cp /home/jinxulin/ResearchFlow/paper-reading/templates/kb-index.md $KB_DIR/
-cp /home/jinxulin/ResearchFlow/paper-reading/templates/reading-queue.md $KB_DIR/
-cp /home/jinxulin/ResearchFlow/paper-reading/templates/research-directions.md $KB_DIR/
+KB_DIR="$HOME/Documents/LogosBase"
+LOGOS="$HOME/Documents/Noesis/Logos"
+cp "$LOGOS/templates/kb-index.md" "$KB_DIR/"
+cp "$LOGOS/templates/reading-queue.md" "$KB_DIR/"
+cp "$LOGOS/templates/research-directions.md" "$KB_DIR/"
 ```
 
-### 2. 配置研究方向
+### 3. 配置研究方向
 
-编辑 `kb/research-directions.md`，填入：
+编辑 `LogosBase/research-directions.md`，填入：
 - 核心关键词 / 扩展关键词
 - 种子论文（用于引用链追踪）
 - 目标 Venue 列表
 - 关注作者
 
-### 3. 发现论文
+### 4. 发现论文
 
 ```
-/paper-reading:discover <kb_path>
+/paper-reading-discover ~/Documents/LogosBase
 ```
 
-自动搜索 arXiv、Semantic Scholar，按相关性评分，更新 `reading-queue.md`。
+或省略路径（使用默认 LogosBase 路径）：
+```
+/paper-reading:discover
+```
 
-### 4. 深度阅读
+### 5. 深度阅读
 
 ```
-/paper-reading:read <kb_path>
+/paper-reading:read
 ```
 
 对 `reading-queue.md` 中的高优先论文进行深度阅读，提取五类知识资产，更新 `kb-index.md`。
@@ -103,19 +123,9 @@ cp /home/jinxulin/ResearchFlow/paper-reading/templates/research-directions.md $K
 
 ## Plugin 命令
 
-在 `~/.claude/settings.json` 中启用 plugin 后可用：
-
-```json
-{ "pluginDirs": ["/home/jinxulin/ResearchFlow/plugin"] }
-```
-
 | 命令 | 说明 |
 |------|------|
-| `/paper-reading:discover <kb_path>` | 论文发现：搜索、评分、更新阅读队列 |
-| `/paper-reading:read <kb_path>` | 深度阅读：阅读论文、提取知识资产、更新知识库 |
+| `/paper-reading:discover [kb_path]` | 论文发现：搜索、评分、更新阅读队列 |
+| `/paper-reading:read [kb_path]` | 深度阅读：阅读论文、提取知识资产、更新知识库 |
 
----
-
-## 共用工具
-
-`/reflect-pipeline`（位于 `ResearchFlow/skills/reflect-pipeline-skill.md`）由两个子系统共享。每个阶段完成后调用，将流程反思追加到 `pipeline-evolution-log.md`。
+`kb_path` 可省略，默认为 LogosBase 路径。

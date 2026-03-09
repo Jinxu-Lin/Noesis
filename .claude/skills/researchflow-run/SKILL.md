@@ -1,9 +1,13 @@
+---
+description: "ResearchFlow 自动化运行器：执行完整研究流程"
+---
+
 # Skill: ResearchFlow 自动化运行器
 
 ## 触发
 
 ```
-/researchflow:run <project_path>
+/researchflow-run <project_path>
 ```
 
 ---
@@ -43,7 +47,7 @@ python3 $RUNNER next <project_path>
 
 - `yes` → 继续步骤 3
 - `skip` → 直接执行步骤 4（runner.py advance 会读取已有 outcome 或以 done 推进）
-- `stop` → 输出"已暂停，下次运行 `/researchflow:run <project_path>` 继续。"，**退出循环**
+- `stop` → 输出"已暂停，下次运行 `/researchflow-run <project_path>` 继续。"，**退出循环**
 
 若 JSON 含 `iteration_warning`，展示后同样等待用户确认（yes/stop）再继续。
 

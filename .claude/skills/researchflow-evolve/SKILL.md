@@ -1,3 +1,7 @@
+---
+description: "从已完成项目提取经验教训，注入全局 lessons"
+---
+
 # Skill: ResearchFlow 跨项目进化（Evolution）
 
 > 从已完成的项目中提取经验教训，注入到全局 lessons 目录，使未来项目的 fork agent 自动获益。
@@ -6,7 +10,7 @@
 ## 触发
 
 ```
-/researchflow:evolve <project_path>
+/researchflow-evolve <project_path>
 ```
 
 ---

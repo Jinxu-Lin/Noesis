@@ -1,9 +1,13 @@
+---
+description: "ResearchFlow 项目状态查看器"
+---
+
 # Skill: ResearchFlow 项目状态查看器
 
 ## 触发
 
 ```
-/researchflow:status <project_path>
+/researchflow-status <project_path>
 ```
 
 ---
@@ -52,7 +56,7 @@ python3 <researchflow_path>/orchestrator/state_machine.py next <project_path>
 
 ### 下一步
 
-运行 `/researchflow:run <project_path>` 继续自动化流程。
+运行 `/researchflow-run <project_path>` 继续自动化流程。
 或手动执行当前阶段的 Skill。
 ```
 

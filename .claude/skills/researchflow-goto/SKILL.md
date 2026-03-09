@@ -1,3 +1,7 @@
+---
+description: "ResearchFlow 强制跳转到指定阶段"
+---
+
 # Skill: ResearchFlow 强制跳转
 
 > 强制将状态机设置到指定阶段。用于：outcome 判断出错需手动纠正、人工决定回退或跳过某阶段。
@@ -5,7 +9,7 @@
 ## 触发
 
 ```
-/researchflow:goto <project_path> <phase>
+/researchflow-goto <project_path> <phase>
 ```
 
 有效的 phase 值：`P1` `P2` `P3` `P4` `P5` `P6` `P7` `P8a` `P8a_validate` `P8b` `P9` `P11`
@@ -22,5 +26,5 @@ python3 <researchflow_path>/orchestrator/state_machine.py init-phase <project_pa
 输出确认：
 ```
 ✓ 强制跳转：当前阶段已设置为 <phase>
-   运行 /researchflow:run <project_path> 继续。
+   运行 /researchflow-run <project_path> 继续。
 ```
