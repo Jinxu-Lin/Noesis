@@ -1,4 +1,4 @@
-# ResearchFlow Pipeline
+# Noesis Pipeline
 
 > 本文档是你（AI Co-Author）在研究项目中的**完整方法论参考**。
 > 每个研究项目都会包含一份本文档的副本。当你进入一个新项目时，从这里开始。
@@ -27,10 +27,9 @@
 | method-design.md | Phase 4 完成 | `/review method` |
 | method-review.md (Pass) | Phase 5 通过 | `/experiment-design` |
 | experiment-design.md | Phase 6 完成 | `/review experiment` |
-| experiment-review.md (Pass) | Phase 7 通过 | `/impl-setup` |
-| CLAUDE.md Code/ 子节已填写 + baseline 复现 | Phase 8 环境就绪 | `/impl-validate` |
-| Dim 0 通过 | Phase 8a 完成 | `/impl-full` |
-| 全部实验完成 | Phase 8b 完成 | `/paper-writing` |
+| experiment-review.md (Pass) | Phase 7 通过 | `/impl-planning` |
+| Codes/ 目录（code-todo.md + experiment-todo.md + CLAUDE.md） | Phase 8 完成 | 退出自动化，人工编码&实验 |
+| 实验完成 | 人工阶段结束 | `/paper-writing` |
 | Papers/ 论文草稿 | Phase 9 完成 | 投稿准备 |
 | retrospective.md | Phase 11 完成 | 项目结束 |
 
@@ -38,17 +37,17 @@
 
 ### 资源路径约定
 
-本文档中引用的 Skill、模板、SubAgent 文件均位于 ResearchFlow 中央仓库：
+本文档中引用的 Skill、模板、SubAgent 文件均位于 Noesis 中央仓库：
 
 ```
-ResearchFlow/               ← 中央方法论仓库
+Noesis/               ← 中央方法论仓库
 ├── pipeline.md              ← 本文档（副本放入每个项目）
 ├── skills/                  ← Skill 文件
 ├── subagents/               ← SubAgent 提示词模板
 └── templates/               ← 文档模板
 ```
 
-项目 CLAUDE.md 中会标注 ResearchFlow 仓库的路径。执行 Skill 时，从该路径读取对应文件。
+项目 CLAUDE.md 中会标注 Noesis 仓库的路径。执行 Skill 时，从该路径读取对应文件。
 
 ---
 
@@ -56,7 +55,7 @@ ResearchFlow/               ← 中央方法论仓库
 
 **AI 不是助手，不是搜索引擎，不是旁观者。AI 是 Co-Author。**
 
-在 ResearchFlow 中，人类研究者与 AI 的关系是：
+在 Noesis 中，人类研究者与 AI 的关系是：
 
 ```
 人类研究者 (PM + 领域直觉 + 创造性判断)
@@ -95,7 +94,7 @@ AI Agent (Co-Author + 技术执行 + 跨领域关联 + 批判性审视)
 
 ### Phase 的定义
 
-在 ResearchFlow 中，**Phase 是一个上下文无关的纯函数**：
+在 Noesis 中，**Phase 是一个上下文无关的纯函数**：
 
 ```
 Phase = f(Input Documents [, Iteration Context]) → Output Documents
@@ -152,18 +151,18 @@ Phase 0: Paper Discovery & Reading (Agent 自主驱动，知识库积累)       
 ║      知识库组合推导 → gap-analysis.md + contribution.md(初始化)              ║
 ║                                                                             ║
 ║      迭代输入 (如有):                                                        ║
-║        ← P3 Revise: +gap-review.md                                          ║
-║        ← P8 L4 Pivot: +iteration-log.md + 当前 gap-analysis.md             ║
+║        ← R3 Revise: +gap-review.md                                          ║
+║        ← R8 L4 Pivot: +iteration-log.md + 当前 gap-analysis.md             ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
          │                        ▲                  ▲
          ▼                        │ Revise           │ L4 Pivot
 ┌─────────────────────────────────┼──────────────────┼──────────────────────┐
 │  Phase 3: Gap Review 🔒         │                  │                     │
-│    Pass ──→ P4                  │                  │                     │
+│    Pass ──→ R4                  │                  │                     │
 │    Revise ──────────────────────┘                  │                     │
 │    Block → Exit Assessment Gate                    │                     │
-│              ├─ Continue → P1 (重新选题)            │                     │
-│              └─ Abandon ─────────────────────────────────────→ P11       │
+│              ├─ Continue → R1 (重新选题)            │                     │
+│              └─ Abandon ─────────────────────────────────────→ R11       │
 └──────────────────────────────────────────────────────────────────────────┘
          │ Pass
          ▼
@@ -172,19 +171,19 @@ Phase 0: Paper Discovery & Reading (Agent 自主驱动，知识库积累)       
 ║      gap-analysis.md + Methods Bank → method-design.md + contribution.md↑   ║
 ║                                                                             ║
 ║      迭代输入 (如有):                                                        ║
-║        ← P5 Revise: +method-review.md                                       ║
-║        ← P8 L2 Swap: +iteration-log.md + 当前 method-design.md             ║
-║        ← P8 L3 Redesign: +iteration-log.md + 当前 method-design.md         ║
+║        ← R5 Revise: +method-review.md                                       ║
+║        ← R8 L2 Swap: +iteration-log.md + 当前 method-design.md             ║
+║        ← R8 L3 Redesign: +iteration-log.md + 当前 method-design.md         ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
          │                        ▲              ▲           ▲
          ▼                        │ Revise       │ L2 Swap   │ L3 Redesign
 ┌─────────────────────────────────┼──────────────┼───────────┼─────────────┐
 │  Phase 5: Method Review 🔒      │              │           │             │
-│    Pass ──→ P6                  │              │           │             │
+│    Pass ──→ R6                  │              │           │             │
 │    Revise ──────────────────────┘              │           │             │
 │    Block → Exit Assessment Gate                │           │             │
-│              ├─ Continue → P2 (重新定义Gap)     │           │             │
-│              └─ Abandon ─────────────────────────────────────────→ P11   │
+│              ├─ Continue → R2 (重新定义Gap)     │           │             │
+│              └─ Abandon ─────────────────────────────────────────→ R11   │
 └──────────────────────────────────────────────────────────────────────────┘
          │ Pass
          ▼
@@ -193,17 +192,17 @@ Phase 0: Paper Discovery & Reading (Agent 自主驱动，知识库积累)       
 ║      gap-analysis.md + method-design.md → experiment-design.md (Dim 0-4)    ║
 ║                                                                             ║
 ║      迭代输入 (如有):                                                        ║
-║        ← P7 Revise: +experiment-review.md                                   ║
+║        ← R7 Revise: +experiment-review.md                                   ║
 ╚═══════════════════════════════════════════════════════════════════════════════╝
          │                        ▲
          ▼                        │ Revise
 ┌─────────────────────────────────┼────────────────────────────────────────┐
 │  Phase 7: Experiment Review 🔒  │                                        │
-│    Pass ──→ P8                  │                                        │
+│    Pass ──→ R8                  │                                        │
 │    Revise ──────────────────────┘                                        │
 │    Block → Exit Assessment Gate                                          │
-│              ├─ Continue → P4 (重新设计方法)                               │
-│              └─ Abandon ─────────────────────────────────────→ P11       │
+│              ├─ Continue → R4 (重新设计方法)                               │
+│              └─ Abandon ─────────────────────────────────────→ R11       │
 └──────────────────────────────────────────────────────────────────────────┘
          │ Pass
          ▼
@@ -214,7 +213,7 @@ Phase 0: Paper Discovery & Reading (Agent 自主驱动，知识库积累)       
 ║  │    code-todo (核心) → experiment-todo (Dim 0)                        │  ║
 ║  │         │                                                            │  ║
 ║  │         ▼                                                            │  ║
-║  │      通过? ── 否 ──┬─ L1 Tune (调参/微调，留在 P8) ──→ 重试 Dim 0   │  ║
+║  │      通过? ── 否 ──┬─ L1 Tune (调参/微调，留在 R8) ──→ 重试 Dim 0   │  ║
 ║  │         │          │                                                 │  ║
 ║  │         │          ├─ L2 Swap ──────→ iteration-log.md ──┐           │  ║
 ║  │         │          ├─ L3 Redesign ──→ iteration-log.md ──┤           │  ║
@@ -222,8 +221,8 @@ Phase 0: Paper Discovery & Reading (Agent 自主驱动，知识库积累)       
 ║  │         │                                                │           │  ║
 ║  │         │                         Exit Assessment Gate ◄─┘           │  ║
 ║  │         │                          ├─ Continue → 回调目标Phase       │  ║
-║  │         │                          │    L2/L3 → P4 | L4 → P2        │  ║
-║  │         │                          └─ Abandon → P11                  │  ║
+║  │         │                          │    L2/L3 → R4 | L4 → R2        │  ║
+║  │         │                          └─ Abandon → R11                  │  ║
 ║  │       是 ▼                                ▲     ▲     ▲              │  ║
 ║  └──────────┼────────────────────────────────┼─────┼─────┼──────────────┘  ║
 ║             ▼                                │     │     │                 ║
@@ -237,10 +236,10 @@ Phase 0: Paper Discovery & Reading (Agent 自主驱动，知识库积累)       
 ║  │    实验结果 + 图表 + contribution.md↑                                │  ║
 ║  └─────────────────────────────────────────────────────────────────────┘  ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
-         │                          ┌─ L2 Swap ──────────→ P4 (替换组件)
-         │                          ├─ L3 Redesign ──────→ P4 (重新设计)
-         │    ◄── 回调路径汇总 ──── ├─ L4 Pivot ─────────→ P2 (重新选Gap)
-         │                          └─ Abandon ──────────→ P11 (中止退出)
+         │                          ┌─ L2 Swap ──────────→ R4 (替换组件)
+         │                          ├─ L3 Redesign ──────→ R4 (重新设计)
+         │    ◄── 回调路径汇总 ──── ├─ L4 Pivot ─────────→ R2 (重新选Gap)
+         │                          └─ Abandon ──────────→ R11 (中止退出)
          │
          ▼ (实验全部通过)
 ╔═══════════════════════════════════════════════════════════════════════════════╗
@@ -259,9 +258,9 @@ Phase 0: Paper Discovery & Reading (Agent 自主驱动，知识库积累)       
 ║  Phase 11: Project Retrospective                    [知识回收 — 终止态Phase] ║
 ║                                                                              ║
 ║      ●─────────────────────────────────────────────────────────● ◄──────────╗║
-║      │  入口 A: P10 完成 (自然完成)                            │            ║║
-║      │  入口 B: Exit Assessment Gate Abandon (中止退出)        │  ◄─ P3/P5 ║║
-║      │                                                        │  ◄─ P7/P8 ║║
+║      │  入口 A: R10 完成 (自然完成)                            │            ║║
+║      │  入口 B: Exit Assessment Gate Abandon (中止退出)        │  ◄─ R3/R5 ║║
+║      │                                                        │  ◄─ R7/R8 ║║
 ║      │  所有项目文档 + iteration-log.md                        │            ║║
 ║      │    → retrospective.md + 知识库更新                      │            ║║
 ║      ●─────────────────────────────────────────────────────────●            ║║
@@ -287,9 +286,9 @@ Phase 8 实验失败时，按影响范围递增选择迭代级别：
 | 级别 | 行动 | 去向 | 影响范围 |
 |------|------|------|---------|
 | L1 调参 | 调整超参数/训练策略 | 留在 Phase 8 | 仅改配置 |
-| L2 换组件 | 替换失败组件 | → P4 → P5 → ... → P8 | 改一个模块 |
-| L3 换框架 | 重新设计方法框架 | → P4 → P5 → P6 → P7 → P8 | 重写大部分代码 |
-| L4 换方向 | 回到 Gap Discovery | → P2 | 项目方向调整 |
+| L2 换组件 | 替换失败组件 | → R4 → R5 → ... → R8 | 改一个模块 |
+| L3 换框架 | 重新设计方法框架 | → R4 → R5 → R6 → R7 → R8 | 重写大部分代码 |
+| L4 换方向 | 回到 Gap Discovery | → R2 | 项目方向调整 |
 
 L2-4 退出时产出 `iteration-log.md`（追加模式），作为目标 Phase 的迭代输入，携带失败诊断和约束传递。
 
@@ -346,7 +345,7 @@ project-startup.md ──→ gap-analysis.md ──→ method-design.md ──�
 ```
 project/
 ├── CLAUDE.md                  ← 项目入口：概览、当前阶段、下一步、文档目录
-├── pipeline.md                ← 方法论参考（从 ResearchFlow 复制）
+├── pipeline.md                ← 方法论参考（从 Noesis 复制）
 ├── project-startup.md         ← Phase 1 产出
 ├── gap-analysis.md            ← Phase 2 产出
 ├── gap-review.md              ← Phase 3 产出
@@ -379,14 +378,14 @@ project/
 
 ### Git 管理约定
 
-ResearchFlow 使用**双仓库**架构：
+Noesis 使用**双仓库**架构：
 
 | 仓库 | 内容 | 职责 |
 |------|------|------|
-| **ResearchFlow repo** | `pipeline.md` + `skills/` + `templates/` | 方法论框架，跨项目共享，版本化演进 |
+| **Noesis repo** | `pipeline.md` + `skills/` + `templates/` | 方法论框架，跨项目共享，版本化演进 |
 | **Project repo** | 项目文档 + 知识库 + `Code/` + `Papers/` | 单个研究项目的全部产出 |
 
-#### ResearchFlow 框架同步
+#### Noesis 框架同步
 
 **何时 Pull**（开始任何实质工作前检查）:
 - 启动新项目（`/project-startup`）之前
@@ -399,7 +398,7 @@ ResearchFlow 使用**双仓库**架构：
 
 ```bash
 # Pull（进入任何工作前检查更新）
-cd [ResearchFlow路径] && git pull origin main
+cd [Noesis路径] && git pull origin main
 
 # Push（框架进化后）
 git add pipeline.md skills/ templates/
@@ -496,39 +495,38 @@ git merge exp/baseline-compare
 
 ## 一·五、自动化运行器（Pipeline Orchestrator）
 
-> **核心理念**：Phase 1 启动后，P1→P11 是一条线性的、文档驱动的流水线。除 Phase 8（代码/实验执行）需要人工确认外，其余阶段可由状态机全程自动推进。
+> **核心理念**：Phase 1 启动后，R1→R11 是一条线性的、文档驱动的流水线。除 Phase 8（代码/实验执行）需要人工确认外，其余阶段可由状态机全程自动推进。
 
 ### 架构概览
 
 ```
-ResearchFlow/
+Noesis/
 ├── orchestrator/
-│   └── state_machine.py        ← Python 状态机（纯计算，不执行任何 Skill）
+│   └── research_state_machine.py        ← Python 状态机（纯计算，不执行任何 Skill）
 └── plugin/
     └── commands/
-        ├── researchflow-run/   ← /researchflow:run  自动化运行器（主循环）
-        └── researchflow-status/ ← /researchflow:status 项目状态查看
+        ├── praxis-run/         ← /praxis-run  自动化运行器（主循环）
+        └── praxis-status/      ← /praxis-status 项目状态查看
 ```
 
-**两层架构**（模仿 Sibyl System 设计）：
+**两层架构**：
 
 | 层次 | 职责 |
 |------|------|
-| `state_machine.py` | 纯函数状态机：读 `pipeline-status.json` → 返回下一个 action JSON |
-| `researchflow-run` Skill | 执行主循环：调用状态机 → 生成 fork subagent 执行 Skill → 读取 outcome → 推进状态机 |
+| `research_state_machine.py` | 纯函数状态机：读 `pipeline-status.json` → 返回下一个 action JSON |
+| `praxis-run` Skill | 执行主循环：调用状态机 → 生成 fork subagent 执行 Skill → 读取 outcome → 推进状态机 |
 
 ### 快速启动
 
 ```bash
-# 加载 ResearchFlow 插件（一次性配置）
-# 在 ~/.claude/settings.json 中添加：
-# { "pluginDirs": ["/path/to/ResearchFlow/plugin"] }
+# 启动新项目（交互式 R1）
+/praxis-start <project_name>
 
 # 查看当前项目状态
-/researchflow:status /path/to/project
+/praxis-status /path/to/project
 
-# 从当前阶段自动推进流水线
-/researchflow:run /path/to/project
+# 从当前阶段自动推进流水线（R2 onward）
+/praxis-run /path/to/project
 ```
 
 ### 状态文件：`pipeline-status.json`
@@ -537,15 +535,15 @@ ResearchFlow/
 
 ```json
 {
-  "phase": "P4",
+  "phase": "R4",
   "last_updated": "2026-03-09T12:00:00",
   "history": [
-    {"phase": "P1", "outcome": "done", "timestamp": "..."},
-    {"phase": "P2", "outcome": "done", "timestamp": "..."},
-    {"phase": "P3", "outcome": "pass", "timestamp": "..."}
+    {"phase": "R1", "outcome": "done", "timestamp": "..."},
+    {"phase": "R2", "outcome": "done", "timestamp": "..."},
+    {"phase": "R3", "outcome": "pass", "timestamp": "..."}
   ],
-  "iter_P2": 1,
-  "iter_P3": 1
+  "iter_R2": 1,
+  "iter_R3": 1
 }
 ```
 
@@ -572,26 +570,22 @@ ResearchFlow/
 | Outcome 类型 | 有效值 |
 |-------------|--------|
 | 工作阶段 | `done` |
-| 审查阶段 | `pass` \| `revise` \| `continue_P1/P2/P4` \| `abandon` |
-| 实现验证 | `pass` \| `L1` \| `continue_P4` \| `continue_P2` \| `abandon` |
-| 完整实验 | `done` \| `continue_P4` \| `continue_P2` \| `abandon` |
+| 审查阶段 | `pass` \| `revise` \| `continue_R1/R2/R4` \| `abandon` |
 
 ### 人工检查点
 
-以下阶段在启动前需要人工确认（涉及代码执行/GPU 实验）：
+R8 完成实验规划后，自动化暂停。人工完成编码和实验后，运行 `/praxis-run` 继续 R9。
 
-- **P8a** — 实现环境搭建
-- **P8a_validate** — 核心实现与 Dim 0 快速验证
-- **P8b** — 完整实验（Dim 1-4）
+- **R9** — 论文写作（需人工确认编码和实验已完成）
 
-其余阶段（P1-P7、P9、P11）可全自动推进。
+R1-R8 和 R11 可全自动推进（R1 通过 `/praxis-start` 交互式启动）。
 
 ### 项目 CLAUDE.md 配置
 
-在项目 CLAUDE.md 中添加以下字段，供运行器读取：
+项目 CLAUDE.md 中需包含 Noesis 路径字段，供运行器定位 Praxis orchestrator：
 
 ```yaml
-researchflow_path: /home/jinxulin/ResearchFlow
+Noesis 路径: ~/Documents/Noesis
 ```
 
 ---
@@ -774,7 +768,7 @@ Quick Scan 的筛选标准（综合评分 1-5）:
 - [ ] Sources → Gap → Direction 逻辑闭环成立
 - [ ] 研究者确认 project-startup.md 内容
 
-**对应 Skill**: `/project-startup` (`skills/project-startup-skill.md`)
+**对应 Skill**: `/project-startup` (`skills/startup-skill.md`)
 **对应模板**: `templates/project-startup.md`
 
 ---
@@ -1352,9 +1346,8 @@ Exit Assessment SubAgent 的输入：
 - [ ] 结果支撑 contribution.md 中的 claims
 - [ ] contribution.md 已更新（含实验发现的新贡献）
 
-**对应 Skill**: `/impl-setup` + `/impl-validate` + `/impl-full` (`skills/impl-*-skill.md`)
-**对应 SubAgent**: `subagents/iteration-diagnosis-subagent.md` + `subagents/exit-assessment-subagent.md`
-**对应模板**: `templates/project-claude-md.md`, `templates/experiment-todo.md`
+**对应 Skill**: `/impl-planning` (`skills/impl-planning-skill.md`)
+**注意**: R8 仅做规划，产出 `Codes/` 目录（code-todo.md + experiment-todo.md + CLAUDE.md）。实际编码和实验由人工完成。
 
 ---
 
@@ -1566,13 +1559,11 @@ Related Work 不是简单的文献罗列。它需要：
 |-------|------|-------|---------|
 | `/paper-discovery` | `skills/paper-discovery-skill.md` | Phase 0 | 自主发现论文 + Quick Scan 筛选 |
 | `/paper-reading` | `skills/paper-reading-skill.md` | Phase 0 | 深度阅读 + 知识资产提取 + NotebookLM 上传 |
-| `/project-startup` | `skills/project-startup-skill.md` | Phase 1 | 启动新研究项目 |
+| `/project-startup` | `skills/startup-skill.md` | Phase 1 | 启动新研究项目 |
 | `/gap-discovery` | `skills/gap-discovery-skill.md` | Phase 2 | 系统性发现研究空白 |
 | `/method-design` | `skills/method-design-skill.md` | Phase 4 | 设计解决 Gap 的方法 |
 | `/experiment-design` | `skills/experiment-design-skill.md` | Phase 6 | 设计五维验证体系 |
-| `/impl-setup` | `skills/impl-setup-skill.md` | Phase 8 环境 | 代码起点选择 + Baseline 复现 |
-| `/impl-validate` | `skills/impl-validate-skill.md` | Phase 8a | 核心实现 + Dim 0 快速验证 |
-| `/impl-full` | `skills/impl-full-skill.md` | Phase 8b | 补全实现 + Dim 1-4 完整实验 |
+| `/impl-planning` | `skills/impl-planning-skill.md` | Phase 8 | 实验规划（产出 Codes/ 目录） |
 | `/paper-writing` | `skills/paper-writing-skill.md` | Phase 9 | 论文撰写 |
 | `/rebuttal` | — | Phase 10 | 投稿与 Rebuttal（暂缓） |
 | `/retrospective` | `skills/retrospective-skill.md` | Phase 11 | 项目回顾与知识回收 + Pipeline 进化 |
@@ -1593,5 +1584,4 @@ Related Work 不是简单的文献罗列。它需要：
 | SubAgent | 文件 | 调用方 | 职责 |
 |----------|------|--------|------|
 | Review SubAgent | `subagents/review-subagent.md` | `/review` Skill | 独立审查，消除确认偏误 |
-| Exit Assessment Gate | `subagents/exit-assessment-subagent.md` | `/review` (Block) + `/impl-validate` (L2-4) | 评估项目是否值得继续 |
-| Iteration Diagnosis | `subagents/iteration-diagnosis-subagent.md` | `/impl-validate` + `/impl-full` | 实验失败诊断 + 迭代级别判定 |
+| Exit Assessment Gate | `subagents/exit-assessment-subagent.md` | `/review` (Block) | 评估项目是否值得继续 |

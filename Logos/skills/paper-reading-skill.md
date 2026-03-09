@@ -12,6 +12,36 @@
 
 ## 执行流程
 
+### Step 0: 同步知识库
+在任何操作前，先拉取远端最新状态：
+```bash
+cd /path/to/Episteme  # 替换为实际 kb_path
+git pull origin main
+```
+
+### Step 0.5: 重复检查
+
+在开始深读前，检查该论文是否已在知识库中：
+
+1. 若已确定 arXiv ID，检查 `<kb_path>/<arxiv-id>.md` 是否存在
+2. 若只有标题/关键词，在 `kb-index.md` 的已读论文索引中模糊匹配标题
+
+**若论文已存在**，告知用户并询问处理方式：
+
+> 该论文已在知识库中（笔记：`<arxiv-id>.md`）。请选择：
+> - **[1] 跳过** — 保留现有笔记，不做任何操作
+> - **[2] 重新阅读（覆盖）** — 完整重走阅读流程，覆盖原有笔记
+> - **[3] 仅更新 Cross-Paper Connections** — 不覆盖笔记，仅基于当前 KB 重新建立与已有论文的关联
+
+根据用户选择：
+- 选 **[1]**：直接结束，跳过后续所有步骤
+- 选 **[2]**：继续执行 Step 1 及后续完整流程
+- 选 **[3]**：跳至 Step 3D（Cross-Paper Connections），完成后更新笔记中的该章节和 `kb-index.md` 中的关联索引，然后跳至 Step 7.5 提交
+
+**若论文不存在**，继续正常流程。
+
+---
+
 ### Step 1: 预读准备
 - 如果论文来自 `reading-queue.md`，读取其 Quick Scan 摘要，带着初步理解进入深读
 - 读取 `kb-index.md`，了解当前知识库的覆盖范围，为 Step 4 的 cross-paper connections 做准备
@@ -59,15 +89,10 @@
 - 可复用评估脚本/pipeline：如论文提供了评估代码，记录其路径和用法
 - **目的**：为 Phase 8 实现阶段提供工程起点，避免从零构建
 
-### Step 4: 上传至 NotebookLM
-- 将论文上传到 NotebookLM 对应研究方向的 notebook 中
-- 如果 notebook 不存在，创建一个
-- 上传方式：优先使用 arXiv URL（NotebookLM 可直接解析），其次使用文本粘贴
-
-### Step 5: 生成论文笔记
+### Step 4: 生成论文笔记
 按 `templates/paper-reading-note.md` 模板输出，保存到知识库目录。
 
-### Step 6: 更新知识库索引
+### Step 5: 更新知识库索引
 更新 `kb-index.md`：
 - 已读论文索引：新增论文条目
 - Methods Bank 索引：新增方法条目
@@ -77,10 +102,10 @@
 - Reusable Resources 索引：新增代码/数据集/模型条目
 - 更新统计数字
 
-### Step 7: 更新阅读队列
+### Step 6: 更新阅读队列
 如论文来自 `reading-queue.md`，将其状态从"待读"更新为"已完成"，记录笔记文件路径。
 
-### Step 7a: 更新领域地图（条件触发）
+### Step 6a: 更新领域地图（条件触发）
 检查该论文所属研究方向在 `kb-index.md` 中的已读论文数量：
 - **≥ 5 篇且 `domain-landscape.md` 不存在**：生成该方向的领域地图（按 `templates/domain-landscape.md` 模板）
 - **已存在 `domain-landscape.md`**：基于新论文的资产更新相关章节（现状摘要、SOTA、方向饱和度、资源汇总）
@@ -93,16 +118,18 @@
 4. 研究方向信号（有前景的方向、值得警惕的陷阱、跨领域启发）
 5. 可用资源汇总（聚合该方向下所有论文的 Reusable Resources）
 
-### Step 7.5: Git 提交 KB 更新
-将本次阅读产出提交到项目仓库：
+### Step 6.5: Git 提交并推送 KB 更新
+将本次阅读产出提交并推送到远端：
 ```bash
-git add kb/[paper-id].md kb-index.md reading-queue.md
+cd /path/to/Episteme  # 替换为实际 kb_path
+git add .
 git commit -m "kb: add [论文标题简写] ([arXiv ID])"
+git push origin main
 ```
 
 如果当前在 worktree 分支（`kb/[arxiv-id]`），提交后通知协调 Agent 可以合并此分支。
 
-### Step 8: 与研究者交互
+### Step 7: 与研究者交互
 - 确认理解是否准确
 - 如果发现了高价值的 cross-paper connection 或隐式假设，主动提出
 - 询问研究者是否有特别想深入的部分
@@ -119,7 +146,6 @@ git commit -m "kb: add [论文标题简写] ([arXiv ID])"
 - 论文笔记文档（保存到知识库目录）
 - `kb-index.md`（更新）
 - `reading-queue.md`（更新，如适用）
-- NotebookLM notebook（论文已上传）
 
 ## Exit Criteria
 - [ ] 论文级理解完整（能说清 storyline、核心方法、实验设计）
@@ -127,11 +153,10 @@ git commit -m "kb: add [论文标题简写] ([arXiv ID])"
 - [ ] 至少识别了 1 个 Gap/隐式假设（含可攻击性评估）
 - [ ] 已提取 Reusable Resources（开源代码/数据集/预训练模型，如有）
 - [ ] 已与 kb-index.md 中的已有论文建立 connections（如有）
-- [ ] 论文已上传至 NotebookLM
 - [ ] kb-index.md 已更新
 - [ ] reading-queue.md 已更新（如适用）
 - [ ] 如该方向已读论文 ≥ 5 篇，domain-landscape.md 已生成或更新
-- [ ] KB 更新已 git commit（worktree 场景已通知协调 Agent 可合并）
+- [ ] KB 更新已 git commit + git push（worktree 场景已通知协调 Agent 可合并）
 
 ## 完成后
 提示用户：论文深度阅读完成，知识库已更新。如果阅读队列中还有高优先论文，建议继续执行 `/paper-reading`。

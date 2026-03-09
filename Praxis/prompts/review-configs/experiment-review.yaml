@@ -1,0 +1,114 @@
+# Experiment Review Configuration (Phase 7)
+# 被 /review experiment 加载
+
+review_type: Experiment Review
+phase_id: 7
+phase_name: "Experiment Review (实验设计审查)"
+
+# ── 多视角辩论配置 ──────────────────────────────────────────────────────
+# R7 辩论焦点：实验协议严格性、统计有效性、SOTA 对标、计算可行性、可证伪性
+debate_agents:
+  - empiricist      # 否证条件定义、最小 Pilot 设计、自我欺骗风险识别
+  - methodologist   # 评估协议审计：baseline 公平性、数据泄漏、ablation 完整性
+  - comparativist   # SOTA 核查：baseline 是否还是当前最强？（含在线搜索）
+  - skeptic         # 统计有效性：样本量、多重比较、混淆因素控制
+  - pragmatist      # 计算预算现实性：全套实验能否在资源限制内完成
+
+debate_output_subdir: R7   # phase-outcomes/debate/R7/
+# ───────────────────────────────────────────────────────────────────────
+
+# SubAgent 需要读取的文档
+input_docs:
+  required:
+    - gap-analysis.md
+    - method-design.md
+    - experiment-design.md
+    - contribution.md
+  optional:
+    - project-startup.md  # 含否证条件，用于验证实验设计是否能真正测试假设
+
+# 审查报告输出文件名
+output_doc: experiment-review.md
+
+# 审查维度
+# 注：P7 是最关键的 Review，借鉴 Sibyl Methodologist 视角大幅加强方法论审计
+review_dimensions:
+  - name: RQ 覆盖率
+    question: "是否每个 claim 都有实验支撑？"
+    criteria: "无遗漏的 claim-experiment 映射"
+
+  - name: Baseline 公平性与时效性（加强）
+    question: "对比方法是否是当前最强？竞争工作核查是否发现了更新的 SOTA？"
+    criteria: >
+      不能只挑弱 baseline 比。
+      主审查需结合 comparativist_search 的在线核查结果：
+      如发现比当前 baseline 更强的近期方法，必须说明是否应纳入比较。
+      Baseline 的超参数设置是否公平（有没有对 baseline 的刻意 under-tune）？
+
+  - name: 消融充分性
+    question: "是否能区分各组件的贡献？消融实验设计是否存在让本方法更好看的偏向？"
+    criteria: >
+      每个组件的必要性都可被验证。
+      特别检查：消融顺序是否会产生"最重要的组件最后消融，显得效果最大"的偏差。
+
+  - name: Metrics 合理性
+    question: "指标是否真的衡量了想衡量的东西？"
+    criteria: "指标与 RQ 的语义对应关系"
+
+  - name: 评估协议完整性（新增，借鉴 Methodologist 视角）
+    question: "实验协议是否能给出公正、无偏的评估？是否存在可能虚增效果的协议漏洞？"
+    criteria: >
+      Methodologist 核心审计清单：
+      1. 训练/验证/测试集划分是否有数据泄露风险？
+      2. 超参数选择是否在测试集上做了 early stopping 或 selection？
+      3. 随机种子是否固定/多种子报告均值和方差？
+      4. 评估指标是否会被"proxy metric gaming"——方法能针对指标优化但对真实任务无益？
+      5. 如果只汇报最好的一次实验，而不是平均，是否会产生误导？
+
+  - name: 假设可检验性（新增，借鉴 Revisionist + Empiricist 视角）
+    question: "实验设计是否能真正检验 gap-analysis.md 的核心假设？否证条件是否被纳入实验？"
+    criteria: >
+      回溯 project-startup.md Section 4.1 的否证条件（如有），
+      检查实验设计是否包含了能触发这些否证条件的测试场景。
+      如否证条件缺失或对应的实验维度缺失，需要 Revise。
+
+  - name: 快速验证 (Dim 0) 合理性
+    question: "Dimension 0 的通过标准是否合理？能否在 1 GPU-day 内提供有效早期信号？"
+    criteria: >
+      标准不能太松（通过了但 Dim 1-4 必定失败）也不能太严（几乎不可能通过）。
+      快速验证应是方法核心假设的最小可测试版本，而非缩水版完整实验。
+
+  - name: 可复现性
+    question: "实验描述是否足够详细以复现？"
+    criteria: "数据集、超参数、随机种子等"
+
+  - name: 审稿人预判（加强）
+    question: "审稿人最可能要求的额外实验？竞争工作核查发现的同类方法是否应作为额外 baseline？"
+    criteria: >
+      提前识别可能的 weakness。
+      特别结合 comparativist_search 结果：如发现近期竞争工作，
+      审稿人几乎必然要求与之比较——提前在实验设计中预留这个 baseline。
+
+# 战略预判引导（此处特别重要，因为 P7 Pass 后是代码实现的高成本阶段）
+strategic_foresight_hint: >
+  在战略预判中，重点回答（借鉴 Sibyl Strategist 的 PIVOT/PROCEED 框架）：
+  1. 如果 Dim 0 实验结果"有正向信号但未过线"（L1 Tune 场景），
+     最关键的调整点是什么？
+  2. 如果 Dim 0 "完全无正向信号"（L2/L3 场景），最可能的根因是方法的哪个组件？
+     （这实际上是在做 P8 失败的预诊断）
+  3. 如果需要 L4 Pivot，还有什么备选方向在 Gap 层面仍然成立？
+
+# 判定后的路由
+routing:
+  pass:
+    next_skill: "/impl-setup"
+    message: "Experiment Review 通过，建议进入 /impl-setup 开始代码实现。"
+
+  revise:
+    next_skill: "/experiment-design"
+    message: "实验设计需要修改，请进入 /experiment-design 进行迭代（experiment-review.md 将作为迭代输入）。"
+
+  block:
+    continue_skill: "/method-design"
+    continue_message: "实验设计的根本问题可能源于方法设计，建议返回 /method-design 重新审视。"
+    abandon_message: "Exit Assessment Gate 判定 Abandon，建议进入 /retrospective 进行项目回顾。"

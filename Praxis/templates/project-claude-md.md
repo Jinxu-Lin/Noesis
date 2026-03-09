@@ -1,6 +1,6 @@
 # [项目名称]
 
-> 项目入口文档。自动化运行器通过此文件读取 `researchflow_path`。
+> 项目入口文档。自动化运行器通过 Noesis 路径定位 Praxis orchestrator。
 
 ## 项目概览
 
@@ -12,7 +12,7 @@
 
 - **当前阶段**: Phase [X] ([阶段名称])
 - **执行模式**: 首次 / P[Y] Revise 迭代 / P8 L[N] 迭代
-- **下一步**: 运行 `/researchflow:run <项目路径>` 继续自动化流程
+- **下一步**: 运行 `/praxis-run <项目路径>` 继续自动化流程
 - **阶段历史**: P1 ✓ → P2 ✓ → P3 Pass → P4 ✓ → ...
 
 > 阶段状态由 `pipeline-status.json` 权威记录，本节仅供人类快速查阅。

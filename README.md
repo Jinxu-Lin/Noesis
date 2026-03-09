@@ -20,75 +20,45 @@
              Logos           Praxis
           (知识积累)        (研究执行)
               │                 │
-         论文发现/阅读      P1→P11 Pipeline
-              │                 │
-              └── LogosBase ────┘
-                  (知识库产出)
+         论文发现/阅读      R1→R8 研究循环
+              │            P1→P7 论文写作
+              └── Episteme ────┘
+                  (知识库)
 ```
 
 ### Logos — 持续知识积累
 
-独立于研究流程的**知识引擎**，负责持续扩充领域知识库：
+独立于研究流程的**循环知识引擎**：
 
-- **论文发现** — arXiv / Semantic Scholar 多策略搜索，按相关性评分，维护阅读队列
-- **深度阅读** — 提取五类知识资产（Methods Bank、Gaps、Experimental Patterns 等）
-- **知识沉淀** — 结构化索引，供 Praxis 在研究阶段消费
-
-命令：`/paper-reading-discover`、`/paper-reading-read`
+- **论文发现** (`/logos-discover`) — arXiv / Semantic Scholar 5 种搜索策略 + Quick Scan 评分，维护阅读队列
+- **深度阅读** (`/logos-read`) — 提取 5 类知识资产（Methods Bank、Gaps & Assumptions、Experimental Patterns、Cross-Paper Connections、Reusable Resources），生成论文笔记，条件触发领域地图生成
 
 ### Praxis — 自动化研究执行
 
-结构化 **12 阶段研究 Pipeline**，由 Python 状态机驱动：
+五大模块，由 Python 状态机驱动：
 
-| 阶段 | 内容 | 类型 |
+| 模块 | 内容 | 命令 |
 |------|------|------|
-| P1 | 项目启动 | work |
-| P2 | Gap 发现 | work |
-| P3 | Gap 评审 | review 🔒 |
-| P4 | 方法设计 | work |
-| P5 | 方法评审 | review 🔒 |
-| P6 | 实验设计 | work |
-| P7 | 实验评审 | review 🔒 |
-| P8a/b | 实现（环境→验证→全量） | work ⏸ |
-| P9 | 论文写作 | work |
-| P11 | 回顾与知识提炼 | work |
+| **Startup** | 交互式项目孵化（六维辩论压力测试）| `/praxis-start` |
+| **Research** | R1→R8 自动化研究循环 | `/praxis-research` |
+| **Code** | 人工编码 & 实验 | `/praxis-conclude`（失败重启） |
+| **Paper** | P1→P7 自动化论文写作 | `/praxis-paper` |
+| **Evolution** | 提取跨项目经验，进化框架 | `/praxis-evolve` |
 
-命令：`/researchflow-run`、`/researchflow-status`、`/researchflow-goto`、`/researchflow-evolve`
-
-## 环境
-
-所有内容存放于 `~/Documents/`，通过 GitHub 跨 Mac 同步：
+**Research 模块**（3 轮独立审查 + 可选 Codex 并行）：
 
 ```
-~/Documents/
-├── Noesis/                        ← 系统本身（GitHub 同步）
-│   ├── Logos/                     ← 知识积累子系统
-│   │   ├── skills/                ← 论文发现与阅读 skill
-│   │   └── templates/             ← 知识库模板
-│   ├── Praxis/                    ← 研究执行子系统
-│   │   ├── orchestrator/          ← Python 状态机 + runner
-│   │   ├── skills/                ← P1-P11 各阶段 skill
-│   │   ├── subagents/             ← SubAgent 提示词模板
-│   │   └── templates/             ← 研究项目文档模板
-│   ├── .claude/skills/            ← Slash commands 注册
-│   ├── pipeline.md                ← 方法论主文档
-│   └── CLAUDE.md                  ← Claude Code 项目指令
-│
-├── LogosBase/                     ← 知识库产出（独立 GitHub 仓库）
-│   ├── research-directions.md     ← 研究方向配置
-│   ├── reading-queue.md           ← 阅读队列
-│   ├── kb-index.md                ← 知识库总索引
-│   └── [arxiv-id].md              ← 论文笔记
-│
-└── <项目名>/                      ← 各研究项目（各自独立 GitHub 仓库）
-    ├── CLAUDE.md                  ← 项目入口（含 noesis_path）
-    ├── pipeline-status.json       ← Pipeline 状态
-    ├── phase-outcomes/            ← 各阶段产出
-    ├── Code/                      ← 代码（P8 阶段）
-    └── Papers/                    ← 论文（P9 阶段）
+R1 Gap Discovery → R2 审查🔒 → R3 Method Design → R4 审查🔒
+→ R5 Experiment Design → R6 审查🔒 → R7 Impl Planning → R8 Retrospective
 ```
 
-**多机协作**：两台 Mac 通过 `git push` / `git pull` 同步。P8 阶段实验通过 SSH MCP 在远程 GPU 服务器执行。
+**Paper 模块**（独立状态机）：
+
+```
+P1 Outline → P2 Sections → P3 Critique🔒 → P4 Integrate → P5 Final Review🔒 → P6 LaTeX → P7 Project Review🔒
+```
+
+其他命令：`/praxis-assimilate`（同化外部项目）、`/praxis-present`（生成进展演示）
 
 ## 快速开始
 
@@ -96,28 +66,48 @@
 
 ```bash
 # 初始化知识库（首次）
-cp ~/Documents/Noesis/Logos/templates/*.md ~/Documents/LogosBase/
+KB="$HOME/Documents/Episteme"
+cp ~/Documents/Noesis/Logos/templates/kb-index.md $KB/
+cp ~/Documents/Noesis/Logos/templates/reading-queue.md $KB/
+cp ~/Documents/Noesis/Logos/templates/research-directions.md $KB/
+# 编辑 Episteme/research-directions.md
 
-# 编辑研究方向
-# 打开 LogosBase/research-directions.md 填入关键词、种子论文等
-
-# 发现论文（在 Noesis 目录下使用 Claude Code）
-/paper-reading-discover
-
-# 深度阅读
-/paper-reading-read
+/logos-discover      # 发现论文，更新阅读队列
+/logos-read 5        # 深度阅读 5 篇
 ```
 
-### 2. 启动研究（Praxis）
+### 2. 启动与执行研究（Praxis）
 
 ```bash
-# 查看项目状态
-/researchflow-status <project_path>
+/praxis-start MyProject           # 交互式项目孵化
+/praxis-research ~/Documents/MyProject   # R1→R8 自动化
 
-# 运行自动化 pipeline
-/researchflow-run <project_path>
+# 人工编码实验...
+
+/praxis-paper ~/Documents/MyProject      # P1→P7 论文写作
+/praxis-evolve ~/Documents/MyProject     # 提取跨项目经验
 ```
 
-## 状态
+### 编码失败时热重启
 
-正在积极开发中。基于真实 AI/ML 科研项目经验持续迭代。
+```bash
+/praxis-conclude ~/Documents/MyProject   # 分析失败，写入 iteration-log
+/praxis-research ~/Documents/MyProject   # 热重启，自动跳过已排除方向
+```
+
+## 环境
+
+```
+~/Documents/
+├── Noesis/          ← 系统本身（GitHub 同步）
+├── Episteme/        ← 知识库（独立 GitHub 仓库）
+└── <项目名>/        ← 各研究项目（各自独立 GitHub 仓库）
+
+~/.noesis/lessons/   ← 跨项目经验教训（本地积累）
+```
+
+多机协作（Mac Mini + MacBook）通过 git 同步。R7 后的实验通过 SSH MCP 在远程 GPU 服务器执行。
+
+## 文档
+
+详细使用说明见 [introduction.md](introduction.md)。

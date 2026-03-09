@@ -11,6 +11,13 @@
 
 ## 执行流程
 
+### Step 0: 同步知识库
+在任何操作前，先拉取远端最新状态：
+```bash
+cd /path/to/Episteme  # 替换为实际 kb_path
+git pull origin main
+```
+
 ### Step 1: 解析研究方向
 读取 `research-directions.md`，提取：
 - 搜索关键词（核心 + 扩展）
@@ -128,5 +135,5 @@ git push origin main  # 或当前分支，跨服务器场景需 push 以同步
 - [ ] 向用户汇报了发现结果
 
 ## 完成后
-提示用户：论文发现完成，阅读队列已更新。建议执行 `/paper-reading` 对高优先论文进行深度阅读。
+提示用户：论文发现完成，阅读队列已更新。建议执行 `/logos-read` 对高优先论文进行深度阅读。
 然后执行 `/reflect-pipeline` 对本阶段的流程进行反思，记录改进观察。
