@@ -15,7 +15,7 @@ P1 大纲完成，按照大纲顺序写作各章节。
 
 ### 写作模式选择（执行前先确认）
 
-在开始写作前，尝试调用 `mcp__codex__codex` 检测 Codex MCP 是否可用：
+在开始写作前，尝试调用 `codex-cli` 检测 Codex MCP 是否可用：
 
 **模式 A — Codex 辅助写作**（Codex MCP 可用时）：
 1. 按照 `Praxis/prompts/codex-writer-prompt.md` 的步骤，逐章节委托 Codex 起草初稿
