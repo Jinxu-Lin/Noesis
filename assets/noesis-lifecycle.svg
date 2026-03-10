@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Noesis 研究生命周期</title>
+  <desc id="desc">Noesis 的五大模块与项目生命周期图，展示 Startup、Research、Code、Paper、Evolution 的关系。</desc>
+  <style>
+    .bg { fill: #f3f0ea; }
+    .window { fill: #fbfaf6; stroke: #ddd7cb; stroke-width: 2; }
+    .bar { fill: #f1ede6; stroke: #ddd7cb; stroke-width: 2; }
+    .card { fill: #fffdf9; stroke: #ddd7cb; stroke-width: 2; }
+    .title { fill: #0f1728; font: 700 72px Georgia, "Times New Roman", serif; }
+    .subtitle { fill: #667085; font: 500 26px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .headline { fill: #101828; font: 700 34px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .subhead { fill: #344054; font: 600 24px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .body { fill: #475467; font: 500 21px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .chipText { font: 600 18px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .badgeText { fill: #3b5ccc; font: 700 23px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .stepNum { fill: #ffffff; font: 700 26px Georgia, "Times New Roman", serif; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1600" height="1200" rx="32"/>
+  <rect class="window" x="36" y="26" width="1528" height="1148" rx="28"/>
+  <rect class="bar" x="36" y="26" width="1528" height="68" rx="28"/>
+  <rect class="bar" x="36" y="66" width="1528" height="28" rx="0"/>
+  <circle cx="76" cy="60" r="8" fill="#ff5f57"/>
+  <circle cx="102" cy="60" r="8" fill="#febc2e"/>
+  <circle cx="128" cy="60" r="8" fill="#28c840"/>
+  <text x="1490" y="64" text-anchor="end" class="subtitle">3 / 4</text>
+
+  <rect x="610" y="122" width="380" height="60" rx="30" fill="#eef2ff" stroke="#c7d2fe"/>
+  <text x="800" y="162" text-anchor="middle" class="badgeText">5 大模块 · 2 套状态机 · 1 条主线</text>
+  <text x="800" y="262" text-anchor="middle" class="title">研究生命周期</text>
+  <text x="800" y="316" text-anchor="middle" class="subtitle">从知识、立项、研究设计，到编码、论文与系统进化</text>
+
+  <line x1="150" y1="390" x2="150" y2="1000" stroke="#d7d2c5" stroke-width="8" stroke-linecap="round"/>
+
+  <rect class="card" x="220" y="348" width="1240" height="112" rx="24"/>
+  <rect class="card" x="220" y="480" width="1240" height="136" rx="24"/>
+  <rect class="card" x="220" y="636" width="1240" height="112" rx="24"/>
+  <rect class="card" x="220" y="768" width="1240" height="120" rx="24"/>
+  <rect class="card" x="220" y="908" width="1240" height="112" rx="24"/>
+
+  <circle cx="150" cy="404" r="28" fill="#203b8d"/>
+  <text x="150" y="414" text-anchor="middle" class="stepNum">1</text>
+  <circle cx="150" cy="548" r="28" fill="#0f9a66"/>
+  <text x="150" y="558" text-anchor="middle" class="stepNum">2</text>
+  <circle cx="150" cy="692" r="28" fill="#b36b00"/>
+  <text x="150" y="702" text-anchor="middle" class="stepNum">3</text>
+  <circle cx="150" cy="828" r="28" fill="#8a46d5"/>
+  <text x="150" y="838" text-anchor="middle" class="stepNum">4</text>
+  <circle cx="150" cy="964" r="28" fill="#d9485f"/>
+  <text x="150" y="974" text-anchor="middle" class="stepNum">5</text>
+
+  <text x="252" y="396" class="headline">Startup</text>
+  <text x="252" y="432" class="subhead">交互式立项与方向压力测试</text>
+  <text x="720" y="404" class="body">把模糊 idea 转化为可推进的研究方向，并完成六维辩论。</text>
+  <rect x="1228" y="382" width="172" height="34" rx="17" fill="#eef2ff"/>
+  <text x="1314" y="405" text-anchor="middle" class="chipText" fill="#3b5ccc">/praxis-start</text>
+
+  <text x="252" y="528" class="headline">Research</text>
+  <text x="252" y="564" class="subhead">R1-R8 自动化研究循环</text>
+  <text x="720" y="514" class="body">Gap Discovery → Review → Method → Review → Experiment → Review → Impl Planning → Retrospective</text>
+  <text x="720" y="550" class="body">研究阶段由主状态机驱动，审查门直接决定下一步路由。</text>
+  <rect x="1108" y="542" width="198" height="34" rx="17" fill="#eef2ff"/>
+  <text x="1207" y="565" text-anchor="middle" class="chipText" fill="#3b5ccc">/praxis-research</text>
+  <rect x="1318" y="542" width="110" height="34" rx="17" fill="#f4ebff"/>
+  <text x="1373" y="565" text-anchor="middle" class="chipText" fill="#7a35c1">Codex</text>
+
+  <text x="252" y="684" class="headline">Code</text>
+  <text x="252" y="720" class="subhead">人工编码与实验验证</text>
+  <text x="720" y="692" class="body">研究者根据 R7 产出的 code-todo 与 experiment-todo 执行实现与实验。</text>
+  <rect x="1140" y="670" width="198" height="34" rx="17" fill="#fff2e2"/>
+  <text x="1239" y="693" text-anchor="middle" class="chipText" fill="#b36b00">/praxis-conclude</text>
+
+  <text x="252" y="812" class="headline">Paper</text>
+  <text x="252" y="848" class="subhead">P1-P7 论文写作状态机</text>
+  <text x="720" y="806" class="body">Outline → Sections → Critique → Integrate → Final Review → LaTeX → Project Review</text>
+  <text x="720" y="842" class="body">论文模块与主研究状态机独立，但严格映射前期研究文档。</text>
+  <rect x="1228" y="814" width="164" height="34" rx="17" fill="#eef2ff"/>
+  <text x="1310" y="837" text-anchor="middle" class="chipText" fill="#3b5ccc">/praxis-paper</text>
+
+  <text x="252" y="956" class="headline">Evolution</text>
+  <text x="252" y="992" class="subhead">lessons 与框架进化</text>
+  <text x="720" y="964" class="body">项目经验写入 ~/.noesis/lessons，并反馈到 prompts / skills / templates。</text>
+  <rect x="1220" y="942" width="174" height="34" rx="17" fill="#f4ebff"/>
+  <text x="1307" y="965" text-anchor="middle" class="chipText" fill="#7a35c1">/praxis-evolve</text>
+
+  <path d="M 840 1070 H 1460" fill="none" stroke="#d6d1c4" stroke-width="2"/>
+  <text x="1148" y="1100" text-anchor="middle" class="subtitle">Research 与 Paper 分别由独立状态机驱动，Code 阶段由研究者主导</text>
+</svg>

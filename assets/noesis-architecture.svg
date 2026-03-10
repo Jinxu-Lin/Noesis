@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 980" role="img" aria-labelledby="title desc">
+  <title id="title">Noesis 系统结构</title>
+  <desc id="desc">Noesis 的系统结构图，展示 Logos、Episteme 与 Praxis 的关系，以及知识如何注入到 R1、R3、R5。</desc>
+  <style>
+    .bg { fill: #f3f0ea; }
+    .window { fill: #fbfaf6; stroke: #ddd7cb; stroke-width: 2; }
+    .bar { fill: #f1ede6; stroke: #ddd7cb; stroke-width: 2; }
+    .card { fill: #fffdf9; stroke: #ddd7cb; stroke-width: 2; }
+    .title { fill: #0f1728; font: 700 72px Georgia, "Times New Roman", serif; }
+    .subtitle { fill: #667085; font: 500 26px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .headline { fill: #101828; font: 700 34px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .subhead { fill: #344054; font: 600 26px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .body { fill: #475467; font: 500 21px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .small { fill: #667085; font: 500 18px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .chipText { font: 600 18px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .badgeText { fill: #3b5ccc; font: 700 23px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .step { fill: #101828; font: 700 24px Georgia, "Times New Roman", serif; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1600" height="980" rx="32"/>
+  <rect class="window" x="36" y="26" width="1528" height="928" rx="28"/>
+  <rect class="bar" x="36" y="26" width="1528" height="68" rx="28"/>
+  <rect class="bar" x="36" y="66" width="1528" height="28" rx="0"/>
+  <circle cx="76" cy="60" r="8" fill="#ff5f57"/>
+  <circle cx="102" cy="60" r="8" fill="#febc2e"/>
+  <circle cx="128" cy="60" r="8" fill="#28c840"/>
+  <text x="1490" y="64" text-anchor="end" class="subtitle">2 / 4</text>
+
+  <rect x="596" y="126" width="408" height="60" rx="30" fill="#eef2ff" stroke="#c7d2fe"/>
+  <text x="800" y="165" text-anchor="middle" class="badgeText">独立运行 · 知识连接 · 状态机驱动</text>
+  <text x="800" y="266" text-anchor="middle" class="title">系统结构</text>
+  <text x="800" y="320" text-anchor="middle" class="subtitle">Logos 与 Praxis 通过 Episteme 连接，但两者本身是独立子系统</text>
+
+  <rect class="card" x="90" y="392" width="430" height="330" rx="28"/>
+  <rect class="card" x="585" y="352" width="430" height="410" rx="28"/>
+  <rect class="card" x="1080" y="392" width="430" height="330" rx="28"/>
+
+  <text x="122" y="452" class="headline">Logos</text>
+  <text x="122" y="488" class="subhead">持续知识积累</text>
+  <text x="122" y="528" class="body">从论文发现到深度阅读，持续生产结构化知识资产。</text>
+  <rect x="122" y="556" width="176" height="34" rx="17" fill="#eef2ff"/>
+  <text x="210" y="579" text-anchor="middle" class="chipText" fill="#3b5ccc">/logos-discover</text>
+  <rect x="310" y="556" width="132" height="34" rx="17" fill="#eef2ff"/>
+  <text x="376" y="579" text-anchor="middle" class="chipText" fill="#3b5ccc">/logos-read</text>
+  <text x="122" y="632" class="body">• 5 种搜索策略</text>
+  <text x="122" y="668" class="body">• Quick Scan 四维评分</text>
+  <text x="122" y="704" class="body">• 5 类知识资产提取</text>
+
+  <text x="617" y="412" class="headline">Episteme</text>
+  <text x="617" y="448" class="subhead">研究知识库</text>
+  <text x="617" y="488" class="body">不是零散笔记，而是被 Praxis 可消费的系统级知识层。</text>
+  <rect x="617" y="522" width="160" height="34" rx="17" fill="#e8f7ef"/>
+  <text x="697" y="545" text-anchor="middle" class="chipText" fill="#248f5b">Methods Bank</text>
+  <rect x="789" y="522" width="190" height="34" rx="17" fill="#f4ebff"/>
+  <text x="884" y="545" text-anchor="middle" class="chipText" fill="#7a35c1">Gaps &amp; Assumptions</text>
+  <rect x="617" y="574" width="210" height="34" rx="17" fill="#fff2e2"/>
+  <text x="722" y="597" text-anchor="middle" class="chipText" fill="#b36b00">Experimental Patterns</text>
+  <rect x="839" y="574" width="146" height="34" rx="17" fill="#fff2e2"/>
+  <text x="912" y="597" text-anchor="middle" class="chipText" fill="#b36b00">Reusable Resources</text>
+  <text x="617" y="664" class="body">知识注入点：</text>
+  <text x="617" y="700" class="body">• R1 读取 Gaps 与 Assumptions</text>
+  <text x="617" y="736" class="body">• R3 读取 Methods Bank</text>
+  <text x="617" y="772" class="body">• R5 读取 Patterns 与 Resources</text>
+
+  <text x="1112" y="452" class="headline">Praxis</text>
+  <text x="1112" y="488" class="subhead">研究执行与论文推进</text>
+  <text x="1112" y="528" class="body">围绕项目生命周期运转，由研究状态机与论文状态机共同驱动。</text>
+  <rect x="1112" y="556" width="152" height="34" rx="17" fill="#eef2ff"/>
+  <text x="1188" y="579" text-anchor="middle" class="chipText" fill="#3b5ccc">/praxis-start</text>
+  <rect x="1278" y="556" width="178" height="34" rx="17" fill="#eef2ff"/>
+  <text x="1367" y="579" text-anchor="middle" class="chipText" fill="#3b5ccc">/praxis-research</text>
+  <rect x="1112" y="608" width="152" height="34" rx="17" fill="#eef2ff"/>
+  <text x="1188" y="631" text-anchor="middle" class="chipText" fill="#3b5ccc">/praxis-paper</text>
+  <rect x="1278" y="608" width="152" height="34" rx="17" fill="#eef2ff"/>
+  <text x="1354" y="631" text-anchor="middle" class="chipText" fill="#3b5ccc">/praxis-evolve</text>
+  <text x="1112" y="688" class="body">• Startup / Research / Code</text>
+  <text x="1112" y="724" class="body">• Paper / Evolution</text>
+
+  <path d="M 520 558 C 548 558, 556 558, 585 558" fill="none" stroke="#b7c2e6" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="573,548 595,558 573,568" fill="#b7c2e6"/>
+  <path d="M 1015 558 C 1044 558, 1050 558, 1080 558" fill="none" stroke="#b7c2e6" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="1068,548 1090,558 1068,568" fill="#b7c2e6"/>
+
+  <rect class="card" x="110" y="796" width="430" height="108" rx="24"/>
+  <rect class="card" x="585" y="796" width="430" height="108" rx="24"/>
+  <rect class="card" x="1060" y="796" width="430" height="108" rx="24"/>
+
+  <circle cx="150" cy="850" r="22" fill="#1f3b8f"/>
+  <text x="150" y="858" text-anchor="middle" class="step" fill="#ffffff">1</text>
+  <text x="188" y="842" class="subhead">知识先行</text>
+  <text x="188" y="874" class="small">研究前先积累可复用资产，而不是每次从零上下文开始。</text>
+
+  <circle cx="625" cy="850" r="22" fill="#0f9a66"/>
+  <text x="625" y="858" text-anchor="middle" class="step" fill="#ffffff">2</text>
+  <text x="663" y="842" class="subhead">状态机推进</text>
+  <text x="663" y="874" class="small">研究与论文写作各有独立状态机，状态显式、可恢复、可追踪。</text>
+
+  <circle cx="1100" cy="850" r="22" fill="#8a46d5"/>
+  <text x="1100" y="858" text-anchor="middle" class="step" fill="#ffffff">3</text>
+  <text x="1138" y="842" class="subhead">经验回流</text>
+  <text x="1138" y="874" class="small">项目结束后提炼 lessons，自动注入未来同类阶段。</text>
+</svg>

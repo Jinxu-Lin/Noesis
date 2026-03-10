@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1180" role="img" aria-labelledby="title desc">
+  <title id="title">Noesis 三步开始</title>
+  <desc id="desc">Noesis 的快速开始图，包含三步安装使用流程以及适用人群说明。</desc>
+  <style>
+    .bg { fill: #f3f0ea; }
+    .window { fill: #fbfaf6; stroke: #ddd7cb; stroke-width: 2; }
+    .bar { fill: #f1ede6; stroke: #ddd7cb; stroke-width: 2; }
+    .card { fill: #fffdf9; stroke: #ddd7cb; stroke-width: 2; }
+    .code { fill: #182746; }
+    .title { fill: #0f1728; font: 700 72px Georgia, "Times New Roman", serif; }
+    .subtitle { fill: #667085; font: 500 26px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .headline { fill: #101828; font: 700 34px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .body { fill: #475467; font: 500 21px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .mono { fill: #f8fafc; font: 600 24px Menlo, Monaco, Consolas, monospace; }
+    .badgeText { fill: #3b5ccc; font: 700 23px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .num { fill: #ffffff; font: 700 28px Georgia, "Times New Roman", serif; }
+    .fitHead { fill: #101828; font: 700 28px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+    .fitBody { fill: #667085; font: 500 19px "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="1600" height="1180" rx="32"/>
+  <rect class="window" x="36" y="26" width="1528" height="1128" rx="28"/>
+  <rect class="bar" x="36" y="26" width="1528" height="68" rx="28"/>
+  <rect class="bar" x="36" y="66" width="1528" height="28" rx="0"/>
+  <circle cx="76" cy="60" r="8" fill="#ff5f57"/>
+  <circle cx="102" cy="60" r="8" fill="#febc2e"/>
+  <circle cx="128" cy="60" r="8" fill="#28c840"/>
+  <text x="1490" y="64" text-anchor="end" class="subtitle">4 / 4</text>
+
+  <rect x="626" y="122" width="348" height="60" rx="30" fill="#eef2ff" stroke="#c7d2fe"/>
+  <text x="800" y="162" text-anchor="middle" class="badgeText">最短可运行路径</text>
+  <text x="800" y="262" text-anchor="middle" class="title">三步开始</text>
+  <text x="800" y="316" text-anchor="middle" class="subtitle">第一次使用 Noesis，不需要先理解全部细节</text>
+
+  <rect class="card" x="110" y="380" width="1380" height="130" rx="24"/>
+  <rect class="card" x="110" y="536" width="1380" height="130" rx="24"/>
+  <rect class="card" x="110" y="692" width="1380" height="130" rx="24"/>
+
+  <circle cx="190" cy="445" r="30" fill="#4f6bda"/>
+  <text x="190" y="456" text-anchor="middle" class="num">1</text>
+  <text x="244" y="434" class="headline">初始化 Episteme</text>
+  <text x="244" y="470" class="body">复制知识库模板，并填写 research-directions.md。</text>
+  <rect class="code" x="820" y="406" width="620" height="74" rx="16"/>
+  <text x="852" y="452" class="mono">$ cp Logos/templates/* ~/Documents/Episteme/</text>
+
+  <circle cx="190" cy="601" r="30" fill="#1ca46f"/>
+  <text x="190" y="612" text-anchor="middle" class="num">2</text>
+  <text x="244" y="590" class="headline">建立知识循环</text>
+  <text x="244" y="626" class="body">先发现论文，再把阅读结果沉淀成可复用资产。</text>
+  <rect class="code" x="820" y="562" width="620" height="74" rx="16"/>
+  <text x="852" y="608" class="mono">$ /logos-discover   &amp;&amp;   /logos-read 5</text>
+
+  <circle cx="190" cy="757" r="30" fill="#c77b11"/>
+  <text x="190" y="768" text-anchor="middle" class="num">3</text>
+  <text x="244" y="746" class="headline">启动并推进项目</text>
+  <text x="244" y="782" class="body">通过 Startup 孵化方向，再由 Research 状态机推进到编码阶段。</text>
+  <rect class="code" x="820" y="718" width="620" height="74" rx="16"/>
+  <text x="852" y="764" class="mono">$ /praxis-start   →   /praxis-research</text>
+
+  <path d="M 110 868 H 1490" fill="none" stroke="#d6d1c4" stroke-width="2"/>
+  <text x="800" y="940" text-anchor="middle" class="title" style="font-size:64px;">适合谁？</text>
+
+  <rect class="card" x="110" y="992" width="660" height="118" rx="24"/>
+  <rect class="card" x="830" y="992" width="660" height="118" rx="24"/>
+
+  <text x="148" y="1038" class="fitHead" fill="#3b5ccc">• 博士生与独立研究者</text>
+  <text x="148" y="1078" class="fitBody">需要从文献、方法、实验到论文持续推进，并且希望长期积累知识资产。</text>
+
+  <text x="868" y="1038" class="fitHead" fill="#8a46d5">• AI 研究团队与在研项目负责人</text>
+  <text x="868" y="1078" class="fitBody">希望把项目状态、评审门、迭代日志与 lessons 纳入统一方法体系。</text>
+</svg>

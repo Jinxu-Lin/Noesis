@@ -86,6 +86,19 @@ Noesis 选择的是第三条路线：**面向真实研究者的、监督优先�
 
 ---
 
+## 一图看懂 Noesis
+
+<p align="center">
+  <img src="assets/noesis-overview.svg" alt="Noesis 系统总览" width="48%" />
+  <img src="assets/noesis-architecture.svg" alt="Noesis 系统结构" width="48%" />
+</p>
+<p align="center">
+  <img src="assets/noesis-lifecycle.svg" alt="Noesis 研究生命周期" width="48%" />
+  <img src="assets/noesis-quickstart.svg" alt="Noesis 三步开始" width="48%" />
+</p>
+
+---
+
 ## 设计哲学
 
 Noesis 的设计建立在四个判断之上。
