@@ -14,7 +14,7 @@
 
 ---
 
-## 系统定位
+## Noesis介绍
 
 Noesis 是一套运行在 Claude Code 上的 **AI Agent 科研项目管理系统**，面向 AI/ML/DL 方向的研究者。
 
