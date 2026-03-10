@@ -1,317 +1,726 @@
-# Noesis — AI Agent 自动科研系统使用说明
+# Noesis 系统说明书
 
-> **Noesis**（希腊语 νόησις，认知/洞察）是一套运行在本地 Claude Code 上的 AI Agent 自动科研框架，面向 AI/ML/DL 方向。它将知识积累与研究执行分为两个独立子系统，从读论文到写出论文全流程自动化，同时保留关键节点的人机交互。
-
----
-
-## 一、系统总览
-
-```
-Logos（知识积累）              Praxis（研究执行）
-  /logos-discover               /praxis-start
-  /logos-read                   /praxis-research
-        │                        /praxis-paper
-        │  知识注入               /praxis-evolve
-        ▼
-   Episteme（知识库）
-   ~/Documents/Episteme
-        │
-        ├─ Gaps & Assumptions  →  R1 Gap Discovery
-        ├─ Methods Bank        →  R3 Method Design
-        └─ Experimental Patterns + Reusable Resources  →  R5 Experiment Design
-```
-
-**两个子系统**完全独立运行，唯一连接点是 **Episteme 知识库**：Logos 持续填充，Praxis 在 R1/R3/R5 三个阶段消费。
+> 本文档是 Noesis 的完整使用手册与架构说明。  
+> 如果 [README.md](README.md) 更像产品首页，那么这里就是可顺读、可查阅、可落地执行的系统说明书。
 
 ---
 
-## 二、环境与路径
+## 阅读导航
+
+如果你第一次接触 Noesis，建议按这个顺序阅读：
+
+1. `1-3` 节：理解 Noesis 的定位、路线与总体结构
+2. `4-5` 节：完成环境准备与最小可运行设置
+3. `6-13` 节：了解 Logos、Praxis 与所有核心命令
+4. `14-16` 节：查看典型工作流、CLI 与文件布局
+5. `17-19` 节：理解系统的设计原则与适用场景
+
+---
+
+## 1. Noesis 是什么
+
+**Noesis**（νόησις，认知与洞察）是一套运行在本地 **Claude Code** 上、面向 **AI/ML/DL 研究者与研究团队** 的科研操作系统。
+
+它的目标不是把研究者排除出流程，也不是把一切都压缩成一次性的 prompt 调用。  
+Noesis 更接近一套长期可运营的方法论框架：
+
+- 让知识积累成为系统资产，而不是聊天记录
+- 让研究推进成为可审查、可恢复、可复盘的过程
+- 让每个项目结束后沉淀出可回流的经验，而不是只留下零散文件
+
+Noesis 的基本立场很明确：
+
+**研究者负责方向判断与关键取舍，Agents 负责高强度执行与结构化劳动。**
+
+---
+
+## 2. Noesis 选择的路线
+
+同类科研辅助系统大致在朝两类方向发展：
+
+- **自治优先**：尽可能把端到端科研闭环交给 AI 自动完成
+- **广覆盖优先**：用大量 skills、commands、hooks 覆盖更多研究与开发场景
+
+Noesis 选择的是第三条路线：
+
+**监督优先、知识优先、复利优先。**
+
+这意味着 Noesis 的核心卖点不是“最像一个自主科研组织”，而是：
+
+- 更像一个**长期可运营的研究系统**
+- 更适合**对研究结果负责任的人**来使用
+- 更适合**个人或团队跨项目积累能力**
+
+---
+
+## 3. 系统总览
+
+Noesis 由两个**彼此独立**、但通过知识库相连的子系统组成。
+
+```text
+Logos  ─────────────→  Episteme  ─────────────→  Praxis
+知识积累                    知识库                    研究执行
+
+/logos-discover           Methods Bank            /praxis-start
+/logos-read               Gaps & Assumptions      /praxis-research
+                          Experimental Patterns   /praxis-paper
+                          Reusable Resources      /praxis-evolve
+                                                   /praxis-present
+                                                   /praxis-assimilate
+```
+
+### 3.1 四个核心概念
+
+| 概念 | 角色 | 职责 |
+|------|------|------|
+| **Noesis** | 顶层方法论框架 | 统一命令接口、流程约束、状态机、经验回流机制 |
+| **Logos** | 知识积累子系统 | 发现论文、深度阅读、提取结构化知识资产 |
+| **Episteme** | 外部知识库 | 存放阅读队列、论文笔记、领域地图与知识索引 |
+| **Praxis** | 研究执行子系统 | 管理项目从立项到论文写作再到复盘演化的生命周期 |
+
+### 3.2 为什么要拆成两个子系统
+
+Noesis 不把“读论文”和“做项目”混成一个大流程，原因很简单：
+
+- **知识积累** 是长期循环，没有固定终点
+- **项目推进** 是阶段性工作，有明确的状态和出口
+
+因此：
+
+- `Logos` 负责持续积累
+- `Praxis` 负责阶段推进
+- `Episteme` 负责把前者的产出转化为后者可消费的研究资产
+
+这使 Noesis 的整体形态更像一个闭环：
+
+**知识 → 判断 → 行动 → 经验回流 → 更好的知识与判断**
+
+---
+
+## 4. 环境与目录约定
+
+Noesis 当前面向 **本地 macOS + Claude Code + GitHub** 的工作流设计。
+
+### 4.1 推荐目录布局
+
+```text
+~/Documents/
+├── Noesis/           ← Noesis 系统本体（本仓库）
+├── Episteme/         ← 知识库仓库
+└── <ProjectName>/    ← 各研究项目，各自独立仓库
+
+~/.noesis/lessons/    ← 跨项目经验教训
+```
+
+### 4.2 各路径的含义
 
 | 路径 | 说明 | 同步方式 |
 |------|------|---------|
 | `~/Documents/Noesis` | Noesis 系统根目录 | GitHub |
-| `~/Documents/Episteme` | 知识库（Logos 产出） | GitHub |
-| `~/Documents/<项目名>` | 各研究项目 | GitHub（独立仓库） |
-| `~/.noesis/lessons/` | 跨项目经验教训 | 本地（各 Mac 独立积累） |
+| `~/Documents/Episteme` | Logos 产出的知识库 | GitHub |
+| `~/Documents/<项目名>` | 具体研究项目目录 | GitHub（每个项目独立仓库） |
+| `~/.noesis/lessons/` | 跨项目 lessons | 本地积累 |
 
-**多机协作**：Mac Mini + MacBook 通过 git 同步，所有路径使用 `~`，不硬编码用户名。
+### 4.3 环境假设
 
-**远程 GPU 服务器**：R7（Impl Planning）完成后，实验通过 SSH MCP 在远程服务器执行，代码经 git 同步，结果回传本地。
+- 多机协作通过 `git push` / `git pull` 完成
+- 所有路径统一使用 `~`，避免硬编码用户名
+- R7 之后的编码与实验可通过 SSH MCP 在远程 GPU 服务器执行
+- Noesis 仓库本身**不是具体项目仓库**，而是中央方法库与执行框架
 
 ---
 
-## 三、Logos — 持续知识积累
+## 5. 快速开始
 
-Logos 是一个没有终点的**循环知识引擎**：发现 → 阅读 → 知识沉淀 → 重复。
+### 5.1 初始化 Episteme
 
-### 使用流程
-
-**第一次使用：初始化知识库**
+首次使用时，先初始化知识库目录：
 
 ```bash
-KB_DIR="$HOME/Documents/Episteme"
-LOGOS="$HOME/Documents/Noesis/Logos"
-cp "$LOGOS/templates/kb-index.md" "$KB_DIR/"
-cp "$LOGOS/templates/reading-queue.md" "$KB_DIR/"
-cp "$LOGOS/templates/research-directions.md" "$KB_DIR/"
+KB="$HOME/Documents/Episteme"
+cp "$HOME/Documents/Noesis/Logos/templates/kb-index.md" "$KB/"
+cp "$HOME/Documents/Noesis/Logos/templates/reading-queue.md" "$KB/"
+cp "$HOME/Documents/Noesis/Logos/templates/research-directions.md" "$KB/"
 ```
 
-然后编辑 `Episteme/research-directions.md`，填入研究方向、核心关键词、种子论文、目标 Venue、关注作者。
+然后编辑：
 
-**日常循环**
+- `~/Documents/Episteme/research-directions.md`
 
-```
-/logos-discover          ← 发现新论文，更新阅读队列
-/logos-read              ← 深度阅读，提取知识资产，更新知识库
-```
+填入：
 
-### `/logos-discover` — 论文发现
+- 研究方向
+- 核心关键词
+- 种子论文
+- 目标 venue
+- 关注作者
 
-执行 5 种搜索策略，将高质量论文加入阅读队列：
-
-| 策略 | 说明 |
-|------|------|
-| A. 关键词搜索 | arXiv API + Semantic Scholar API，核心 × 扩展关键词 |
-| B. 引用链追踪 | 种子论文的前向/后向引用 |
-| C. 作者追踪 | 关注作者最新发表 |
-| D. Venue 追踪 | 目标会议最新论文 |
-| E. 争议/负面搜索 | negative results / criticism / replication failures |
-
-每篇候选论文经 **Quick Scan**（Title + Abstract + Conclusion）按 4 维度评分：
-
-| 维度 | 说明 |
-|------|------|
-| 研究方向相关性 | 与设定方向的匹配程度 |
-| 方法可复用性 | 核心方法/组件迁移潜力 |
-| 知识库互补性 | 是否填补 KB 空白 |
-| 隐式假设潜力 | 是否存在可被质疑的假设 |
-
-评分 ≥ 4 → 高优先队列；= 3 → 普通优先队列；≤ 2 → 跳过。
-
-完成后自动 git commit + push `reading-queue.md`。
-
-### `/logos-read [参数]` — 深度阅读
-
-参数格式：
-- 无参数 → 读队列最高优先级 1 篇
-- 数字（如 `5`）→ 依次读 N 篇
-- arXiv ID（如 `2405.12186`）→ 直接读指定论文
-- 标题关键词 → 在队列中匹配，匹配不到则直接搜索
-
-**提取 5 类知识资产**：
-
-| 资产类型 | 内容 |
-|---------|------|
-| **Methods Bank** | 核心机制、公式、适用条件、组件可解耦性分析 |
-| **Gaps & Assumptions** | 显式 limitation + 隐式可质疑假设（含可攻击性评估） |
-| **Experimental Patterns** | Baselines、metrics、消融策略、数据集选择逻辑 |
-| **Cross-Paper Connections** | 与 KB 已有论文的互补/矛盾/延伸/可结合关系 |
-| **Reusable Resources** | GitHub 代码、数据集、预训练模型 |
-
-完成后自动生成论文笔记、更新 `kb-index.md`，并在该方向已读 ≥ 5 篇时触发生成/更新 `domain-landscape.md`（领域地图）。
-
----
-
-## 四、Praxis — 研究执行
-
-Praxis 分为五大模块，驱动一个项目从研究想法到发表论文的完整生命周期。
-
-```
-Module 1: Startup      /praxis-start       交互式项目孵化
-           ↓
-Module 2: Research     /praxis-research    R1→R8 自动化研究循环
-           ↓
-Module 3: Code         （人工编码 + 实验）  /praxis-conclude 处理失败
-           ↓
-Module 4: Paper        /praxis-paper       P1→P7 自动化论文写作
-           ↓
-Module 5: Evolution    /praxis-evolve      提取跨项目经验教训
-```
-
-### Module 1：Startup — `/praxis-start <项目名>`
-
-交互式项目种子孵化，分七步完成：
-
-1. 研究者提供初始想法
-2. AI 整理研究背景与当前 SOTA
-3. AI 分析候选研究空白
-4. **六维辩论压力测试**（并行召唤 6 个 SubAgent）：
-   - 创新者（Innovator）— 放大亮点
-   - 务实者（Pragmatist）— 实现可行性
-   - 理论家（Theorist）— 理论基础
-   - 反对者（Contrarian）— 质疑假设
-   - 跨学科者（Interdisciplinary）— 跨领域视角
-   - 实验主义者（Empiricist）— 实验设计可行性
-   - 综合者汇总判定：方向确认 / 强化 / 修正 / HIGH RISK
-5. 研究者与 AI 共同确认研究方向
-6. 输出 `project-startup.md`（含完整辩论记录和已知风险列表）
-7. Git 初始化 + GitHub repo 创建，状态设为 R1
-
-完成后，`~/Documents/<项目名>/` 下已有完整的项目 `CLAUDE.md`、`pipeline-status.json`、`project-startup.md`。
-
-### Module 2：Research — `/praxis-research <项目路径>`
-
-自动化执行 R1→R8，由 `research_runner.py` 编排，每阶段 fork 独立 Agent 执行。
-
-#### 研究 Pipeline 阶段表
-
-| Phase | 内容 | Agent Tier | Codex | 出口 |
-|-------|------|-----------|-------|------|
-| **R1** Gap Discovery | 从 Episteme 提取 Gaps，发现研究空白，输出 `gap-analysis.md` | heavy | — | → R2 |
-| **R2** Gap Review | 独立审查 R1 成果（上下文隔离）+ 可选 Codex 外部视角 | heavy | ✓ | pass→R3 / revise→R1 / abandon→R8 |
-| **R3** Method Design | 从 Episteme Methods Bank 汲取，设计核心方法，输出 `method-design.md` | heavy | — | → R4 |
-| **R4** Method Review | 独立审查 R3 成果 + 可选 Codex | heavy | ✓ | pass→R5 / revise→R3 / continue_R1→R1 / abandon→R8 |
-| **R5** Experiment Design | 从 Episteme Patterns 汲取，设计实验规划，输出 `experiment-design.md` | heavy | — | → R6 |
-| **R6** Experiment Review | 独立审查 R5 成果 + 可选 Codex | heavy | ✓ | pass→R7 / revise→R5 / continue_R3→R3 / abandon→R8 |
-| **R7** Impl Planning | 产出 `Codes/` 目录（code-todo.md、experiment-todo.md），纯规划不写代码 | standard | — | → R8 |
-| **R8** Retrospective | 知识回收，总结本轮研究经验，写入迭代日志 | heavy | — | → coding |
-
-> **注意**：R8 在 R7 完成后、编码开始前执行（知识回收，不是在论文完成后）。
-
-#### Agent Tier 说明
-
-| Tier | 模型 | 角色 |
-|------|------|------|
-| `standard` | claude-sonnet-4-6 | AI Co-Author，执行性工作（R7, P2, P4, P6） |
-| `heavy` | claude-opus-4-6 | 独立批判审查者，严格不妥协（R1-R6, R8, P1, P3, P5, P7） |
-| `codex` | gpt-4.5-high | 可选外部 AI 审查，提供第三方视角（R2/R4/R6/P3/P7 并行） |
-
-Codex 审查 non-blocking：MCP 不可用时自动跳过，不影响主流程路由。Codex 结果写入 `codex-reviews/`，仅供参考，不参与路由决策。
-
-#### 迭代模式（Runner 自动注入）
-
-- **Revise 模式**：review 文件存在（如 `gap-review.md`）→ 工作阶段被提示"基于审查意见修改，不从零开始"
-- **Pivot 模式**：`iteration-log.md` 存在且阶段已迭代 → 被提示"热重启第 N 轮，严禁重复已排除方向"
-- **迭代守卫**：研究 pipeline ≥ 3 次迭代自动发出警告
-
-### Module 3：Code — 人工阶段
-
-R8 完成后进入人工编码阶段。参照 `Codes/` 目录中的规划文档：
-- `code-todo.md` — 代码实现任务列表
-- `experiment-todo.md` — 实验运行任务列表
-- 项目 `Codes/CLAUDE.md` — 编码阶段专用指导
-
-**验证通过** → 进入论文写作（`paper_writing` 阶段，再运行 `/praxis-paper`）
-
-**验证失败** → 运行 `/praxis-conclude` 进行失败总结：
-
-```
-/praxis-conclude <项目路径>
-```
-
-分析失败层级：
-- L2（换组件）→ 重置到 R3（Method Design）
-- L3（换框架）→ 重置到 R3
-- L4（换方向）→ 重置到 R1
-
-写入 `iteration-log.md`，重置 `pipeline-status.json`，然后重新运行 `/praxis-research` 热重启。热重启时 Runner 自动注入迭代历史，避免重复已排除方向。
-
-### Module 4：Paper — `/praxis-paper <项目路径>`
-
-独立状态机（`paper_state_machine.py` + `paper_runner.py`），与主 pipeline 完全解耦，状态持久化在 `Papers/paper-status.json`。
-
-#### 论文 Pipeline 阶段表
-
-| Phase | 内容 | Agent Tier | Codex |
-|-------|------|-----------|-------|
-| **P1** Outline | 从研究文档映射论文结构，输出完整大纲 | heavy | — |
-| **P2** Sections | 顺序写作各章节正文 | standard | — |
-| **P3** Critique | 5 角色并行审查（新颖性/方法/实验/写作/复现性）+ Codex 🔒 | heavy | ✓ |
-| **P4** Integrate | 编辑整合审查意见，精炼 Abstract | standard | — |
-| **P5** Final Review | 会议级终审评分（< 7.0 → 回到 P4，最多 2 轮）🔒 | heavy | — |
-| **P6** LaTeX | 生成 LaTeX 源码，编译 PDF | standard | — |
-| **P7** Project Review | 多视角项目级审查（Critic + Supervisor + 可选 Codex）🔒 | heavy | ✓ |
-
-🔒 = 上下文隔离的独立审查
-
-### Module 5：Evolution — `/praxis-evolve <项目路径>`
-
-项目完成后，提取跨项目可复用经验，产出两类成果：
-
-1. **跨项目 Lessons** → `~/.noesis/lessons/<skill_name>.md`
-   - 标签系统：`[SYSTEM/EXPERIMENT/WRITING/...]` × `[RECURRING/NEW]` × `[✓verified/✗ineffective/?unverified]`
-   - Runner 在后续项目相同阶段**自动注入**有效 lessons
-   - `[✗ineffective]` 自动过滤；`[RECURRING]` 优先显示
-
-2. **框架进化** → 基于各阶段积累的 `pipeline-evolution-log.md`，直接修改 `Praxis/prompts/`、`Praxis/skills/`、`Praxis/templates/` 文档，并 push 到 Noesis GitHub
-
----
-
-## 五、辅助命令
-
-### `/praxis-assimilate <项目路径>` — 同化外部项目
-
-将任意状态的现有科研项目纳入 Noesis 框架：
-- 重建各阶段文档（gap-analysis.md / method-design.md / experiment-design.md）
-- 实际运行 R2/R4/R6 评审
-- 写入 `pipeline-status.json`，使项目可被 `/praxis-research` 或 `/praxis-paper` 直接接管
-
-### `/praxis-present <项目路径>` — 生成进展演示
-
-读取项目当前状态，生成结构化的 `presentation.md`，用于与导师/合作者的进展汇报。支持热启动：已有 `presentation.md` 时增量更新，保留人工编辑内容。
-
----
-
-## 六、全流程操作示例
-
-### 从零开始一个新项目
+### 5.2 建立知识循环
 
 ```bash
-# Step 1: 积累领域知识（可先于项目启动，也可并行进行）
 /logos-discover
 /logos-read 5
+```
 
-# Step 2: 孵化研究想法
+### 5.3 启动一个新项目
+
+```bash
 /praxis-start MyResearchProject
-
-# Step 3: 自动化研究阶段（R1→R8）
 /praxis-research ~/Documents/MyResearchProject
+```
 
-# Step 4: 人工编码 + 实验
-# 参照 Codes/code-todo.md 和 Codes/experiment-todo.md
+### 5.4 编码完成后进入论文模块
 
-# Step 5a: 编码成功 → 论文写作
+```bash
 /praxis-paper ~/Documents/MyResearchProject
-
-# Step 5b: 编码失败 → 总结并热重启
-/praxis-conclude ~/Documents/MyResearchProject
-/praxis-research ~/Documents/MyResearchProject   # 热重启
-
-# Step 6: 项目完成后提取经验
 /praxis-evolve ~/Documents/MyResearchProject
 ```
 
-### 同化已有项目
+---
+
+## 6. Logos：持续知识积累子系统
+
+`Logos` 是一个没有终点的循环引擎：
+
+**发现 → 阅读 → 知识沉淀 → 再发现**
+
+### 6.1 Logos 解决什么问题
+
+很多研究系统直接从 idea 开始，但 Noesis 认为真正决定研究上限的往往不是 idea 本身，而是背后的知识密度。
+
+`Logos` 的作用是把“看过很多论文”转换成“拥有一个长期可检索、可组合、可复用的研究知识库”。
+
+### 6.2 命令入口
+
+| 命令 | 作用 |
+|------|------|
+| `/logos-discover [kb_path]` | 多策略发现论文，更新阅读队列 |
+| `/logos-read [参数]` | 深读论文，提取结构化知识资产 |
+
+默认知识库路径为 `~/Documents/Episteme`。
+
+### 6.3 `/logos-discover`
+
+`/logos-discover` 会执行 5 种搜索策略：
+
+| 策略 | 说明 |
+|------|------|
+| **关键词搜索** | arXiv + Semantic Scholar，核心关键词 × 扩展关键词 |
+| **引用链追踪** | 种子论文的前向 / 后向引用网络 |
+| **作者追踪** | 持续关注目标研究者的最新发表 |
+| **Venue 追踪** | 关注目标会议 / 期刊的最新论文 |
+| **争议搜索** | negative results / criticism / replication failures |
+
+候选论文会经过 **Quick Scan**，按 4 个维度评分：
+
+| 维度 | 含义 |
+|------|------|
+| 相关性 | 是否真正属于设定研究方向 |
+| 可复用性 | 方法或组件是否适合迁移 |
+| 互补性 | 是否填补现有知识库空白 |
+| 隐式假设潜力 | 是否存在值得攻击的隐含前提 |
+
+评分之后，系统会更新：
+
+- `reading-queue.md`
+
+并提交知识库变更，便于多机同步。
+
+### 6.4 `/logos-read`
+
+`/logos-read` 支持四种输入：
+
+- 无参数：读取队列最高优先级论文
+- 数字：连续深读 N 篇
+- arXiv ID：直接读取指定论文
+- 标题关键词：在队列中匹配，匹配不到则直接搜索
+
+例如：
 
 ```bash
-/praxis-assimilate ~/Documents/ExistingProject
-# 完成后根据同化结果选择 /praxis-research 或 /praxis-paper 接管
+/logos-read
+/logos-read 3
+/logos-read 2405.12186
 ```
+
+### 6.5 Logos 提取的 5 类知识资产
+
+| 资产类型 | 说明 |
+|----------|------|
+| **Methods Bank** | 机制、公式、适用条件、组件可解耦性 |
+| **Gaps & Assumptions** | 显式 limitation 与隐式可攻击假设 |
+| **Experimental Patterns** | baseline、metric、ablation、数据集与验证逻辑 |
+| **Cross-Paper Connections** | 论文之间的互补、矛盾、延伸与组合关系 |
+| **Reusable Resources** | 代码、数据集、模型与工程资源 |
+
+### 6.6 Logos 的核心产物
+
+在 `~/Documents/Episteme/` 中，Logos 主要维护：
+
+```text
+Episteme/
+├── research-directions.md
+├── reading-queue.md
+├── kb-index.md
+├── domain-landscape.md
+└── [arxiv-id].md
+```
+
+其中：
+
+- `reading-queue.md` 由 discover 写入，由 read 消费
+- `kb-index.md` 是整个知识库的总入口
+- `[arxiv-id].md` 是单篇论文的结构化笔记
+- `domain-landscape.md` 在某方向已读论文达到阈值后生成
+
+### 6.7 Logos 如何为 Praxis 供给知识
+
+`Praxis` 不会“直接复用所有阅读笔记”，而是在关键阶段消费特定资产：
+
+| Praxis 阶段 | 消费内容 |
+|-------------|----------|
+| `R1 Gap Discovery` | `Gaps & Assumptions` |
+| `R3 Method Design` | `Methods Bank` |
+| `R5 Experiment Design` | `Experimental Patterns` + `Reusable Resources` |
 
 ---
 
-## 七、Orchestrator CLI 参考
+## 7. Praxis：研究执行子系统
 
-### 研究 Pipeline（research_runner.py）
+`Praxis` 将项目推进拆成五大模块：
+
+```text
+Startup → Research → Code → Paper → Evolution
+```
+
+### 7.1 Praxis 解决什么问题
+
+单纯“让 AI 生成一些研究文档”并不能真正推进项目。  
+真正困难的是：
+
+- 在关键节点做判断
+- 在失败后回到正确位置
+- 在阶段之间保持状态和约束
+- 在论文写作时保留对前期研究逻辑的忠实映射
+
+`Praxis` 用状态机、审查门、迭代日志和演化机制来解决这些问题。
+
+### 7.2 命令入口
+
+| 命令 | 作用 |
+|------|------|
+| `/praxis-start <project_name>` | 交互式立项与项目脚手架创建 |
+| `/praxis-research <project_path>` | 自动推进 `R1→R8` |
+| `/praxis-conclude <project_path>` | 编码失败后总结并重置阶段 |
+| `/praxis-paper <project_path>` | 自动推进 `P1→P7` |
+| `/praxis-assimilate <project_path>` | 将现有项目同化进 Noesis |
+| `/praxis-present <project_path>` | 生成用于汇报的 `presentation.md` |
+| `/praxis-evolve <project_path>` | 提取 lessons 与框架改进 |
+
+---
+
+## 8. Module 1：Startup
+
+命令：
 
 ```bash
-# 查看当前状态
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py status <project_path>
+/praxis-start <project_name>
+```
 
-# 获取下一步动作（返回 JSON，含 fork_prompt）
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py next <project_path>
+### 8.1 Startup 的作用
 
-# 推进状态（fork agent 写完 phase-outcomes/<phase>.json 后调用）
+Startup 不是单纯“创建项目目录”，而是把模糊的研究种子转化为一份可进入自动化研究阶段的、经过压力测试的项目起点。
+
+### 8.2 Startup 的基本流程
+
+1. 收集研究者提供的 idea、论文、笔记或 Episteme 线索
+2. 识别研究种子类型与核心假设
+3. 整理背景、SOTA、候选 gap 与技术风险
+4. 进行 **六维辩论压力测试**
+5. 与研究者确认方向是否成立
+6. 生成 `project-startup.md`
+7. 初始化项目目录、Git 与研究状态
+
+### 8.3 六维辩论角色
+
+Startup 并行调用 6 个辩论 Agent：
+
+- Innovator
+- Pragmatist
+- Theorist
+- Contrarian
+- Interdisciplinary
+- Empiricist
+
+然后再由综合者输出判定：
+
+- 方向确认
+- 方向强化
+- 方向修正
+- HIGH RISK
+
+### 8.4 Startup 结束后项目中会出现什么
+
+至少包括：
+
+- `CLAUDE.md`
+- `project-startup.md`
+- `pipeline-status.json`
+- `phase-outcomes/`
+- `pipeline-evolution-log.md`
+
+并将主研究状态设置为 `R1`。
+
+---
+
+## 9. Module 2：Research
+
+命令：
+
+```bash
+/praxis-research <project_path>
+```
+
+Research 模块由：
+
+- `research_state_machine.py`
+- `research_runner.py`
+
+共同驱动。
+
+### 9.1 研究阶段总览
+
+| Phase | 内容 | Tier | Codex | 主要出口 |
+|------|------|------|-------|----------|
+| `R1` | Gap Discovery | heavy | — | `done → R2` |
+| `R2` | Gap Review | heavy | ✓ | `pass / revise / abandon` |
+| `R3` | Method Design | heavy | — | `done → R4` |
+| `R4` | Method Review | heavy | ✓ | `pass / revise / continue_R1 / abandon` |
+| `R5` | Experiment Design | heavy | — | `done → R6` |
+| `R6` | Experiment Review | heavy | ✓ | `pass / revise / continue_R3 / abandon` |
+| `R7` | Impl Planning | standard | — | `done → R8` |
+| `R8` | Retrospective | heavy | — | `done → coding` |
+
+### 9.2 每个阶段在做什么
+
+| 阶段 | 核心输出 |
+|------|----------|
+| `R1` | `gap-analysis.md` |
+| `R2` | `gap-review.md` + 路由决策 |
+| `R3` | `method-design.md` |
+| `R4` | `method-review.md` + 路由决策 |
+| `R5` | `experiment-design.md` |
+| `R6` | `experiment-review.md` + 路由决策 |
+| `R7` | `Codes/code-todo.md` + `Codes/experiment-todo.md` |
+| `R8` | `retrospective.md` |
+
+### 9.3 Research 模块的几个关键特征
+
+#### 1. 它不是线性直出，而是带审查门的推进
+
+`R2 / R4 / R6` 都是独立评审阶段。  
+审查结果会直接决定是否进入下一阶段、打回修改、切回更早阶段或放弃当前方向。
+
+#### 2. 它不是单一 Agent 角色
+
+研究阶段使用不同 tier：
+
+| Tier | 模型定位 | 典型阶段 |
+|------|----------|----------|
+| `standard` | AI Co-Author | `R7` |
+| `heavy` | 严格独立审查者 / 决策者 | `R1-R6`, `R8` |
+| `codex` | 外部第三方视角 | `R2`, `R4`, `R6` |
+
+Codex 并行审查是 **non-blocking** 的：  
+MCP 不可用时不会阻塞主流程，结果仅写入 `codex-reviews/` 供参考。
+
+#### 3. 它支持带记忆的迭代
+
+Runner 会自动识别两种迭代上下文：
+
+- **Revise 模式**：存在上一轮 review 文档，要求在已有成果上修改
+- **Pivot 模式**：存在 `iteration-log.md`，要求在被排除方向之外重启
+
+这样可以减少两类常见浪费：
+
+- 每次 revise 都从零重写
+- 每次失败后又走回已经被否掉的路径
+
+### 9.4 R8 的位置为什么特殊
+
+`R8 Retrospective` 发生在：
+
+**R7 完成之后、coding 开始之前**
+
+它不是项目结束后的总结，而是研究设计阶段的知识回收。  
+它的作用是把研究设计中的判断、风险与中间经验先沉淀下来，再进入人工编码与实验。
+
+---
+
+## 10. Module 3：Code
+
+Code 阶段是人工主导阶段，不由状态机自动完成。
+
+进入条件：
+
+- `R8` 完成
+- 主状态进入 `coding`
+
+### 10.1 Code 阶段的输入
+
+`R7` 产出的：
+
+- `Codes/code-todo.md`
+- `Codes/experiment-todo.md`
+- `Codes/CLAUDE.md`（如已生成）
+
+### 10.2 Code 阶段的两种出口
+
+#### 情况 A：验证成功
+
+进入论文写作阶段：
+
+- 主状态进入 `paper_writing`
+- 然后运行 `/praxis-paper <project_path>`
+
+#### 情况 B：验证失败
+
+运行：
+
+```bash
+/praxis-conclude <project_path>
+```
+
+`/praxis-conclude` 会：
+
+- 分析失败层级
+- 追加 `iteration-log.md`
+- 将项目重置到合理研究阶段
+
+失败层级与回退关系：
+
+| 失败层级 | 含义 | 回退位置 |
+|----------|------|----------|
+| `L2` | 需要换组件 | `R3` |
+| `L3` | 需要换框架 | `R3` |
+| `L4` | 需要换方向 | `R1` |
+
+之后重新运行：
+
+```bash
+/praxis-research <project_path>
+```
+
+完成热重启。
+
+---
+
+## 11. Module 4：Paper
+
+命令：
+
+```bash
+/praxis-paper <project_path>
+```
+
+Paper 模块拥有一套与主研究流程**完全独立**的状态机：
+
+- `paper_state_machine.py`
+- `paper_runner.py`
+
+状态文件位于：
+
+- `<project>/Papers/paper-status.json`
+
+### 11.1 论文阶段总览
+
+| Phase | 内容 | Tier | Codex |
+|------|------|------|-------|
+| `P1` | Outline | heavy | — |
+| `P2` | Sections | standard | — |
+| `P3` | Critique | heavy | ✓ |
+| `P4` | Integrate | standard | — |
+| `P5` | Final Review | heavy | — |
+| `P6` | LaTeX | standard | — |
+| `P7` | Project Review | heavy | ✓ |
+
+### 11.2 各阶段的典型产物
+
+| 阶段 | 典型产物 |
+|------|----------|
+| `P1` | `Papers/outline.md`, `Papers/notation.md` |
+| `P2` | `Papers/sections/*.md` |
+| `P3` | 多角色 critique + 可选 Codex 审查 |
+| `P4` | `Papers/paper.md` |
+| `P5` | 终审评分与 revise/pass 决策 |
+| `P6` | `Papers/latex/main.tex`, `references.bib`, 可选 `main.pdf` |
+| `P7` | `Papers/project-review/*.md`, `synthesis.md` |
+
+### 11.3 Paper 模块的关键机制
+
+#### 1. 它不是“直接生成整篇论文”
+
+Noesis 先用 `P1` 建立叙事脊柱和符号表，再用 `P2` 分章节写作，之后通过 `P3-P5` 做真正的质量控制。
+
+#### 2. 它带有修订循环
+
+`P5 Final Review` 的结果如果低于阈值，会回到 `P4`。  
+当前实现最多允许 2 轮修订，超限后强制通过，以避免无休止循环。
+
+#### 3. 它忠实映射研究文档，而不是重新发明项目
+
+Paper 阶段的基本原则是：
+
+- 从 `gap-analysis.md`、`method-design.md`、`experiment-design.md` 和 `Codes/` 提取素材
+- 保持 `Gap → 根因 → 方法 → 验证 → 贡献` 的叙事一致性
+- 不在论文阶段凭空发明研究贡献
+
+---
+
+## 12. Module 5：Evolution
+
+命令：
+
+```bash
+/praxis-evolve <project_path>
+```
+
+`/praxis-evolve` 的作用不是再写一份总结，而是提取两类真正会影响后续系统行为的结果。
+
+### 12.1 产物一：跨项目 lessons
+
+写入：
+
+- `~/.noesis/lessons/<skill_name>.md`
+
+每条 lesson 带有三类标签：
+
+- 类别：`[SYSTEM]`、`[EXPERIMENT]`、`[WRITING]` 等
+- 频率：`[RECURRING]`、`[NEW]`
+- 有效性：`[✓ verified]`、`[✗ ineffective]`、`[? unverified]`
+
+Runner 会在后续项目的相同阶段自动注入 lessons，并自动过滤：
+
+- `[✗ ineffective]`
+
+### 12.2 产物二：框架自我进化
+
+`/praxis-evolve` 还会读取：
+
+- `pipeline-evolution-log.md`
+
+据此决定是否修改：
+
+- `Praxis/prompts/`
+- `Praxis/skills/`
+- `Praxis/templates/`
+
+这意味着 Noesis 的进化不只发生在“项目层”，也发生在“框架层”。
+
+---
+
+## 13. 辅助命令
+
+### 13.1 `/praxis-assimilate`
+
+```bash
+/praxis-assimilate <project_path>
+```
+
+作用：
+
+- 将任意阶段的已有科研项目纳入 Noesis
+- 重建缺失的阶段文档
+- 补跑关键评审
+- 写入 `pipeline-status.json`
+
+适用场景：
+
+- 你已经有一个在研项目，但还没用 Noesis 管理
+- 你想让旧项目获得状态机、审查门和演化能力
+
+### 13.2 `/praxis-present`
+
+```bash
+/praxis-present <project_path>
+```
+
+作用：
+
+- 读取当前项目状态
+- 生成适合导师 / 合作者阅读的 `presentation.md`
+- 支持热启动，不覆盖已有人工编辑内容
+
+`presentation.md` 的设计目标不是流水线归档，而是：
+
+**服务 15 分钟研究讨论。**
+
+因此它会优先呈现：
+
+- 当前进展
+- 关键主张
+- Open Questions
+- 需要拍板的问题
+
+---
+
+## 14. 两条典型使用路径
+
+### 14.1 从零开始新项目
+
+```bash
+# Step 1: 建立知识循环
+/logos-discover
+/logos-read 5
+
+# Step 2: 启动项目
+/praxis-start MyResearchProject
+
+# Step 3: 推进研究阶段
+/praxis-research ~/Documents/MyResearchProject
+
+# Step 4: 人工编码与实验
+# 参考 Codes/code-todo.md 与 Codes/experiment-todo.md
+
+# Step 5a: 成功后进入论文
+/praxis-paper ~/Documents/MyResearchProject
+
+# Step 6: 项目结束后提取 lessons
+/praxis-evolve ~/Documents/MyResearchProject
+```
+
+### 14.2 接管已有项目
+
+```bash
+/praxis-assimilate ~/Documents/ExistingProject
+```
+
+之后根据同化结果，继续运行：
+
+- `/praxis-research`
+- 或 `/praxis-paper`
+
+---
+
+## 15. Orchestrator CLI 参考
+
+除了 slash commands，Praxis 还提供底层 runner CLI，适合调试、恢复和脚本化调用。
+
+### 15.1 研究状态机
+
+```bash
+python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py status  <project_path>
+python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py next    <project_path>
 python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py advance <project_path>
-
-# 强制设置阶段（用于恢复/覆盖）
 python3 ~/Documents/Noesis/Praxis/orchestrator/research_state_machine.py init-phase <project_path> <phase>
 ```
 
-状态持久化：`<project>/pipeline-status.json`
-Fork agent 输出：`<project>/phase-outcomes/<phase>.json`（格式：`{"outcome": "...", "notes": "..."}`）
+相关文件：
 
-### 论文 Pipeline（paper_runner.py）
+- 状态：`<project>/pipeline-status.json`
+- outcome：`<project>/phase-outcomes/<phase>.json`
+
+### 15.2 论文状态机
 
 ```bash
 python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py status  <project_path>
@@ -320,123 +729,179 @@ python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py advance <project_
 python3 ~/Documents/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase <project_path> <phase>
 ```
 
-状态持久化：`<project>/Papers/paper-status.json`
-Fork agent 输出：`<project>/Papers/phase-outcomes/<phase>.json`
+相关文件：
+
+- 状态：`<project>/Papers/paper-status.json`
+- outcome：`<project>/Papers/phase-outcomes/<phase>.json`
+
+### 15.3 outcome 文件格式
+
+主流程与论文流程的 outcome 文件都采用同一种最小结构：
+
+```json
+{
+  "outcome": "<outcome_key>",
+  "notes": "<1-2 句简短说明>"
+}
+```
+
+状态机只基于 `outcome` 路由，`notes` 供人类阅读和汇报使用。
 
 ---
 
-## 八、文件结构
+## 16. 文件结构总览
 
-### Noesis 系统
+### 16.1 Noesis 系统仓库
 
-```
+```text
 ~/Documents/Noesis/
 ├── Logos/
-│   ├── CLAUDE.md                    ← Logos 子系统指导
-│   ├── skills/
-│   │   ├── paper-discovery-skill.md ← 论文发现详细指令
-│   │   └── paper-reading-skill.md   ← 深度阅读详细指令
-│   └── templates/
-│       ├── research-directions.md   ← 研究方向配置模板
-│       ├── reading-queue.md         ← 阅读队列模板
-│       ├── kb-index.md              ← 知识库索引模板
-│       └── paper-reading-note.md    ← 论文笔记模板
-│
-├── Praxis/
-│   ├── CLAUDE.md                    ← Praxis 子系统指导
-│   ├── orchestrator/
-│   │   ├── research_state_machine.py
-│   │   ├── research_runner.py
-│   │   ├── paper_state_machine.py
-│   │   └── paper_runner.py
-│   ├── skills/                      ← 非自动化模块详细指令
-│   │   ├── startup-skill.md         ← /praxis-start（六维辩论）
-│   │   ├── conclude-skill.md
-│   │   ├── assimilate-skill.md
-│   │   ├── evolve-skill.md
-│   │   └── present-skill.md
-│   ├── prompts/                     ← 状态机 Fork Agent 指令
-│   │   ├── 10-gap-discovery-prompt.md      ← R1
-│   │   ├── 1X-review-prompt.md             ← R2/R4/R6 通用审查
-│   │   ├── 11-method-design-prompt.md      ← R3
-│   │   ├── 12-experiment-design-prompt.md  ← R5
-│   │   ├── 13-impl-planning-prompt.md      ← R7
-│   │   ├── 14-retrospective-prompt.md      ← R8
-│   │   ├── 30~36-*-prompt.md               ← P1~P7
-│   │   ├── codex-reviewer-prompt.md
-│   │   ├── X-reflect-pipeline-prompt.md    ← 每阶段自动注入
-│   │   └── review-configs/                 ← 审查 YAML 配置
-│   ├── subagents/                   ← SubAgent prompt 模板
-│   └── templates/                   ← 项目文档模板
-│
-├── .claude/skills/                  ← slash commands 注册
-│   ├── logos-discover/
-│   ├── logos-read/
-│   ├── praxis-start/
-│   ├── praxis-research/
-│   ├── praxis-paper/
-│   ├── praxis-assimilate/
-│   ├── praxis-conclude/
-│   ├── praxis-present/
-│   └── praxis-evolve/
-│
-├── introduction.md                  ← 本文件
-├── CLAUDE.md                        ← Claude Code 指导
-└── README.md
-```
-
-### 研究项目（单个项目）
-
-```
-~/Documents/<项目名>/
-├── CLAUDE.md                        ← 项目级 Claude 指导（含 noesis_path）
-├── pipeline-status.json             ← 主 pipeline 状态（单一事实源）
-├── project-startup.md               ← Startup 产出（研究方向 + 辩论记录）
-├── gap-analysis.md                  ← R1 产出
-├── method-design.md                 ← R3 产出
-├── experiment-design.md             ← R5 产出
-├── iteration-log.md                 ← 迭代历史（conclude 追加）
-├── pipeline-evolution-log.md        ← 流程反思日志（X-reflect 追加）
-├── phase-outcomes/                  ← Fork agent 输出
-├── codex-reviews/                   ← Codex 审查输出（仅参考）
-├── Codes/                           ← R7 产出（实现规划）
 │   ├── CLAUDE.md
+│   ├── skills/
+│   └── templates/
+├── Praxis/
+│   ├── CLAUDE.md
+│   ├── orchestrator/
+│   ├── prompts/
+│   ├── skills/
+│   ├── subagents/
+│   └── templates/
+├── .claude/skills/
+├── README.md
+├── introduction.md
+└── CLAUDE.md
+```
+
+### 16.2 单个研究项目
+
+```text
+~/Documents/<ProjectName>/
+├── CLAUDE.md
+├── pipeline-status.json
+├── project-startup.md
+├── gap-analysis.md
+├── gap-review.md
+├── method-design.md
+├── method-review.md
+├── experiment-design.md
+├── experiment-review.md
+├── retrospective.md
+├── iteration-log.md
+├── pipeline-evolution-log.md
+├── phase-outcomes/
+├── codex-reviews/
+├── Codes/
 │   ├── code-todo.md
 │   └── experiment-todo.md
-└── Papers/                          ← 论文写作模块
-    ├── paper-status.json            ← 论文 pipeline 状态
-    ├── paper-outline.md             ← P1 产出
-    ├── paper-draft.md               ← P2/P4 产出
-    ├── paper-final.tex              ← P6 产出
+└── Papers/
+    ├── paper-status.json
+    ├── outline.md
+    ├── notation.md
+    ├── paper.md
+    ├── sections/
     ├── phase-outcomes/
-    └── project-review/              ← P7 产出
+    ├── codex-reviews/
+    ├── project-review/
+    └── latex/
 ```
 
-### Episteme 知识库
+### 16.3 Episteme 知识库
 
-```
+```text
 ~/Documents/Episteme/
-├── research-directions.md           ← 研究方向配置（用户维护）
-├── reading-queue.md                 ← 阅读队列（discover 写，read 消费）
-├── kb-index.md                      ← 知识库总索引（read 自动更新）
-├── domain-landscape.md              ← 领域地图（≥5篇后自动生成）
-└── [arxiv-id].md                    ← 每篇论文的结构化笔记
+├── research-directions.md
+├── reading-queue.md
+├── kb-index.md
+├── domain-landscape.md
+└── [arxiv-id].md
 ```
 
 ---
 
-## 九、设计原则
+## 17. 关键架构原则
 
-**两个独立子系统** — Logos 和 Praxis 各自运行，无运行时依赖，唯一连接是 Episteme 知识库。
+### 17.1 两个独立子系统
 
-**三层架构（Praxis）** — Orchestrator（runner.py）决定 WHAT/WHEN；Prompts（`prompts/*-prompt.md`）是纯 agent 指令；Slash commands（`.claude/skills/`）是薄封装调用层。State machine 只做纯状态转换和 I/O，不含 prompt 逻辑。
+`Logos` 与 `Praxis` 在运行时没有直接耦合。  
+唯一连接点是 `Episteme` 知识库。
 
-**单一事实源** — 主 pipeline 状态唯一来源：`pipeline-status.json`；论文模块：`Papers/paper-status.json`。无自动检测或状态推断。
+### 17.2 双状态机
 
-**独立审查隔离** — R2/R4/R6（研究审查）和 P3/P5/P7（论文审查）均在上下文隔离的独立 Agent 中执行，避免确认偏误。
+Noesis 不把研究和论文写作混在一套状态里。
 
-**Codex 并行审查** — 第三方 GPT-4.5-high 外部视角，non-blocking，不影响主流程路由，提供额外的独立参考意见。
+- 主流程状态机：研究阶段
+- 论文状态机：写作阶段
 
-**跨项目学习** — `/praxis-evolve` 将经验写入 `~/.noesis/lessons/`，Runner 在后续项目自动注入已验证的 lessons，系统随每个项目变得更聪明。
+这让两者可以独立恢复、独立迭代。
 
-**X-reflect 自动注入** — 每个非 manual 阶段完成后，Runner 自动在 fork_prompt 末尾注入流程反思指令，agent 将观察追加到 `pipeline-evolution-log.md`，作为 `/praxis-evolve` 的原材料。
+### 17.3 单一事实源
+
+项目当前状态只以两个文件为准：
+
+- `pipeline-status.json`
+- `Papers/paper-status.json`
+
+Noesis 不通过“扫描目录结构猜测状态”来决定流程位置。
+
+### 17.4 Prompt / Runner / State Machine 三层分离
+
+`Praxis` 的内部结构遵循明确的职责分离：
+
+| 层级 | 职责 |
+|------|------|
+| `runner.py` | 决定下一步动作、拼装 fork prompt、注入 lessons |
+| `prompts/*.md` | 纯 Agent 指令，不负责状态推进 |
+| `state_machine.py` | 纯状态转换与 I/O，不负责 prompt 逻辑 |
+
+### 17.5 独立审查隔离
+
+以下阶段都在上下文隔离的独立审查中完成：
+
+- `R2 / R4 / R6`
+- `P3 / P5 / P7`
+
+它的目的不是增加复杂度，而是降低确认偏误。
+
+### 17.6 lessons 自动注入
+
+Runner 会读取：
+
+- `~/.noesis/lessons/<skill_name>.md`
+
+将有效经验自动注入后续同类阶段。  
+这使 Noesis 具备真正的跨项目复利，而不是每个项目都从零开始。
+
+### 17.7 X-reflect 自动积累
+
+每个非 manual 阶段完成后，runner 会自动注入：
+
+- `X-reflect-pipeline-prompt.md`
+
+Agent 会把对流程本身的观察追加到：
+
+- `pipeline-evolution-log.md`
+
+随后由 `/praxis-evolve` 决定是否把这些观察转化为框架升级。
+
+---
+
+## 18. 谁适合使用 Noesis
+
+Noesis 尤其适合：
+
+- 需要长期维护知识库的博士生与独立研究者
+- 需要让研究项目更制度化、更可追踪的实验室
+- 希望把 AI 从“对话助手”升级为“研究系统”的个人或团队
+- 已经有多个项目并行，希望跨项目积累研究经验的人
+
+如果你要的是“一次性写一份文档”，Noesis 可能偏重。  
+如果你关心的是**研究能力如何持续复利**，它就是为这个问题设计的。
+
+---
+
+## 19. 进一步阅读
+
+- 产品化总览见 [README.md](README.md)
+- 系统内部开发约定见 [CLAUDE.md](CLAUDE.md)
+- Logos 子系统约定见 `Logos/CLAUDE.md`
+- Praxis 子系统约定见 `Praxis/CLAUDE.md`
