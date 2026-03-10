@@ -84,7 +84,7 @@ Noesis 选择的是第三条路线：**面向真实研究者的、监督优先�
 - **更适合有明确研究责任的人来使用**
 - **更适合需要跨项目积累能力的个人与团队**
 
----
+<!-- ---
 
 ## 一图看懂 Noesis
 
@@ -95,7 +95,7 @@ Noesis 选择的是第三条路线：**面向真实研究者的、监督优先�
 <p align="center">
   <img src="assets/noesis-lifecycle.svg" alt="Noesis 研究生命周期" width="48%" />
   <img src="assets/noesis-quickstart.svg" alt="Noesis 三步开始" width="48%" />
-</p>
+</p> -->
 
 ---
 
