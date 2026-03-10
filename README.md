@@ -2,242 +2,377 @@
 
 # Noesis
 
-**基于 Agents 的 AI/ML 科研项目管理系统**
+### A Research Operating System for the Age of Agents
+
+**让知识积累、研究判断、实验执行与论文写作，进入同一套可持续进化的系统。**
 
 *νόησις · λόγος · πρᾶξις · ἐπιστήμη*
-
----
-
-*Noesis（认知与洞察）· Logos（理性与知识）· Praxis（实践与行动）· Episteme（科学知识）*
 
 </div>
 
 ---
 
-## Noesis介绍
+> 如果知识不能沉淀，灵感就只能反复从零开始。  
+> 如果判断不能结构化，研究就会滑向随机游走。  
+> 如果经验不能回流，项目完成之后，系统依然像第一次工作。
 
-Noesis 是一套运行在 Claude Code 上的 **AI Agent 科研项目管理系统**，面向 AI/ML/DL 方向的研究者。
+**Noesis** 试图解决的，正是这三件事。
 
-它的核心主张是：**深度科研项目的推进，离不开研究者的监督、判断与协同。** Noesis 将研究者置于**产品经理**的位置——定义方向、把握节奏、做出关键决策——同时通过一套精心设计的 Agent 编排系统，让 AI 高效承担从文献调研、方法设计、实验规划到论文写作的繁重执行工作。
+它不是一个“帮你写点文档”的 AI 工具，也不是一套零散的 prompt 集合。  
+它是一套运行在 **Claude Code** 上、面向 **AI/ML/DL 研究者与研究团队** 的 **科研操作系统**：
 
-Noesis 包含两个独立子系统，通过 **Episteme** 知识库连接：
+- 用 **Logos** 持续发现、阅读、拆解论文，把知识沉淀为可复用的研究资产
+- 用 **Episteme** 作为系统级知识库，让知识不再只服务于单个项目
+- 用 **Praxis** 将项目从 idea、方法、实验、编码、论文推进到可交付成果
+- 用 **lessons + framework evolution** 让每个项目都成为下一次研究的起点
 
-- **Logos**（理性与知识）— 持续知识积累引擎。自动发现、阅读、结构化提取论文中的方法、研究空白、实验模式等知识资产，沉淀到 Episteme 知识库，为研究提供持续的知识供给。
+如果把研究看成一项长期事业，而不是一串临时对话，那么 Noesis 的目标很明确：
 
-- **Praxis**（实践与行动）— 科研项目管理系统。从项目立项到论文发表，分五大模块驱动完整的研究生命周期，在关键节点与研究者深度协同，并在每个阶段从 Episteme 知识库中汲取养分。
+**把一次性的 AI 协助，升级为可积累、可审查、可复盘、可进化的研究生产力。**
 
+---
+
+## Noesis 是什么
+
+Noesis 由两个**彼此独立**、但通过知识库相连的子系统组成：
+
+```text
+Logos  ─────────────→  Episteme  ─────────────→  Praxis
+知识积累                    知识库                    研究执行
+
+/logos-discover           Methods Bank            /praxis-start
+/logos-read               Gaps & Assumptions      /praxis-research
+                          Experimental Patterns   /praxis-paper
+                          Reusable Resources      /praxis-evolve
+                                                   /praxis-present
 ```
-  Logos ──────────→ Episteme ──────────→ Praxis
- 知识积累             知识库               研究执行
-/logos-discover     Methods Bank        /praxis-start
-/logos-read         Gaps & Assumptions  /praxis-research
-                    Experimental        /praxis-paper
-                    Patterns ...        /praxis-evolve
-```
+
+| 系统 | 角色 | 核心任务 |
+|------|------|----------|
+| **Noesis** | 顶层方法论框架 | 统一研究流程、命令接口、状态管理与跨项目学习 |
+| **Logos** | 知识积累引擎 | 发现论文、深度阅读、提取结构化知识资产 |
+| **Episteme** | 外部知识库 | 存放阅读队列、论文笔记、领域地图与知识索引 |
+| **Praxis** | 研究执行引擎 | 立项、方法设计、实验规划、论文写作、演化复盘 |
+
+这意味着：**Noesis 不把科研理解成一条线性的流水线，而是一个“知识 → 判断 → 行动 → 经验回流”的闭环。**
 
 ---
 
 ## 设计哲学
 
-**科研灵感的迸发，离不开知识的深度积累。**
+Noesis 的设计建立在四个判断之上。
 
-在尝试提出新想法之前，研究者需要广泛而深入地阅读相关文献，理解领域的已知边界和潜在空白。Noesis 将这一过程制度化：在执行研究之前，先系统地积累知识。
+### 1. 研究不是从 idea 开始，而是从知识密度开始
 
-因此，Noesis 含有两个独立子系统：
+很多研究项目之所以后劲不足，不是因为没有灵感，而是因为灵感没有足够深的知识背景。  
+Noesis 先用 `Logos` 建立长期知识底座，再让 `Praxis` 消费这些资产推进项目。
 
-| 子系统 | 词源 | 职责 |
-|--------|------|------|
-| **Logos** | λόγος，理性与知识 | 持续积累知识，维护 Episteme 知识库 |
-| **Praxis** | πρᾶξις，实践与行动 | 管理研究项目从立项到发表的全生命周期 |
+### 2. AI 不是研究者的替身，而是被编排的研究劳动力
 
-两者通过 **Episteme** 知识库连接：Logos 持续填充，Praxis 在关键研究阶段从中汲取养分。
+Noesis 不试图“替代研究判断”。  
+它把研究者放在真正应该在的位置上：定义方向、做关键取舍、批准重要转折。  
+把高耗时、高重复、需要大量上下文搬运的工作交给被良好约束的 Agents。
 
-```
-    Logos                            Praxis
-  （知识积累）                      （研究执行）
-  /logos-discover                  /praxis-start
-  /logos-read                      /praxis-research
-       │                           /praxis-paper
-       │         知识注入            /praxis-evolve
-       ▼
-  Episteme（知识库）  ~/Documents/Episteme
-       │
-       ├─ Gaps & Assumptions    ──→  R1  研究空白发现
-       ├─ Methods Bank          ──→  R3  方法设计
-       └─ Experimental Patterns ──→  R5  实验设计
-```
+### 3. 研究质量来自审查，而不是来自第一次生成
+
+Praxis 的关键阶段不是单次直出，而是通过独立评审、上下文隔离、外部视角和状态机路由来逼近更稳健的结论。  
+在 Noesis 里，**批判机制本身就是生产力的一部分**。
+
+### 4. 一个好系统，应该随着项目结束而变强
+
+大多数 AI 工作流的最大浪费，在于项目结束之后经验被留在聊天记录里。  
+Noesis 用 `lessons`、`pipeline-evolution-log` 和 `/praxis-evolve` 把经验重新注入系统，让未来项目直接受益。
 
 ---
+
+## 为什么它不一样
+
+| 指标 | 含义 | 对研究者的价值 |
+|------|------|----------------|
+| **2** | 独立子系统 | 知识积累与研究执行解耦，不把“读论文”和“做项目”混成一个大 prompt |
+| **15** | 自动化阶段 | `R1-R8` 研究阶段 + `P1-P7` 论文阶段，覆盖从问题定义到论文定稿 |
+| **9** | Slash Commands | 从论文发现、项目孵化到汇报展示，都有稳定入口 |
+| **6** | Startup 辩论角色 | 在正式投入前先做方向压力测试，减少无效迭代 |
+| **3** | Agent Tier | `standard`、`heavy`、`codex` 各司其职，不让所有任务共享同一种智能角色 |
+| **∞** | 跨项目复利 | 每个项目的经验会回流到后续项目，而不是停留在单次产出里 |
+
+Noesis 最核心的差异，不在于“能不能自动写点东西”，而在于它把科研的几个关键稀缺品重新组织起来了：
+
+- **长期知识记忆**
+- **结构化审查**
+- **状态机式推进**
+- **失败后的热重启**
+- **对既有项目的接管能力**
+- **跨项目能力复利**
+
+---
+
+## 系统能力总览
+
+### Logos: 把论文变成知识资本
+
+`Logos` 不是简单的“论文搜索 + 摘要生成”，而是一台持续运转的知识积累引擎。
+
+#### 它能做什么
+
+- 通过 **5 种搜索策略** 发现论文：关键词、引用链、作者、Venue、争议/负面结果
+- 对候选论文做 **Quick Scan 四维评分**：相关性、可复用性、知识互补性、隐式假设潜力
+- 按优先级维护 `reading-queue.md`
+- 深度阅读论文，并抽取 **5 类结构化知识资产**
+- 当某方向累计已读论文达到阈值后，自动生成 `domain-landscape.md`
+
+#### 抽取的知识资产
+
+| 资产类型 | 内容 |
+|----------|------|
+| **Methods Bank** | 核心机制、公式、适用条件、组件可解耦性 |
+| **Gaps & Assumptions** | 显式 limitation 与隐式可攻击假设 |
+| **Experimental Patterns** | baseline、metric、ablation、数据集选择逻辑 |
+| **Cross-Paper Connections** | 论文之间的互补、矛盾、延伸与可结合关系 |
+| **Reusable Resources** | 代码、数据集、预训练模型等工程资源 |
+
+#### 对 Praxis 的直接供给
+
+| Praxis 阶段 | 消费的知识资产 |
+|-------------|----------------|
+| **R1 Gap Discovery** | `Gaps & Assumptions` |
+| **R3 Method Design** | `Methods Bank` |
+| **R5 Experiment Design** | `Experimental Patterns` + `Reusable Resources` |
+
+### Praxis: 把研究从想法推进到论文
+
+`Praxis` 是 Noesis 的研究执行子系统，由两套独立状态机和一层 runner 编排组成。
+
+#### 五大模块
+
+| 模块 | 命令 | 作用 |
+|------|------|------|
+| **Startup** | `/praxis-start <project_name>` | 交互式立项，六维辩论压力测试，创建项目脚手架 |
+| **Research** | `/praxis-research <project_path>` | 自动推进 `R1→R8`，完成 Gap、Method、Experiment 与知识回收 |
+| **Code** | 人工阶段 | 研究者主导编码与实验，失败时通过 `/praxis-conclude` 热重启 |
+| **Paper** | `/praxis-paper <project_path>` | 独立推进 `P1→P7`，完成大纲、写作、审查、LaTeX 与项目级终审 |
+| **Evolution** | `/praxis-evolve <project_path>` | 提取 lessons，并推动 Noesis 框架本身演进 |
+
+#### 研究阶段 `R1-R8`
+
+```text
+R1 Gap Discovery
+→ R2 Gap Review
+→ R3 Method Design
+→ R4 Method Review
+→ R5 Experiment Design
+→ R6 Experiment Review
+→ R7 Impl Planning
+→ R8 Retrospective
+→ coding
+```
+
+其中 `R2 / R4 / R6` 是独立评审关口，支持并行引入 **Codex 外部视角**。  
+审查结果不会只生成意见，而会直接决定路由：`pass`、`revise`、`continue`、`abandon`。
+
+#### 论文阶段 `P1-P7`
+
+```text
+P1 Outline
+→ P2 Sections
+→ P3 Critique
+→ P4 Integrate
+→ P5 Final Review
+→ P6 LaTeX
+→ P7 Project Review
+```
+
+其中 `P5` 带有修订循环机制：评分低于阈值会回到 `P4`，最多两轮。  
+这使论文写作不再是“生成一份草稿”，而是一个有明确质量门槛的迭代过程。
+
+---
+
 ## 核心优势
 
-| | 特性 | 说明 |
-|---|---|---|
-| **8+7自动化阶段** | 复杂模块（Research/PaperWriting）由状态机驱动，每阶段由独立 Agent 执行，多轮上下文隔离审查防止重要内容偏误 |
-| **9核心Commands** | 通过命令执行知识积累，项目管理，一键同步外部科研项目至Noesis系统，一键准备对外展示报表 |
-| **∞** | Noesis系统具备自我进化功能，每阶段完成后自动记录流程反思；`/praxis-evolve` 提取跨项目经验教训，Runner 在后续项目中自动注入——越用越聪明 |
-| **5核心模块**  | 项目初始化 · 方法探索 · 代码编写 · 论文撰写 · 自我进化，并在每个阶段与Episteme 知识库深度链接 |
+### 1. Knowledge-first，而不是 prompt-first
+
+Noesis 把研究知识作为系统资产来经营，而不是把每次聊天都当作一次性上下文。  
+你读过的论文、发现的 gap、沉淀的方法组件，会持续进入后续项目。
+
+### 2. 真正的多 Agent 编排，而不是一个 Agent 扮演所有角色
+
+Startup 有六维辩论，Research 有独立评审关口，Paper 有多角色论文审查，Codex 可以作为并行外部 reviewer。  
+系统不是“换个 prompt 假装多角色”，而是把角色职责明确拆开。
+
+### 3. 两套独立状态机，真正可恢复、可追踪、可迭代
+
+主研究流程与论文流程分别由 `research_state_machine.py` 和 `paper_state_machine.py` 驱动。  
+状态写入 `pipeline-status.json` 与 `Papers/paper-status.json`，没有依赖模糊推断。
+
+### 4. 失败不是终点，而是热重启入口
+
+编码或实验失败后，`/praxis-conclude` 会把失败层级写入 `iteration-log.md`，并把项目重置到合理阶段重新启动。  
+Runner 会自动注入迭代历史，避免重复走已经被排除的路线。
+
+### 5. 不只适合新项目，也能接管存量项目
+
+`/praxis-assimilate` 可以把任意阶段的既有科研项目纳入 Noesis：  
+重建阶段文档、补齐评审、写入状态文件，让旧项目获得与原生项目相同的系统能力。
+
+### 6. 不只服务 AI，也服务人与团队沟通
+
+`/praxis-present` 会自动生成适合导师、合作者阅读的 `presentation.md`。  
+它不是流水线文档的堆砌，而是按照“会议讨论优先级”重新组织信息。
+
+### 7. 系统会随着项目结束而学习
+
+`/praxis-evolve` 会把项目中的有效经验提炼为 `~/.noesis/lessons/`，并在后续阶段自动注入。  
+与此同时，`pipeline-evolution-log.md` 还能推动 prompts、skills、templates 本身进化。
 
 ---
 
-## Logos — 持续知识积累
+## 命令矩阵
 
-Logos 是一个**没有终点的循环知识引擎**：发现 → 阅读 → 知识沉淀 → 重复。
+| 命令 | 作用 | 输出价值 |
+|------|------|----------|
+| `/logos-discover` | 多策略发现论文 | 持续更新高价值阅读队列 |
+| `/logos-read [n\|arxiv_id]` | 深读并抽取知识资产 | 把论文转化为可复用研究资本 |
+| `/praxis-start <name>` | 交互式项目立项 | 完成方向孵化、风险清单与项目脚手架 |
+| `/praxis-research <path>` | 自动推进研究状态机 | 产出 Gap、Method、Experiment 与 Retrospective |
+| `/praxis-conclude <path>` | 编码失败总结 | 写入迭代日志并热重启研究流程 |
+| `/praxis-paper <path>` | 自动推进论文状态机 | 生成论文大纲、正文、LaTeX 与审查结果 |
+| `/praxis-assimilate <path>` | 同化现有项目 | 让旧项目进入 Noesis 管理体系 |
+| `/praxis-present <path>` | 生成对外汇报文档 | 面向导师/合作者的结构化进展展示 |
+| `/praxis-evolve <path>` | 提取 lessons 与框架改进 | 形成跨项目复利与系统自进化 |
 
-**初始化知识库（首次使用）**
+---
+
+## Quick Start
+
+### 1. 推荐目录布局
+
+```text
+~/Documents/
+├── Noesis/           ← 本仓库：系统本体
+├── Episteme/         ← 知识库仓库
+└── <ProjectName>/    ← 各研究项目，各自独立仓库
+
+~/.noesis/lessons/    ← 跨项目经验教训
+```
+
+> 这个仓库本身不是某个具体研究项目，而是你的**中央研究方法库**。  
+> 每个项目应位于独立目录和独立仓库中，由 Noesis 引用和驱动。
+
+### 2. 初始化 Episteme
 
 ```bash
 KB="$HOME/Documents/Episteme"
-cp ~/Documents/Noesis/Logos/templates/kb-index.md $KB/
-cp ~/Documents/Noesis/Logos/templates/reading-queue.md $KB/
-cp ~/Documents/Noesis/Logos/templates/research-directions.md $KB/
-# 编辑 Episteme/research-directions.md，填入研究方向与关键词
+cp "$HOME/Documents/Noesis/Logos/templates/kb-index.md" "$KB/"
+cp "$HOME/Documents/Noesis/Logos/templates/reading-queue.md" "$KB/"
+cp "$HOME/Documents/Noesis/Logos/templates/research-directions.md" "$KB/"
+# 编辑 Episteme/research-directions.md，填写研究方向、关键词、种子论文、作者与目标 venue
 ```
 
-### `/logos-discover` — 论文发现
+### 3. 建立知识循环
 
 ```bash
-/logos-discover      # 发现论文，按优先级写入阅读队列
+/logos-discover
+/logos-read 3
 ```
 
-用户配置研究方向后，Logos 通过 5 种搜索策略系统扫描学术前沿：
-
-| 策略 | 说明 |
-|------|------|
-| **关键词搜索** | arXiv + Semantic Scholar，核心与扩展关键词组合 |
-| **引用链追踪** | 种子论文的前向/后向引用网络 |
-| **作者追踪** | 关注研究者的最新发表 |
-| **Venue 追踪** | 目标顶会/期刊的最新收录 |
-| **争议/负面搜索** | 负面结果、复现失败、批评性论文 |
-
-每篇候选论文经 Quick Scan（标题 + 摘要 + 结论）进行 4 维评分（**相关性 · 方法可复用性 · 知识互补性 · 假设可攻击性**），按优先级写入阅读队列。
-
-### `/logos-read` — 深度阅读
+### 4. 启动并推进项目
 
 ```bash
-/logos-read              # 读队列最高优先级 1 篇
-/logos-read 5            # 依次深度阅读 5 篇
-/logos-read 2405.12186   # 直接读指定 arXiv 论文
+/praxis-start MyProject
+/praxis-research ~/Documents/MyProject
 ```
 
-Agents 按优先级自动阅读队列论文，从每篇提取 5 类结构化知识资产，沉淀到 Episteme 知识库：
-
-| 知识资产 | 内容 |
-|---------|------|
-| **Methods Bank** | 核心机制、公式、适用条件、组件可解耦性 |
-| **Gaps & Assumptions** | 显式 limitation + 隐式可质疑假设（含可攻击性评估） |
-| **Experimental Patterns** | Baseline、Metric、消融策略、数据集选择逻辑 |
-| **Cross-Paper Connections** | 与已有论文的互补/矛盾/延伸/可结合关系 |
-| **Reusable Resources** | 代码、数据集、预训练模型 |
-
-读够 5 篇后自动生成 `domain-landscape.md`（领域地图）。
-
----
-
-## Praxis — 科研项目管理
-
-Praxis 将研究项目分为**五大模块**，由 Python 状态机编排，研究者在关键节点参与决策。
-
-```
-  ┌─────────────────────────────────────────────────────────────┐
-  │                        Praxis Pipeline                      │
-  │                                                             │
-  │  M1 Startup   →   M2 Research   →   M3 Code                │
-  │  /praxis-start    /praxis-research   （人机协同）            │
-  │                                          ↓                  │
-  │               M5 Evolution   ←   M4 Paper                  │
-  │               /praxis-evolve     /praxis-paper              │
-  └─────────────────────────────────────────────────────────────┘
-```
-
-### Module 1 · Startup — `/praxis-start <项目名>`
+### 5. 编码完成后进入论文与演化
 
 ```bash
-/praxis-start MyProject    # 交互式立项，完成后自动初始化项目仓库
-```
-
-**这一阶段是 Praxis 与研究者协作最密集的时刻。** 立项支持三种触发方式：
-
-- **研究者主动提供 Idea** — 将初始想法交给 Noesis，由 AI 补充背景、梳理 SOTA、分析研究空白
-- **人机共同头脑风暴** — 研究者向 Noesis 询问 Episteme 知识库内容，结合已积累的 Gaps 和 Methods 共同发散
-- **Noesis 主动迸发灵感** — 由 Noesis 自主梳理 Episteme 库，发现跨论文的潜在联系与未填补的空白，向研究者提出候选方向
-
-无论哪种方式，立项都经历**六维辩论压力测试**（6 个 SubAgent 并行批判候选方向：创新者 · 务实者 · 理论家 · 反对者 · 跨学科者 · 实验主义者），确保方向在进入后续耗时流程前经过充分检验。立项完成后自动生成 `project-startup.md`（含完整辩论记录与已知风险清单），初始化项目仓库。
-
-### Module 2 · Research — `/praxis-research <项目路径>`
-
-```bash
-/praxis-research ~/Documents/MyProject    # 驱动 R1→R8，可随时中断续跑
-```
-
-每阶段 fork 独立 Agent，3 轮上下文隔离审查防止确认偏误，可选 Codex（GPT-4.5-high）提供第三方外部视角：
-
-```
-R1 研究空白发现 ──→ R2 审查 🔒 ──→ R3 方法设计 ──→ R4 审查 🔒
-──→ R5 实验设计 ──→ R6 审查 🔒 ──→ R7 实现规划 ──→ R8 知识回收
-```
-
-审查结果驱动分支路由：`pass`（进入下一阶段）·`revise`（打回修改）·`abandon`（放弃本方向）。Runner 自动注入**迭代历史**，严禁 Agent 重复已排除路径。
-
-### Module 3 · Code — 研究者主导
-
-R8 完成后进入编码实验阶段，参照 R7 产出的 `Codes/` 目录（`code-todo.md`、`experiment-todo.md`）执行。验证失败时：
-
-```bash
-/praxis-conclude ~/Documents/MyProject    # 分析失败层级，写入迭代日志，重置状态
-/praxis-research ~/Documents/MyProject    # 热重启，自动跳过已排除方向
-```
-
-### Module 4 · Paper — `/praxis-paper <项目路径>`
-
-```bash
-/praxis-paper ~/Documents/MyProject      # 驱动 P1→P7，独立状态机，与研究 pipeline 解耦
-```
-
-```
-P1 大纲 ──→ P2 写作 ──→ P3 五角色批判审查 🔒 ──→ P4 整合修改
-──→ P5 终审评分 🔒（< 7.0 回 P4，最多 2 轮）──→ P6 LaTeX ──→ P7 项目级审查 🔒
-```
-
-### Module 5 · Evolution — `/praxis-evolve <项目路径>`
-
-```bash
-/praxis-evolve ~/Documents/MyProject     # 提取跨项目经验，进化框架文档
-```
-
-提取跨项目可复用经验，写入 `~/.noesis/lessons/`。Runner 在后续项目**自动注入**已验证的 lessons——系统随每个项目变得更聪明。同时直接修改 Noesis 框架文档并推送 GitHub，实现框架自我进化。
-
-### 辅助命令
-
-```bash
-/praxis-assimilate ~/Documents/ExistingProject  # 同化现有项目，接入 Noesis 管理
-/praxis-present ~/Documents/MyProject           # 生成结构化进展演示（用于导师汇报）
+/praxis-paper ~/Documents/MyProject
+/praxis-evolve ~/Documents/MyProject
 ```
 
 ---
 
-## 环境要求
+## 运行环境
 
-Noesis 运行在本地 macOS + Claude Code 上，通过 GitHub 在多台设备间同步。
+Noesis 当前面向 **本地 macOS + Claude Code + GitHub** 的研究工作流设计。
 
+- **本地运行**：Noesis 与项目文档主要在本机维护
+- **多机同步**：通过 GitHub 在多台 Mac 之间同步
+- **远程实验**：R7 之后的实验可通过 SSH MCP 在远程 GPU 服务器执行
+- **路径策略**：统一使用 `~`，避免用户名硬编码
+
+---
+
+## 架构要点
+
+### 双状态机
+
+- **研究状态机**：`Praxis/orchestrator/research_state_machine.py`
+- **论文状态机**：`Praxis/orchestrator/paper_state_machine.py`
+
+两者完全解耦，分别由 runner 负责拼装 prompt、注入 lessons、写入 outcome、推进状态。
+
+### 单一事实源
+
+- 主研究状态：`<project>/pipeline-status.json`
+- 论文状态：`<project>/Papers/paper-status.json`
+
+Noesis 不依赖“猜测项目当前在哪一步”，而是依赖显式状态。
+
+### 三类 Agent Tier
+
+| Tier | 角色定位 | 典型阶段 |
+|------|----------|----------|
+| `standard` | AI Co-Author / Writer | R7、P2、P4、P6 |
+| `heavy` | 独立审稿人 / 严格决策者 | R1-R6、R8、P1、P3、P5、P7 |
+| `codex` | 外部第三方视角 | R2、R4、R6、P3、P7 |
+
+### 自动经验注入
+
+Noesis 会把已验证的 lessons 注入后续项目阶段，把高频问题提前暴露，而不是等它们再次发生。
+
+---
+
+## 仓库结构
+
+```text
+Noesis/
+├── Logos/
+│   ├── skills/
+│   └── templates/
+├── Praxis/
+│   ├── orchestrator/
+│   ├── prompts/
+│   ├── skills/
+│   ├── subagents/
+│   └── templates/
+├── .claude/skills/
+├── introduction.md
+├── CLAUDE.md
+└── README.md
 ```
-~/Documents/
-├── Noesis/           ← Noesis 系统本体（GitHub 同步）
-├── Episteme/         ← 知识库（独立 GitHub 仓库）
-└── <项目名>/         ← 各研究项目（各自独立 GitHub 仓库）
 
-~/.noesis/lessons/    ← 跨项目经验教训（本地积累）
-```
+---
 
-多机协作（Mac Mini + MacBook）通过 git 同步，所有路径使用 `~`，不硬编码用户名。R7 后的实验通过 SSH MCP 在远程 GPU 服务器执行，代码经 git 同步，结果回传本地。
+## 适合谁
+
+Noesis 适合这些人：
+
+- 想把 AI 从“聊天助手”升级为“可复用研究系统”的研究者
+- 需要长期维护知识库、持续寻找方向的博士生与独立研究者
+- 需要让项目状态、实验设计与论文写作更加制度化的实验室
+- 已有在研项目，但希望纳入统一方法论与状态机管理的研究团队
+
+如果你追求的是“一次性生成一篇内容”，Noesis 可能太重。  
+如果你在意的是**研究能力如何持续复利**，它正是为这个问题设计的。
+
+---
+
+## 进一步阅读
+
+完整使用说明、阶段细节、Orchestrator CLI 与文件约定，见 [introduction.md](introduction.md)。
 
 ---
 
 ## 致谢
 
-[Sibyl Research System](https://github.com/Sibyl-Research/sibyl-research-system) 对 Noesis 部分阶段的设计提供了灵感，在此表示感谢。
-
----
-
-## 详细文档
-
-完整使用说明（各阶段细节、Orchestrator CLI 参考、文件结构）见 [introduction.md](introduction.md)。
+[Sibyl Research System](https://github.com/Sibyl-Research/sibyl-research-system) 为 Noesis 的部分阶段设计提供了启发。
