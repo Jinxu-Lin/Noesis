@@ -26,6 +26,27 @@ AI Agent 团队（执行层）
 
 ---
 
+## 核心优势
+
+```
+┌─────────────────┬──────────────────────────────────────────────────────────┐
+│  15 个自动化阶段 │  研究 Pipeline R1→R8，论文 Pipeline P1→P7，状态机驱动，    │
+│                 │  每阶段独立 Agent 执行，3 轮上下文隔离审查防止确认偏误      │
+├─────────────────┼──────────────────────────────────────────────────────────┤
+│   9 条斜杠命令   │  /logos-discover · /logos-read · /praxis-start           │
+│                 │  /praxis-research · /praxis-paper · /praxis-conclude      │
+│                 │  /praxis-assimilate · /praxis-present · /praxis-evolve    │
+├─────────────────┼──────────────────────────────────────────────────────────┤
+│  系统自我进化    │  每阶段完成后自动记录流程反思；/praxis-evolve 提取跨项目    │
+│                 │  经验教训，Runner 在后续项目中自动注入——越用越聪明          │
+├─────────────────┼──────────────────────────────────────────────────────────┤
+│  结构化知识管理  │  5 类知识资产（方法库 · 研究空白 · 实验模式 · 论文关联 ·   │
+│                 │  可复用资源）沉淀到 Episteme 知识库，灵感有据可查           │
+└─────────────────┴──────────────────────────────────────────────────────────┘
+```
+
+---
+
 ## 设计哲学
 
 **科研灵感的迸发，离不开知识的深度积累。**
@@ -63,7 +84,21 @@ AI Agent 团队（执行层）
 
 Logos 是一个**没有终点的循环知识引擎**：发现 → 阅读 → 知识沉淀 → 重复。
 
-### 论文发现：`/logos-discover`
+**初始化知识库（首次）**
+
+```bash
+KB="$HOME/Documents/Episteme"
+cp ~/Documents/Noesis/Logos/templates/kb-index.md $KB/
+cp ~/Documents/Noesis/Logos/templates/reading-queue.md $KB/
+cp ~/Documents/Noesis/Logos/templates/research-directions.md $KB/
+# 编辑 Episteme/research-directions.md，填入研究方向与关键词
+```
+
+### `/logos-discover` — 论文发现
+
+```bash
+/logos-discover      # 发现论文，按优先级写入阅读队列
+```
 
 用户配置研究方向后，Logos 通过 5 种搜索策略系统扫描学术前沿：
 
@@ -75,7 +110,13 @@ Logos 是一个**没有终点的循环知识引擎**：发现 → 阅读 → 知
 
 每篇候选论文经 Quick Scan（标题+摘要+结论）进行 4 维评分（**相关性 · 方法可复用性 · 知识互补性 · 假设可攻击性**），按优先级写入阅读队列。
 
-### 深度阅读：`/logos-read [参数]`
+### `/logos-read [参数]` — 深度阅读
+
+```bash
+/logos-read          # 读队列最高优先级 1 篇
+/logos-read 5        # 依次深度阅读 5 篇
+/logos-read 2405.12186   # 直接读指定 arXiv 论文
+```
 
 Agents 按优先级自动阅读队列论文，从每篇提取 5 类结构化知识资产，沉淀到 Episteme 知识库：
 
@@ -107,11 +148,13 @@ Module 4: Paper        /praxis-paper       P1→P7 自动化论文写作
 Module 5: Evolution    /praxis-evolve      提取跨项目经验，进化框架
 ```
 
-### Module 1 · Startup — 项目立项
+### Module 1 · Startup — `/praxis-start <项目名>`
 
-**这一阶段是 Praxis 与研究者协作最密集的时刻。**
+```bash
+/praxis-start MyProject    # 交互式立项，完成后自动初始化项目仓库
+```
 
-立项有三种触发方式，均支持：
+**这一阶段是 Praxis 与研究者协作最密集的时刻。** 立项有三种触发方式：
 
 1. **研究者主动提供 Idea** — 将初始想法交给 Noesis，由 AI 补充背景、梳理 SOTA、分析研究空白
 2. **人机共同头脑风暴** — 研究者向 Noesis 询问 Episteme 知识库的内容，结合已积累的 Gaps 和 Methods 共同发散
@@ -121,85 +164,56 @@ Module 5: Evolution    /praxis-evolve      提取跨项目经验，进化框架
 
 立项完成后：生成 `project-startup.md`（含完整辩论记录与已知风险清单），初始化项目仓库，状态进入 R1。
 
-### Module 2 · Research — 自动化研究循环
+### Module 2 · Research — `/praxis-research <项目路径>`
 
-`/praxis-research` 驱动 R1→R8，每阶段 fork 独立 Agent，三轮独立审查（上下文隔离，防止确认偏误），可选 Codex（GPT-4.5-high）提供第三方外部视角：
+```bash
+/praxis-research ~/Documents/MyProject    # 驱动 R1→R8，可随时中断续跑
+```
+
+每阶段 fork 独立 Agent，三轮独立审查（上下文隔离，防止确认偏误），可选 Codex（GPT-4.5-high）提供第三方外部视角：
 
 ```
 R1 研究空白发现 → R2 审查🔒 → R3 方法设计 → R4 审查🔒
 → R5 实验设计 → R6 审查🔒 → R7 实现规划 → R8 知识回收
 ```
 
-审查结果驱动路由：`pass`（进入下一阶段）/ `revise`（打回修改）/ `abandon`（放弃本方向）。
-
-Runner 自动注入**迭代历史**（若本方向已经历失败迭代），严禁 Agent 重复已排除路径。
+审查结果驱动路由：`pass`（进入下一阶段）/ `revise`（打回修改）/ `abandon`（放弃本方向）。Runner 自动注入**迭代历史**，严禁 Agent 重复已排除路径。
 
 ### Module 3 · Code — 研究者主导阶段
 
 R8 完成后进入编码实验阶段。参照 R7 产出的 `Codes/` 目录（`code-todo.md`、`experiment-todo.md`）执行。
 
-**验证失败时**，运行 `/praxis-conclude` 分析失败层级，写入迭代日志，重置状态，热重启 `/praxis-research`——自动跳过已排除方向。
+**验证失败时**，热重启流程：
 
-### Module 4 · Paper — 自动化论文写作
+```bash
+/praxis-conclude ~/Documents/MyProject    # 分析失败层级，写入迭代日志，重置状态
+/praxis-research ~/Documents/MyProject    # 热重启，自动跳过已排除方向
+```
 
-独立状态机（`paper_state_machine.py`），与主 pipeline 完全解耦：
+### Module 4 · Paper — `/praxis-paper <项目路径>`
+
+```bash
+/praxis-paper ~/Documents/MyProject      # 驱动 P1→P7，独立状态机，与研究 pipeline 解耦
+```
 
 ```
 P1 大纲 → P2 写作 → P3 五角色批判审查🔒 → P4 整合修改
 → P5 终审评分🔒（< 7.0 → 回 P4，最多 2 轮）→ P6 LaTeX → P7 项目级审查🔒
 ```
 
-### Module 5 · Evolution — 框架进化
-
-项目完成后，`/praxis-evolve` 提取跨项目可复用经验，写入 `~/.noesis/lessons/`。Runner 在后续项目**自动注入**已验证的 lessons——系统随每个项目变得更聪明。
-
-同时基于各阶段积累的 `pipeline-evolution-log.md`，直接修改 Noesis 框架文档并推送 GitHub，实现框架自我进化。
-
----
-
-## 快速开始
-
-### 初始化知识库（首次）
+### Module 5 · Evolution — `/praxis-evolve <项目路径>`
 
 ```bash
-KB="$HOME/Documents/Episteme"
-cp ~/Documents/Noesis/Logos/templates/kb-index.md $KB/
-cp ~/Documents/Noesis/Logos/templates/reading-queue.md $KB/
-cp ~/Documents/Noesis/Logos/templates/research-directions.md $KB/
-# 编辑 Episteme/research-directions.md，填入研究方向与关键词
+/praxis-evolve ~/Documents/MyProject     # 提取跨项目经验，进化框架文档
 ```
 
-### 积累知识
-
-```bash
-/logos-discover      # 发现论文，更新阅读队列
-/logos-read 5        # 深度阅读 5 篇，提取知识资产
-```
-
-### 启动与执行研究
-
-```bash
-/praxis-start MyProject                        # 交互式项目孵化（立项）
-/praxis-research ~/Documents/MyProject         # R1→R8 自动化研究
-
-# 人工编码实验...（参照 Codes/ 目录）
-
-/praxis-paper ~/Documents/MyProject            # P1→P7 论文写作
-/praxis-evolve ~/Documents/MyProject           # 提取经验，进化框架
-```
-
-### 编码失败时热重启
-
-```bash
-/praxis-conclude ~/Documents/MyProject         # 分析失败，写入迭代日志
-/praxis-research ~/Documents/MyProject         # 热重启，自动跳过已排除方向
-```
+提取跨项目可复用经验，写入 `~/.noesis/lessons/`。Runner 在后续项目**自动注入**已验证的 lessons——系统随每个项目变得更聪明。同时直接修改 Noesis 框架文档并推送 GitHub，实现框架自我进化。
 
 ### 辅助命令
 
 ```bash
-/praxis-assimilate ~/Documents/ExistingProject # 同化现有项目，接入 Noesis 管理
-/praxis-present ~/Documents/MyProject          # 生成进展演示（用于导师汇报）
+/praxis-assimilate ~/Documents/ExistingProject  # 同化现有项目，接入 Noesis 管理
+/praxis-present ~/Documents/MyProject           # 生成进展演示（用于导师汇报）
 ```
 
 ---
@@ -216,6 +230,12 @@ cp ~/Documents/Noesis/Logos/templates/research-directions.md $KB/
 ```
 
 多机协作（Mac Mini + MacBook）通过 git 同步，所有路径使用 `~`，不硬编码用户名。R7 后的实验通过 SSH MCP 在远程 GPU 服务器执行。
+
+---
+
+## 致谢
+
+[Sibyl Research System](https://github.com/Sibyl-Research/sibyl-research-system) 对 Noesis 部分阶段的设计提供了灵感，在此表示感谢。
 
 ---
 
