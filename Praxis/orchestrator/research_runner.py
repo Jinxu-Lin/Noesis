@@ -138,14 +138,24 @@ _PHASE_REVIEW_FILES: dict[str, str] = {
     "R5": "experiment-review.md",
 }
 
+# Maps work phases to downstream documents produced in later phases.
+# On Pivot restart, agent should read these for full iteration context.
+_PHASE_DOWNSTREAM_DOCS: dict[str, list[str]] = {
+    "R1": ["method-design.md", "experiment-design.md"],
+    "R3": ["experiment-design.md"],
+}
+
 
 def _build_iteration_context(project_path: Path, phase: str, iter_count: int) -> str:
     """Detect execution mode from project state and return an injection block.
 
-    Three modes:
-      首次执行  — review file absent AND no iteration-log.md  → empty string
+    Three modes (priority order: Pivot > Revise > Fresh):
+      Pivot     — iteration-log.md present AND iter_count > 0 (hot-restart after coding failure)
       Revise    — review file present (came back from review phase)
-      Pivot     — iteration-log.md present (hot-restart after coding failure)
+      首次执行  — neither condition met → empty string
+
+    Pivot takes priority because /praxis-conclude resets state from coding phase,
+    and any existing review file is stale (from a previous cycle, not a fresh review).
     """
     review_file_name = _PHASE_REVIEW_FILES.get(phase)
     if not review_file_name:
@@ -154,6 +164,31 @@ def _build_iteration_context(project_path: Path, phase: str, iter_count: int) ->
     review_file = project_path / review_file_name
     iter_log    = project_path / "iteration-log.md"
 
+    # Pivot mode takes priority: /praxis-conclude hot-restart overrides stale review files
+    if iter_count > 0 and iter_log.exists():
+        # Build downstream docs reference
+        downstream_lines = ""
+        downstream_docs = _PHASE_DOWNSTREAM_DOCS.get(phase, [])
+        existing_docs = [d for d in downstream_docs if (project_path / d).exists()]
+        if existing_docs:
+            doc_list = "\n".join(f"  - `{d}`" for d in existing_docs)
+            downstream_lines = (
+                f"\n前序迭代产出文档（必须阅读以获取完整失败上下文）：\n{doc_list}\n"
+                f"\n> 这些文档记录了上一轮迭代的完整设计细节，"
+                f"比 iteration-log 摘要更详尽——优先从中理解失败全貌。\n"
+            )
+
+        return (
+            f"\n## 迭代模式：Pivot（第 {iter_count + 1} 轮热重启）\n\n"
+            f"前序方向已排除，迭代日志：`{iter_log}`（必须全文读取）\n"
+            f"{downstream_lines}\n"
+            f"执行要点：\n"
+            f"- 理解所有已排除方向、失败层级（L2/L3/L4）和根因\n"
+            f"- **严禁**重复 iteration-log.md 中已排除的方向\n"
+            f"- 根据失败层级决定改动范围（见 prompt 中的层级说明）\n"
+        )
+
+    # Revise mode: review file present from a fresh review cycle (not stale)
     if review_file.exists():
         return (
             f"\n## 迭代模式：Revise（基于审查意见修改）\n\n"
@@ -162,16 +197,6 @@ def _build_iteration_context(project_path: Path, phase: str, iter_count: int) ->
             f"- 逐条理解每个 Revise / Block 级问题，定位对应段落，针对性修改\n"
             f"- **不从零开始**——保留已通过审查的内容\n"
             f"- Pass 级建议可选择性采纳\n"
-        )
-
-    if iter_count > 0 and iter_log.exists():
-        return (
-            f"\n## 迭代模式：Pivot（第 {iter_count + 1} 轮热重启）\n\n"
-            f"前序方向已排除，迭代日志：`{iter_log}`（必须全文读取）\n\n"
-            f"执行要点：\n"
-            f"- 理解所有已排除方向、失败层级（L2/L3/L4）和根因\n"
-            f"- **严禁**重复 iteration-log.md 中已排除的方向\n"
-            f"- 根据失败层级决定改动范围（见 prompt 中的层级说明）\n"
         )
 
     return ""  # 首次执行 — no special context needed

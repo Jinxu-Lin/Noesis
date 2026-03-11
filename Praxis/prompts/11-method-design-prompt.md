@@ -6,7 +6,7 @@
 
 **Revise 模式额外输入**：`method-review.md`（审查意见，由 runner 在上方注入时说明）
 
-**Pivot 模式额外输入**：`iteration-log.md` + 当前 `method-design.md`（由 runner 在上方注入时说明）
+**Pivot 模式额外输入**：`iteration-log.md` + 当前 `method-design.md` + 前序迭代产出文档（如 `experiment-design.md`，由 runner 在上方注入时说明）
 
 ## 执行流程
 
@@ -68,19 +68,23 @@ Gap 根因 (来自 gap-analysis.md)
 
 ### Pivot 迭代（L2 / L3 热重启）
 
-读 `iteration-log.md`，确认失败层级，再执行对应操作：
+读 `iteration-log.md`，确认失败层级。**同时读 runner 注入的前序迭代产出文档**（如 `experiment-design.md`），从中提取上一轮实验设计的完整细节——哪些实验配置有效、哪些 metric 有诊断价值、哪些 baseline 行为符合预期。这些信息对方法修改至关重要。
+
+然后执行对应操作：
 
 **L2 Swap（组件替换）**：
 1. 定位**失败组件**，确认其余组件仍然有效
-2. **仅替换失败组件**——从知识库搜索替代方案
-3. 验证新组件与框架其他部分的接口兼容性
-4. 更新 `method-design.md`（最小改动）
+2. 结合 `experiment-design.md` 中的实验洞察，理解失败组件在实验中的具体表现
+3. **仅替换失败组件**——从知识库搜索替代方案
+4. 验证新组件与框架其他部分的接口兼容性
+5. 更新 `method-design.md`（最小改动）
 
 **L3 Redesign（框架重设计）**：
 1. 理解整体失败原因和已排除约束
 2. 读当前 `method-design.md` 作参考，保留被标记为"已验证可行"的组件
-3. 在已排除约束下**重新设计方法框架**
-4. 重写 `method-design.md`
+3. 从 `experiment-design.md` 中提取可复用的实验发现（如有效的评估维度、baseline 行为规律）
+4. 在已排除约束下**重新设计方法框架**
+5. 重写 `method-design.md`
 
 ## AI Co-Author 关键行为
 - 不被人类知识边界限制，主动搜索跨领域替代组件

@@ -6,7 +6,7 @@
 
 **Revise 模式额外输入**：`gap-review.md`（审查意见，由 runner 在上方注入时说明）
 
-**Pivot 模式额外输入**：`iteration-log.md` + 当前 `gap-analysis.md`（由 runner 在上方注入时说明）
+**Pivot 模式额外输入**：`iteration-log.md` + 当前 `gap-analysis.md` + 前序迭代产出文档（如 `method-design.md`、`experiment-design.md`，由 runner 在上方注入时说明）
 
 ## 执行流程
 
@@ -53,10 +53,11 @@
 ### Pivot 迭代（L4 重启）
 
 1. 读完整 `iteration-log.md`，理解所有已排除的 Gap 方向和根因
-2. 读当前 `gap-analysis.md` 作参考
-3. **严禁**重复 iteration-log.md 中已排除的方向
-4. 在约束下重新从知识库组合推导新 Gap
-5. 更新 `gap-analysis.md` 和 `contribution.md`
+2. **读 runner 注入的前序迭代产出文档**（如 `method-design.md`、`experiment-design.md`），从中提取上一轮的完整设计细节和实验洞察——这些信息比 iteration-log 摘要更丰富
+3. 读当前 `gap-analysis.md` 作参考
+4. **严禁**重复 iteration-log.md 中已排除的方向
+5. 在约束下重新从知识库组合推导新 Gap，充分利用前序迭代中积累的实验发现
+6. 更新 `gap-analysis.md` 和 `contribution.md`
 
 ## AI Co-Author 关键行为
 - 主动从知识库做组合搜索——人类难以同时关联 10+ 篇论文，AI 可以
