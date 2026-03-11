@@ -178,7 +178,7 @@ Lessons 目录：`~/.noesis/lessons/`
 
 如果 Step 6d 执行了任何修改：
 ```bash
-cd ~/Documents/Noesis
+cd ~/Research/Noesis
 git add Praxis/prompts/ Praxis/skills/ Praxis/templates/
 git commit -m "evolve: [项目名] — [改进主题简述]"
 git push origin main

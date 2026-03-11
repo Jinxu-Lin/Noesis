@@ -62,7 +62,7 @@
 向用户展示扫描摘要，只问**一个问题**：
 
 ```
-扫描完成：~/Documents/my-paper/
+扫描完成：~/Research/my-paper/
 
 项目理解：
   研究问题：[你提炼出的一句话描述]
@@ -229,7 +229,7 @@ Fork 一个重量级评审 agent，传入：
 ### Step 6：完整同化报告
 
 ```
-同化完成：~/Documents/my-paper/
+同化完成：~/Research/my-paper/
 
 重建的文档：
   ✓ project-startup.md [从 README.md + Abstract 生成]
@@ -245,8 +245,8 @@ Fork 一个重量级评审 agent，传入：
 
 当前阶段：coding（代码已有，实验结果已存在）
 推荐下一步：
-  论文写作：/praxis-goto ~/Documents/my-paper/ paper_writing
-           → /praxis-paper ~/Documents/my-paper/
+  论文写作：/praxis-goto ~/Research/my-paper/ paper_writing
+           → /praxis-paper ~/Research/my-paper/
 
 注意：所有 [ASSIMILATED] 文档是从现有材料提炼的，建议通读一遍确认准确性。
      如有偏差，直接编辑对应文档即可，不影响 Noesis pipeline 使用。

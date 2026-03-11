@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 论文发现（arXiv/Semantic Scholar 多策略搜索，含争议/负面结果搜索）
 - 深度阅读、知识资产提取（Methods Bank、Gaps & Assumptions、Experimental Patterns、Cross-Paper Connections、Reusable Resources）
 - 命令：`/logos-discover`、`/logos-read`（强制使用 Sonnet 模型）
-- 知识库产出位于：`~/Documents/Episteme`
+- 知识库产出位于：`~/Research/Episteme`
 
 **Praxis**（`Praxis/`）— 研究执行流程，五大模块：
 - **Startup**：`/praxis-start` — 交互式项目种子孵化（六维辩论压力测试），完成后设状态 → R1
@@ -29,13 +29,13 @@ This repo itself is not a research project — it is the **central methodology l
 
 ## Environment
 
-Noesis 运行在本地 macOS 上，存放于 `~/Documents/`，通过 GitHub 在多台 Mac 间同步：
+Noesis 运行在本地 macOS 上，存放于 `~/Research/`，通过 GitHub 在多台 Mac 间同步：
 
 | 路径 | 说明 | 同步方式 |
 |------|------|---------|
-| `~/Documents/Noesis` | Noesis 系统根目录 | GitHub |
-| `~/Documents/Episteme` | Logos 知识库产出 | GitHub |
-| `~/Documents/<项目名>` | 各研究项目 | GitHub（每个项目独立仓库） |
+| `~/Research/Noesis` | Noesis 系统根目录 | GitHub |
+| `~/Research/Episteme` | Logos 知识库产出 | GitHub |
+| `~/Research/<项目名>` | 各研究项目 | GitHub（每个项目独立仓库） |
 | `~/.noesis/lessons/` | 跨项目经验教训 | 本地（各 Mac 独立积累） |
 
 **多机协作**：两台 Mac（Mac Mini / MacBook）通过 `git push` / `git pull` 同步，用户名不同（`jlin8272` / `linjinxu`），因此所有配置使用 `~` 而非硬编码绝对路径。
@@ -49,11 +49,11 @@ Noesis 运行在本地 macOS 上，存放于 `~/Documents/`，通过 GitHub 在�
 ### Logos skills（model: sonnet）
 - `/logos-discover [kb_path]` — 论文发现：多策略搜索、Quick Scan 评分（4维度）、更新阅读队列
 - `/logos-read [参数]` — 深度阅读：提取 5 类知识资产、更新知识库
-- `kb_path` 默认为 `~/Documents/Episteme`，可省略
+- `kb_path` 默认为 `~/Research/Episteme`，可省略
 - `/logos-read` 参数：无参（读队列第1篇）/ 数字（读N篇）/ arXiv ID / 标题关键词
 
 ### Praxis skills
-- `/praxis-start <project_name>` — 交互式项目启动（六维辩论），创建项目于 `~/Documents/<project_name>/`，完成后状态设为 R1
+- `/praxis-start <project_name>` — 交互式项目启动（六维辩论），创建项目于 `~/Research/<project_name>/`，完成后状态设为 R1
 - `/praxis-research <project_path>` — 自动化研究循环（R1→R8）
 - `/praxis-paper <project_path>` — 自动化论文写作（P1→P7）
 - `/praxis-conclude <project_path>` — 编码失败总结，写 iteration-log，重置状态热重启
@@ -67,16 +67,16 @@ Noesis 运行在本地 macOS 上，存放于 `~/Documents/`，通过 GitHub 在�
 
 ```bash
 # 获取下一步动作（返回 JSON，含 fork_prompt）
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py next    <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py next    <project_path>
 
 # 推进状态（fork agent 写完 phase-outcomes/<phase>.json 后调用）
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py advance <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py advance <project_path>
 
 # 查看当前状态
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py status  <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py status  <project_path>
 
 # 强制设置阶段（恢复/覆盖）
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_state_machine.py init-phase <project_path> <phase>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_state_machine.py init-phase <project_path> <phase>
 ```
 
 状态持久化在 `<project>/pipeline-status.json`。Fork agents 将结果写入 `<project>/phase-outcomes/<phase>.json`，格式：`{"outcome": "...", "notes": "..."}`。
@@ -84,10 +84,10 @@ python3 ~/Documents/Noesis/Praxis/orchestrator/research_state_machine.py init-ph
 ### Paper Writing Orchestrator
 
 ```bash
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py next    <project_path>
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py advance <project_path>
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py status  <project_path>
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase <project_path> <phase>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_runner.py next    <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_runner.py advance <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_runner.py status  <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase <project_path> <phase>
 ```
 
 论文状态持久化在 `<project>/Papers/paper-status.json`。Paper outcomes 写入 `<project>/Papers/phase-outcomes/<phase>.json`。

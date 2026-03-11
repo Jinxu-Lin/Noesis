@@ -14,7 +14,7 @@
 - 领域描述 / 关键词
 - 研究者自己的初步想法或直觉
 - 已有的笔记或草稿
-- **"一起看看 Episteme 知识库"** — Claude 与研究者共同探索 `~/Documents/Episteme` 中已积累的知识资产，从中发现可做的方向
+- **"一起看看 Episteme 知识库"** — Claude 与研究者共同探索 `~/Research/Episteme` 中已积累的知识资产，从中发现可做的方向
 
 ## 执行流程
 
@@ -22,16 +22,16 @@
 
 **0a. 确定项目名称与路径**
 
-与研究者确认项目名称，项目默认创建在 `~/Documents/` 下：
+与研究者确认项目名称，项目默认创建在 `~/Research/` 下：
 
 ```bash
-mkdir -p ~/Documents/<project_name>/phase-outcomes
+mkdir -p ~/Research/<project_name>/phase-outcomes
 ```
 
 **0b. 创建项目脚手架**
 
 ```
-~/Documents/<project_name>/
+~/Research/<project_name>/
 ├── CLAUDE.md                  ← 本步骤创建（项目入口文件）
 ├── phase-outcomes/            ← fork agent 写入 outcome JSON
 ├── contribution.md            ← 空文件，Phase 2 时填写
@@ -41,7 +41,7 @@ mkdir -p ~/Documents/<project_name>/phase-outcomes
 **0c. 创建 CLAUDE.md**
 
 按 `Praxis/templates/project-claude-md.md` 模板，填入实际项目信息。关键字段：
-- `Noesis 路径`: `~/Documents/Noesis`（使用 `~`，不硬编码用户名）
+- `Noesis 路径`: `~/Research/Noesis`（使用 `~`，不硬编码用户名）
 - `当前阶段`: Phase 1 (Project Startup)
 
 ---
@@ -218,7 +218,7 @@ project_path: <project_path>
 **7a. 初始化 Git 仓库并创建 GitHub repo**：
 
 ```bash
-cd ~/Documents/<project_name>
+cd ~/Research/<project_name>
 git init
 gh repo create <project_name> --private --source=. --remote=origin
 git add CLAUDE.md project-startup.md contribution.md pipeline-evolution-log.md phase-outcomes/
@@ -231,13 +231,13 @@ git push -u origin main
 **7b. 写入 pipeline-status.json，推进到 R1（Gap Discovery）**：
 
 ```bash
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_state_machine.py init-phase ~/Documents/<project_name> R1
+python3 ~/Research/Noesis/Praxis/orchestrator/research_state_machine.py init-phase ~/Research/<project_name> R1
 ```
 
 同时写入 startup 的 outcome 文件（保持记录一致性）：
 
 ```json
-// ~/Documents/<project_name>/phase-outcomes/startup.json
+// ~/Research/<project_name>/phase-outcomes/startup.json
 {
   "outcome": "done",
   "notes": "<1-2 句总结>"
@@ -248,7 +248,7 @@ python3 ~/Documents/Noesis/Praxis/orchestrator/research_state_machine.py init-ph
 
 ```
 Startup 完成。后续阶段将由自动化运行器推进。
-运行：/praxis-research ~/Documents/<project_name>
+运行：/praxis-research ~/Research/<project_name>
 ```
 
 ## 输出

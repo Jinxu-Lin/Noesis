@@ -16,7 +16,7 @@ R8 Implementation Planning 完成后自动执行，在进入人工编码阶段�
 - `Codes/code-todo.md`、`Codes/experiment-todo.md` — 实现规划
 - `iteration-log.md`（如有，记录 R2-R8 中的迭代历史）
 - `pipeline-evolution-log.md`（如有，供 /praxis-evolve 后续使用，本阶段不处理）
-- `retrospective.md` 模板（`~/Documents/Noesis/Praxis/templates/retrospective.md`）
+- `retrospective.md` 模板（`~/Research/Noesis/Praxis/templates/retrospective.md`）
 
 ## 执行流程
 
@@ -81,7 +81,7 @@ R8 Implementation Planning 完成后自动执行，在进入人工编码阶段�
 
 ### Step 5: 执行知识库更新
 
-将 Step 3 提取的资产**实际写入 Episteme 知识库**（路径：`~/Documents/Episteme/`）：
+将 Step 3 提取的资产**实际写入 Episteme 知识库**（路径：`~/Research/Episteme/`）：
 - 写入 Methods Bank 新条目
 - 更新 Gaps & Assumptions（新 Gap 标记 in-progress，新假设列表）
 - 写入 Experimental Patterns 新条目
@@ -94,7 +94,7 @@ git add retrospective.md
 git commit -m "R11: research design retrospective"
 git push origin main
 
-cd ~/Documents/Episteme
+cd ~/Research/Episteme
 git add .
 git commit -m "update: [项目名] research design knowledge assets (pending validation)"
 git push origin main

@@ -29,8 +29,8 @@ echo $HOME
 ```
 
 将结果记为 `HOME_DIR`，然后：
-- `kb_path` = `HOME_DIR/Documents/Episteme`
-- `noesis_root` = `HOME_DIR/Documents/Noesis`
+- `kb_path` = `HOME_DIR/Research/Episteme`
+- `noesis_root` = `HOME_DIR/Research/Noesis`
 
 ### 步骤 1：加载 Skill 内容
 

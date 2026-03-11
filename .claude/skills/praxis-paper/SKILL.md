@@ -14,7 +14,7 @@ description: "Praxis 论文写作模块：自动化执行 P1→P7 论文写作�
 
 ## 初始化
 
-1. 从项目 `CLAUDE.md` 读取 `Noesis 路径` 字段（默认通过 `echo $HOME` 推导为 `$HOME/Documents/Noesis`）。
+1. 从项目 `CLAUDE.md` 读取 `Noesis 路径` 字段（默认通过 `echo $HOME` 推导为 `$HOME/Research/Noesis`）。
 2. 设 `RUNNER = <noesis_path>/Praxis/orchestrator/paper_runner.py`。
 3. 确认项目 `Papers/` 目录存在（不存在则创建）。
 

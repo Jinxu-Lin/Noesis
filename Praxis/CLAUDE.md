@@ -59,9 +59,9 @@ Praxis 是 Noesis 的**研究执行子系统**，独立于 Logos 运行。分为
 
 | 路径 | 说明 |
 |------|------|
-| Praxis 系统 | `~/Documents/Noesis/Praxis` |
-| 知识库 (Episteme) | `~/Documents/Episteme` |
-| 研究项目 | `~/Documents/<项目名>` |
+| Praxis 系统 | `~/Research/Noesis/Praxis` |
+| 知识库 (Episteme) | `~/Research/Episteme` |
+| 研究项目 | `~/Research/<项目名>` |
 | Cross-project lessons | `~/.noesis/lessons/` |
 
 所有路径使用 `~`，勿硬编码用户名（多 Mac 协作）。
@@ -74,7 +74,7 @@ Praxis 是 Noesis 的**研究执行子系统**，独立于 Logos 运行。分为
 /praxis-start <项目名>
 ```
 
-交互式创建项目，在 `~/Documents/<项目名>/` 下生成 `CLAUDE.md`、`pipeline-status.json`、`project-startup.md` 等，完成后自动设置状态为 R1。
+交互式创建项目，在 `~/Research/<项目名>/` 下生成 `CLAUDE.md`、`pipeline-status.json`、`project-startup.md` 等，完成后自动设置状态为 R1。
 
 ### 2. 运行研究模块
 
@@ -119,16 +119,16 @@ Praxis 是 Noesis 的**研究执行子系统**，独立于 Logos 运行。分为
 
 ```bash
 # 获取下一步动作（返回 JSON，含 fork_prompt）
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py next    <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py next    <project_path>
 
 # 推进状态（fork agent 写完 phase-outcomes 后调用）
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py advance <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py advance <project_path>
 
 # 查看状态
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py status  <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py status  <project_path>
 
 # 强制设置阶段（恢复/覆盖）
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_state_machine.py init-phase <project_path> <phase>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_state_machine.py init-phase <project_path> <phase>
 ```
 
 状态持久化在 `<project>/pipeline-status.json`。Fork agent 将结果写入 `<project>/phase-outcomes/<phase>.json`，格式为 `{"outcome": "...", "notes": "..."}`。
@@ -139,16 +139,16 @@ python3 ~/Documents/Noesis/Praxis/orchestrator/research_state_machine.py init-ph
 
 ```bash
 # 获取下一步动作（返回 JSON，含 fork_prompt）
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py next    <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_runner.py next    <project_path>
 
 # 推进状态（fork agent 写完 phase-outcomes 后调用）
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py advance <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_runner.py advance <project_path>
 
 # 查看状态
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py status  <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_runner.py status  <project_path>
 
 # 强制设置阶段（恢复/覆盖）
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase <project_path> <phase>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase <project_path> <phase>
 ```
 
 状态持久化在 `<project>/Papers/paper-status.json`。Fork agent 将结果写入 `<project>/Papers/phase-outcomes/<phase>.json`，格式为 `{"outcome": "...", "notes": "..."}`。

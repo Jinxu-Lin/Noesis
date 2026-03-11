@@ -29,8 +29,8 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch, WebSearch, Agent
 echo $HOME
 ```
 
-- `kb_path` = `HOME_DIR/Documents/Episteme`
-- `noesis_root` = `HOME_DIR/Documents/Noesis`
+- `kb_path` = `HOME_DIR/Research/Episteme`
+- `noesis_root` = `HOME_DIR/Research/Noesis`
 
 ### 步骤 1：解析参数
 

@@ -26,7 +26,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 echo $HOME
 ```
 
-- `noesis_root` = `HOME_DIR/Documents/Noesis`
+- `noesis_root` = `HOME_DIR/Research/Noesis`
 - `project_path` = 用户提供的路径
 
 ### 步骤 1：加载 Skill 内容

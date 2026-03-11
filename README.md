@@ -293,7 +293,7 @@ Runner 会自动注入迭代历史，避免重复走已经被排除的路线。
 ### 1. 推荐目录布局
 
 ```text
-~/Documents/
+~/Research/
 ├── Noesis/           ← 本仓库：系统本体
 ├── Episteme/         ← 知识库仓库
 └── <ProjectName>/    ← 各研究项目，各自独立仓库
@@ -307,10 +307,10 @@ Runner 会自动注入迭代历史，避免重复走已经被排除的路线。
 ### 2. 初始化 Episteme
 
 ```bash
-KB="$HOME/Documents/Episteme"
-cp "$HOME/Documents/Noesis/Logos/templates/kb-index.md" "$KB/"
-cp "$HOME/Documents/Noesis/Logos/templates/reading-queue.md" "$KB/"
-cp "$HOME/Documents/Noesis/Logos/templates/research-directions.md" "$KB/"
+KB="$HOME/Research/Episteme"
+cp "$HOME/Research/Noesis/Logos/templates/kb-index.md" "$KB/"
+cp "$HOME/Research/Noesis/Logos/templates/reading-queue.md" "$KB/"
+cp "$HOME/Research/Noesis/Logos/templates/research-directions.md" "$KB/"
 # 编辑 Episteme/research-directions.md，填写研究方向、关键词、种子论文、作者与目标 venue
 ```
 
@@ -325,14 +325,14 @@ cp "$HOME/Documents/Noesis/Logos/templates/research-directions.md" "$KB/"
 
 ```bash
 /praxis-start MyProject
-/praxis-research ~/Documents/MyProject
+/praxis-research ~/Research/MyProject
 ```
 
 ### 5. 编码完成后进入论文与演化
 
 ```bash
-/praxis-paper ~/Documents/MyProject
-/praxis-evolve ~/Documents/MyProject
+/praxis-paper ~/Research/MyProject
+/praxis-evolve ~/Research/MyProject
 ```
 
 ---

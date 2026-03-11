@@ -104,7 +104,7 @@ Noesis 当前面向 **本地 macOS + Claude Code + GitHub** 的工作流设计�
 ### 4.1 推荐目录布局
 
 ```text
-~/Documents/
+~/Research/
 ├── Noesis/           ← Noesis 系统本体（本仓库）
 ├── Episteme/         ← 知识库仓库
 └── <ProjectName>/    ← 各研究项目，各自独立仓库
@@ -116,9 +116,9 @@ Noesis 当前面向 **本地 macOS + Claude Code + GitHub** 的工作流设计�
 
 | 路径 | 说明 | 同步方式 |
 |------|------|---------|
-| `~/Documents/Noesis` | Noesis 系统根目录 | GitHub |
-| `~/Documents/Episteme` | Logos 产出的知识库 | GitHub |
-| `~/Documents/<项目名>` | 具体研究项目目录 | GitHub（每个项目独立仓库） |
+| `~/Research/Noesis` | Noesis 系统根目录 | GitHub |
+| `~/Research/Episteme` | Logos 产出的知识库 | GitHub |
+| `~/Research/<项目名>` | 具体研究项目目录 | GitHub（每个项目独立仓库） |
 | `~/.noesis/lessons/` | 跨项目 lessons | 本地积累 |
 
 ### 4.3 环境假设
@@ -137,15 +137,15 @@ Noesis 当前面向 **本地 macOS + Claude Code + GitHub** 的工作流设计�
 首次使用时，先初始化知识库目录：
 
 ```bash
-KB="$HOME/Documents/Episteme"
-cp "$HOME/Documents/Noesis/Logos/templates/kb-index.md" "$KB/"
-cp "$HOME/Documents/Noesis/Logos/templates/reading-queue.md" "$KB/"
-cp "$HOME/Documents/Noesis/Logos/templates/research-directions.md" "$KB/"
+KB="$HOME/Research/Episteme"
+cp "$HOME/Research/Noesis/Logos/templates/kb-index.md" "$KB/"
+cp "$HOME/Research/Noesis/Logos/templates/reading-queue.md" "$KB/"
+cp "$HOME/Research/Noesis/Logos/templates/research-directions.md" "$KB/"
 ```
 
 然后编辑：
 
-- `~/Documents/Episteme/research-directions.md`
+- `~/Research/Episteme/research-directions.md`
 
 填入：
 
@@ -166,14 +166,14 @@ cp "$HOME/Documents/Noesis/Logos/templates/research-directions.md" "$KB/"
 
 ```bash
 /praxis-start MyResearchProject
-/praxis-research ~/Documents/MyResearchProject
+/praxis-research ~/Research/MyResearchProject
 ```
 
 ### 5.4 编码完成后进入论文模块
 
 ```bash
-/praxis-paper ~/Documents/MyResearchProject
-/praxis-evolve ~/Documents/MyResearchProject
+/praxis-paper ~/Research/MyResearchProject
+/praxis-evolve ~/Research/MyResearchProject
 ```
 
 ---
@@ -197,7 +197,7 @@ cp "$HOME/Documents/Noesis/Logos/templates/research-directions.md" "$KB/"
 | `/logos-discover [kb_path]` | 多策略发现论文，更新阅读队列 |
 | `/logos-read [参数]` | 深读论文，提取结构化知识资产 |
 
-默认知识库路径为 `~/Documents/Episteme`。
+默认知识库路径为 `~/Research/Episteme`。
 
 ### 6.3 `/logos-discover`
 
@@ -255,7 +255,7 @@ cp "$HOME/Documents/Noesis/Logos/templates/research-directions.md" "$KB/"
 
 ### 6.6 Logos 的核心产物
 
-在 `~/Documents/Episteme/` 中，Logos 主要维护：
+在 `~/Research/Episteme/` 中，Logos 主要维护：
 
 ```text
 Episteme/
@@ -677,22 +677,22 @@ Runner 会在后续项目的相同阶段自动注入 lessons，并自动过滤�
 /praxis-start MyResearchProject
 
 # Step 3: 推进研究阶段
-/praxis-research ~/Documents/MyResearchProject
+/praxis-research ~/Research/MyResearchProject
 
 # Step 4: 人工编码与实验
 # 参考 Codes/code-todo.md 与 Codes/experiment-todo.md
 
 # Step 5a: 成功后进入论文
-/praxis-paper ~/Documents/MyResearchProject
+/praxis-paper ~/Research/MyResearchProject
 
 # Step 6: 项目结束后提取 lessons
-/praxis-evolve ~/Documents/MyResearchProject
+/praxis-evolve ~/Research/MyResearchProject
 ```
 
 ### 14.2 接管已有项目
 
 ```bash
-/praxis-assimilate ~/Documents/ExistingProject
+/praxis-assimilate ~/Research/ExistingProject
 ```
 
 之后根据同化结果，继续运行：
@@ -709,10 +709,10 @@ Runner 会在后续项目的相同阶段自动注入 lessons，并自动过滤�
 ### 15.1 研究状态机
 
 ```bash
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py status  <project_path>
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py next    <project_path>
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_runner.py advance <project_path>
-python3 ~/Documents/Noesis/Praxis/orchestrator/research_state_machine.py init-phase <project_path> <phase>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py status  <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py next    <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py advance <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_state_machine.py init-phase <project_path> <phase>
 ```
 
 相关文件：
@@ -723,10 +723,10 @@ python3 ~/Documents/Noesis/Praxis/orchestrator/research_state_machine.py init-ph
 ### 15.2 论文状态机
 
 ```bash
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py status  <project_path>
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py next    <project_path>
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_runner.py advance <project_path>
-python3 ~/Documents/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase <project_path> <phase>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_runner.py status  <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_runner.py next    <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_runner.py advance <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase <project_path> <phase>
 ```
 
 相关文件：
@@ -754,7 +754,7 @@ python3 ~/Documents/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase
 ### 16.1 Noesis 系统仓库
 
 ```text
-~/Documents/Noesis/
+~/Research/Noesis/
 ├── Logos/
 │   ├── CLAUDE.md
 │   ├── skills/
@@ -775,7 +775,7 @@ python3 ~/Documents/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase
 ### 16.2 单个研究项目
 
 ```text
-~/Documents/<ProjectName>/
+~/Research/<ProjectName>/
 ├── CLAUDE.md
 ├── pipeline-status.json
 ├── project-startup.md
@@ -808,7 +808,7 @@ python3 ~/Documents/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase
 ### 16.3 Episteme 知识库
 
 ```text
-~/Documents/Episteme/
+~/Research/Episteme/
 ├── research-directions.md
 ├── reading-queue.md
 ├── kb-index.md

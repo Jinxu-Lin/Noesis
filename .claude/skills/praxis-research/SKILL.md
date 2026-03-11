@@ -14,7 +14,7 @@ description: "Praxis 研究模块：自动化执行 R2→R8 研究流程"
 
 ## 初始化
 
-1. 从项目 `CLAUDE.md` 读取 `Noesis 路径` 字段（默认通过 `echo $HOME` 推导为 `$HOME/Documents/Noesis`）。
+1. 从项目 `CLAUDE.md` 读取 `Noesis 路径` 字段（默认通过 `echo $HOME` 推导为 `$HOME/Research/Noesis`）。
 2. 设 `RUNNER = <noesis_path>/Praxis/orchestrator/research_runner.py`。
 
 ---

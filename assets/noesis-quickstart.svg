@@ -41,7 +41,7 @@
   <text x="244" y="434" class="headline">初始化 Episteme</text>
   <text x="244" y="470" class="body">复制知识库模板，并填写 research-directions.md。</text>
   <rect class="code" x="820" y="406" width="620" height="74" rx="16"/>
-  <text x="852" y="452" class="mono">$ cp Logos/templates/* ~/Documents/Episteme/</text>
+  <text x="852" y="452" class="mono">$ cp Logos/templates/* ~/Research/Episteme/</text>
 
   <circle cx="190" cy="601" r="30" fill="#1ca46f"/>
   <text x="190" y="612" text-anchor="middle" class="num">2</text>

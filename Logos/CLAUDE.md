@@ -15,7 +15,7 @@ Logos（知识积累）
     │       ↓
     ├── 深度阅读 (/logos-read)
     │       ↓
-    └── Episteme 知识库 (~/Documents/Episteme)
+    └── Episteme 知识库 (~/Research/Episteme)
             │
             ↓  知识注入
     Praxis（研究执行）
@@ -32,9 +32,9 @@ Logos 产出的知识库被 Praxis 在以下阶段消费：
 
 | 路径 | 说明 |
 |------|------|
-| Logos 系统 | `~/Documents/Noesis/Logos` |
-| 知识库产出 (Episteme) | `~/Documents/Episteme` |
-| Noesis 根目录 | `~/Documents/Noesis` |
+| Logos 系统 | `~/Research/Noesis/Logos` |
+| 知识库产出 (Episteme) | `~/Research/Episteme` |
+| Noesis 根目录 | `~/Research/Noesis` |
 
 系统代码与知识库产出**分离存放**。两者均通过 GitHub 跨 Mac 同步。
 
@@ -43,8 +43,8 @@ Logos 产出的知识库被 Praxis 在以下阶段消费：
 ### 1. 初始化知识库
 
 ```bash
-KB_DIR="$HOME/Documents/Episteme"
-LOGOS="$HOME/Documents/Noesis/Logos"
+KB_DIR="$HOME/Research/Episteme"
+LOGOS="$HOME/Research/Noesis/Logos"
 cp "$LOGOS/templates/kb-index.md" "$KB_DIR/"
 cp "$LOGOS/templates/reading-queue.md" "$KB_DIR/"
 cp "$LOGOS/templates/research-directions.md" "$KB_DIR/"
@@ -68,7 +68,7 @@ cp "$LOGOS/templates/research-directions.md" "$KB_DIR/"
 | `/logos-discover [kb_path]` | 论文发现：多策略搜索、评分、更新阅读队列 |
 | `/logos-read [参数]` | 深度阅读：阅读论文、提取知识资产、更新知识库 |
 
-`kb_path` 可省略，默认为 `~/Documents/Episteme`。
+`kb_path` 可省略，默认为 `~/Research/Episteme`。
 
 `/logos-read` 参数说明：
 - 无参数：从阅读队列读取 1 篇最高优先级论文
