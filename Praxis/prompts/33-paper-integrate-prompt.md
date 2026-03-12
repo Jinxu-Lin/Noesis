@@ -79,7 +79,7 @@ Agent 首先判断本次执行属于哪种模式：
 | 检查项 | 方法 |
 |--------|------|
 | 叙事一致性 | Introduction 的 claim 全部被 Experiments 覆盖？ |
-| 贡献完整性 | contribution.md 中每个贡献都被充分论证？ |
+| 贡献完整性 | research/contribution.md 中每个贡献都被充分论证？ |
 | 无凭空内容 | 论文是否引入了研究文档中没有的新内容？ |
 | 图表自包含 | 每个图表的 caption 足够独立理解？ |
 | 逻辑自洽 | Intro → Method → Experiments → Conclusion 逻辑链通顺？ |

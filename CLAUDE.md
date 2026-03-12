@@ -56,7 +56,7 @@ Noesis 运行在本地 macOS 上，存放于 `~/Research/`，通过 GitHub 在�
 - `/praxis-start <project_name>` — 交互式项目启动（六维辩论），创建项目于 `~/Research/<project_name>/`，完成后状态设为 R1
 - `/praxis-research <project_path>` — 自动化研究循环（R1→R8）
 - `/praxis-paper <project_path>` — 自动化论文写作（P1→P7）
-- `/praxis-conclude <project_path>` — 编码失败总结，写 iteration-log，重置状态热重启
+- `/praxis-conclude <project_path>` — 编码失败总结，写 iteration-log + result.md，统一重置到 R1 热重启
 - `/praxis-assimilate <project_path>` — 同化现有项目（重建文档 + 真实运行 R2/R4/R6 评审）
 - `/praxis-present <project_path>` — 生成 presentation.md（热启动支持，保留人工编辑）
 - `/praxis-evolve <project_path>` — 提取跨项目 lessons + 更新 Noesis 框架文档
@@ -114,6 +114,14 @@ R8 Retrospective 在 R7 完成后、coding 开始前执行（知识回收，不�
 
 Review 出口：R2: pass→R3 / revise→R1 / abandon→R8；R4: pass→R5 / revise→R3 / continue_R1→R1 / abandon→R8；R6: pass→R7 / revise→R5 / continue_R3→R3 / abandon→R8
 
+Coding 出口：success→paper_writing / iterate→R1（统一从 R1 热重启） / abandon→complete
+
+**项目目录结构**（研究文档和审查文件分别存放在子目录中）：
+- `research/`：gap-analysis.md, method-design.md, experiment-design.md, contribution.md, result.md
+- `inner-reviews/`：gap-review.md, method-review.md, experiment-review.md
+- `codex-reviews/`：外部 AI 审查（已有）
+- `phase-outcomes/`：阶段结果 JSON + 辩论输出
+
 ### Paper Writing Module（独立状态机）
 
 | Phase | Skill | Type | Tier | Codex |
@@ -147,7 +155,7 @@ P5: 评分 < 7.0 → 回到 P4（最多 2 轮，超限强制通过）。
 
 **单一事实源** — 主 pipeline 唯一状态源：`pipeline-status.json`；论文模块：`Papers/paper-status.json`。无自动检测或回退推断。
 
-**迭代模式（Runner 自动注入）** — Revise 模式（review 文件存在 → 基于审查意见修改）；Pivot 模式（`iteration-log.md` 存在且阶段已迭代 → 热重启，严禁重复已排除方向）；迭代守卫（研究 ≥ 3 次 / 论文 ≥ 5 次迭代发警告）。
+**迭代模式（Runner 自动注入）** — Revise 模式（review 文件存在 → 基于审查意见修改）；Pivot 模式（`iteration-log.md` 存在且阶段已迭代 → 热重启**统一从 R1 开始**，严禁重复已排除方向，读取 `research/result.md` 获取实验洞察）；迭代守卫（研究 ≥ 3 次 / 论文 ≥ 5 次迭代发警告）。
 
 **跨项目学习** — `/praxis-evolve` 产出两类成果：① lessons → `~/.noesis/lessons/<skill_name>.md`，Runner 在相同阶段自动注入（`[✗ineffective]` 自动过滤，`[RECURRING]` 排在最前）；② 框架进化 → 基于 `pipeline-evolution-log.md` 直接修改 Noesis 框架文档并 push GitHub。
 

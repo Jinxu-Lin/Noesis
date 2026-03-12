@@ -24,10 +24,11 @@
 | 文档 | 状态 | 说明 |
 |------|------|------|
 | `project-startup.md` | | Phase 1 — 项目知识基础 |
-| `gap-analysis.md` | | Phase 2 — 研究空白与研究问题 |
-| `method-design.md` | | Phase 4 — 方法设计与理论 |
-| `experiment-design.md` | | Phase 6 — 实验方案（含结果） |
-| `contribution.md` | | 跨阶段 — 贡献跟踪 |
+| `research/gap-analysis.md` | | Phase 2 — 研究空白与研究问题 |
+| `research/method-design.md` | | Phase 4 — 方法设计与理论 |
+| `research/experiment-design.md` | | Phase 6 — 实验方案（含结果） |
+| `research/contribution.md` | | 跨阶段 — 贡献跟踪 |
+| `research/result.md` | | 实验结果与洞察（如有） |
 | `iteration-log.md` | | 迭代历史（如有） |
 
 ## 迭代记录
@@ -59,7 +60,7 @@ Code/
 
 ### 方法组件 → 代码映射
 
-| method-design.md 中的组件 | 代码文件 | 说明 |
+| research/method-design.md 中的组件 | 代码文件 | 说明 |
 |--------------------------|---------|------|
 | Component A | `src/methods/xxx.py` | |
 | Component B | `src/methods/yyy.py` | |
@@ -98,11 +99,11 @@ Code/
 
 - **配置管理**: [yaml / hydra / argparse]
 - **实验结果**: 存储在 `experiments/[实验名]/[日期]/`
-- **重要**: 修改核心方法代码前，先读 method-design.md 中对应的理论部分
+- **重要**: 修改核心方法代码前，先读 research/method-design.md 中对应的理论部分
 
 ### 关键实现决策记录
 
-| 决策 | 原因 | 对应 method-design.md 章节 |
+| 决策 | 原因 | 对应 research/method-design.md 章节 |
 |------|------|--------------------------|
 | | | |
 

@@ -28,22 +28,33 @@
 2. **验证了什么？** — 运行了哪些实验（Dim 0 或更多）
 3. **失败了什么？** — 具体的失败现象、指标数据
 4. **失败原因分析** — 与用户讨论：
-   - 是某个组件不 work？（→ L2 Swap，回到 R4 换组件）
-   - 是整体方法框架有问题？（→ L3 Redesign，回到 R4 重设计）
-   - 是 Gap/RQ 方向本身有问题？（→ L4 Pivot，回到 R2 换方向）
-   - 是否应该放弃该项目？（→ Abandon，进入 R11 回顾）
+   - 是某个组件不 work？（→ L2 Swap，回到 R1，R1 agent 会根据 L2 标签微调 Gap）
+   - 是整体方法框架有问题？（→ L3 Redesign，回到 R1，R1 agent 重新框架化 Gap）
+   - 是 Gap/RQ 方向本身有问题？（→ L4 Pivot，回到 R1，换全新方向）
+   - 是否应该放弃该项目？（→ Abandon，进入 R8 回顾）
 
-同时读取项目中的现有文档（`method-design.md`、`experiment-design.md`、`Codes/` 下的文件）来辅助分析。
+同时读取项目中的现有文档（`research/method-design.md`、`research/experiment-design.md`、`Codes/` 下的文件）来辅助分析。
 
 ### Step 3: 写入 iteration-log.md
 
 按 `<noesis_root>/Praxis/templates/iteration-log.md` 模板格式，在项目的 `iteration-log.md` 中追加一个新 Entry：
 
 - **迭代级别**：L2 / L3 / L4 / Abandon
-- **目标 Phase**：R4 / R2 / R11
+- **目标 Phase**：R1 / R8
 - **失败诊断**：核心发现、失败定位、根因分析、证据
 - **约束传递**：已验证可行的部分、已排除方案、建议方向
-- **当前版本快照**：method-design.md 摘要、关键实验结果
+- **当前版本快照**：research/method-design.md 摘要、关键实验结果
+
+同时写入 `research/result.md`（追加模式）：
+
+将实验过程中所有有价值的发现和洞察记录在此文件中。与 iteration-log.md 不同，result.md 不受结构化格式限制，可以详细记录：
+- 实验观察到的现象和数据
+- 与用户讨论中产生的 insight
+- 各组件的实际行为 vs 预期行为
+- 意外发现（即使方法失败，这些发现可能指向新方向）
+- 具体的实验数据、图表描述、日志片段等
+
+> 这些一手信息是后续研究迭代最宝贵的输入。
 
 ### Step 4: 设置状态
 
@@ -55,10 +66,10 @@ python3 <noesis_root>/Praxis/orchestrator/research_state_machine.py init-phase <
 
 | 诊断结果 | 目标 Phase | 说明 |
 |---------|-----------|------|
-| L2 Swap（换组件） | R4 | method-design 会读 iteration-log.md，仅替换失败组件 |
-| L3 Redesign（换框架） | R4 | method-design 会读 iteration-log.md，重新设计框架 |
-| L4 Pivot（换方向） | R2 | gap-discovery 会读 iteration-log.md，避免已排除方向 |
-| Abandon | R11 | 进入回顾，提取经验教训 |
+| L2 Swap（换组件） | R1 | gap-discovery 读 iteration-log + result.md，微调 Gap 后重建完整叙事 |
+| L3 Redesign（换框架） | R1 | gap-discovery 读 iteration-log + result.md，重新框架化 Gap |
+| L4 Pivot（换方向） | R1 | gap-discovery 读 iteration-log + result.md，避免已排除方向 |
+| Abandon | R8 | 进入回顾，提取经验教训 |
 
 ### Step 5: 提示下一步
 

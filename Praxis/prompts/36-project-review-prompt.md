@@ -8,10 +8,10 @@ P6 LaTeX 编译完成后，对**整个研究项目**（不仅是论文）进行�
 - `Papers/paper.md` — 完整论文 Markdown
 - `Papers/review.md` — P5 终审报告
 - `Papers/critique/summary.md` — P3 审查汇总
-- `contribution.md` — 贡献列表
-- `gap-analysis.md` — Gap 分析
-- `method-design.md` — 方法设计
-- `experiment-design.md` — 实验设计
+- `research/contribution.md` — 贡献列表
+- `research/gap-analysis.md` — Gap 分析
+- `research/method-design.md` — 方法设计
+- `research/experiment-design.md` — 实验设计
 - `Codes/` — 代码与实验结果（如存在）
 
 ## 执行流程

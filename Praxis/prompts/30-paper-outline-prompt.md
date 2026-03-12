@@ -5,10 +5,10 @@
 
 ## 输入
 - `project-startup.md` — 背景材料、研究动机
-- `gap-analysis.md` — Gap 定义、RQ、根因分析
-- `method-design.md` — 方法框架、因果论证
-- `experiment-design.md` — 实验设计
-- `contribution.md` — 贡献列表
+- `research/gap-analysis.md` — Gap 定义、RQ、根因分析
+- `research/method-design.md` — 方法框架、因果论证
+- `research/experiment-design.md` — 实验设计
+- `research/contribution.md` — 贡献列表
 - `Codes/` 目录 — 实验结果、图表
 
 ## 执行流程
@@ -43,12 +43,12 @@
 #### 3.3 图表规划
 | 图/表编号 | 类型 | 内容描述 | 数据来源 | 所在章节 |
 |-----------|------|---------|---------|---------|
-| Fig.1 | Framework | 方法整体架构 | method-design.md | Method |
+| Fig.1 | Framework | 方法整体架构 | research/method-design.md | Method |
 | Tab.1 | Results | 主实验结果 | Codes/ | Experiments |
 | ... | ... | ... | ... | ... |
 
 #### 3.4 叙事一致性检查
-- contribution.md 中每个贡献 → 在论文中如何论证和验证
+- research/contribution.md 中每个贡献 → 在论文中如何论证和验证
 - 每个实验 → 验证哪个 claim
 - 确保无悬空贡献（有 claim 无验证）和无悬空实验（有验证无 claim）
 
@@ -61,7 +61,7 @@
 
 ## AI Co-Author 关键行为
 - 从研究文档**映射**到论文结构，而非从零创作
-- 叙事脊柱必须与 gap-analysis → method-design → experiments 的逻辑链一致
+- 叙事脊柱必须与 research/gap-analysis → research/method-design → experiments 的逻辑链一致
 - 大纲阶段不写正文，只规划结构和素材映射
 - 图表规划要考虑审稿人的阅读体验
 

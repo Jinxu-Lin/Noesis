@@ -20,15 +20,15 @@ debate_output_subdir: R7   # phase-outcomes/debate/R7/
 # SubAgent 需要读取的文档
 input_docs:
   required:
-    - gap-analysis.md
-    - method-design.md
-    - experiment-design.md
-    - contribution.md
+    - research/gap-analysis.md
+    - research/method-design.md
+    - research/experiment-design.md
+    - research/contribution.md
   optional:
     - project-startup.md  # 含否证条件，用于验证实验设计是否能真正测试假设
 
 # 审查报告输出文件名
-output_doc: experiment-review.md
+output_doc: inner-reviews/experiment-review.md
 
 # 审查维度
 # 注：P7 是最关键的 Review，借鉴 Sibyl Methodologist 视角大幅加强方法论审计

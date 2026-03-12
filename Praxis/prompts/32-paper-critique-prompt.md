@@ -7,9 +7,9 @@ P2 章节写作完成，需要从多个审稿人视角对全文进行独立审�
 - `Papers/sections/` — 所有章节文件
 - `Papers/outline.md` — 论文大纲
 - `Papers/notation.md` — 符号表
-- `contribution.md` — 贡献列表
-- `method-design.md` — 方法设计（用于验证论文是否准确反映方法）
-- `experiment-design.md` — 实验设计（用于验证论文是否准确反映实验）
+- `research/contribution.md` — 贡献列表
+- `research/method-design.md` — 方法设计（用于验证论文是否准确反映方法）
+- `research/experiment-design.md` — 实验设计（用于验证论文是否准确反映实验）
 
 ## 执行流程
 

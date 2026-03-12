@@ -6,8 +6,8 @@ P1 大纲完成，按照大纲顺序写作各章节。
 ## 输入
 - `Papers/outline.md` — 论文大纲（结构、素材映射、图表规划）
 - `Papers/notation.md` — 符号表
-- `gap-analysis.md`、`method-design.md`、`experiment-design.md` — 研究文档
-- `contribution.md` — 贡献列表
+- `research/gap-analysis.md`、`research/method-design.md`、`research/experiment-design.md` — 研究文档
+- `research/contribution.md` — 贡献列表
 - `project-startup.md` — 背景材料
 - `Codes/` — 实验结果、图表
 
@@ -36,16 +36,16 @@ P1 大纲完成，按照大纲顺序写作各章节。
 
 ### Step 1: Method (`Papers/sections/method.md`)
 
-- **素材来源**：`method-design.md` 直接转化
+- **素材来源**：`research/method-design.md` 直接转化
 - **核心叙事**：Gap → 根因 → 方法设计理由 → 技术细节 → 为什么能解决
 - 保留数学公式的精确表述，使用 `notation.md` 统一符号
 - 包含方法图（Framework Figure）描述——说明图中应包含的元素和布局
-- **不发明新方法**——所有内容必须来自 `method-design.md`
-- **模式 A 精炼要点**：检查所有数学符号是否与 `notation.md` 完全一致；确认 Framework Figure 描述完整；删除任何 Codex 补充的超出 `method-design.md` 范围的技术细节
+- **不发明新方法**——所有内容必须来自 `research/method-design.md`
+- **模式 A 精炼要点**：检查所有数学符号是否与 `notation.md` 完全一致；确认 Framework Figure 描述完整；删除任何 Codex 补充的超出 `research/method-design.md` 范围的技术细节
 
 ### Step 2: Experiments (`Papers/sections/experiments.md`)
 
-- **素材来源**：`experiment-design.md` + `Codes/` 实验结果
+- **素材来源**：`research/experiment-design.md` + `Codes/` 实验结果
 - 结构：
   1. Experimental Setup（数据集、baselines、超参数、硬件）
   2. Main Results（主表/主图 + 分析）
@@ -54,18 +54,18 @@ P1 大纲完成，按照大纲顺序写作各章节。
 - 每个实验明确说清"它验证了什么 claim"
 - 表格和图的 caption 要**自包含**（只读 caption 就能理解图表）
 - 与 baselines 对比要公平：相同数据集、相同评估指标
-- **模式 A 精炼要点**：填充所有 `[RESULT: ...]` 占位符（来自 `Codes/` 实际数据）；确认所有 baseline 数字与 `experiment-design.md` 一致；删除 Codex 可能虚构的数字
+- **模式 A 精炼要点**：填充所有 `[RESULT: ...]` 占位符（来自 `Codes/` 实际数据）；确认所有 baseline 数字与 `research/experiment-design.md` 一致；删除 Codex 可能虚构的数字
 
 ### Step 3: Introduction (`Papers/sections/intro.md`)
 
-- **素材来源**：`gap-analysis.md` + `contribution.md` + `project-startup.md`
+- **素材来源**：`research/gap-analysis.md` + `research/contribution.md` + `project-startup.md`
 - 叙事结构（约 4-5 段）：
   1. 领域背景 + 任务重要性
   2. 现有方法 + 它们的局限性
   3. Gap 的精确描述 + 根因
   4. 我们的方法概述 + 关键洞察
   5. 贡献列表（每个贡献 1 bullet）
-- 贡献列表**直接来自 `contribution.md`**——不在论文中发明新贡献
+- 贡献列表**直接来自 `research/contribution.md`**——不在论文中发明新贡献
 - 每个贡献 claim 都必须在 Experiments 中有对应验证
 
 ### Step 4: Related Work (`Papers/sections/related_work.md`)
@@ -89,7 +89,7 @@ P1 大纲完成，按照大纲顺序写作各章节。
 - 结构：问题 → 方法 → 结果 → 贡献
 - 4-6 句话，150-250 词
 - 不使用"In this paper, we..."等套话
-- **模式 A 精炼要点**：确认摘要中的数字与 Experiments 节一致；确认贡献表述与 `contribution.md` 对齐
+- **模式 A 精炼要点**：确认摘要中的数字与 Experiments 节一致；确认贡献表述与 `research/contribution.md` 对齐
 
 ### Step 7（可选）: 外部 AI 跨章节一致性审查
 

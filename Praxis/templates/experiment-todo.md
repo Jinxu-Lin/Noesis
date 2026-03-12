@@ -1,12 +1,12 @@
 # Experiment Execution Todo: [项目名称]
 
-> 本文档是 `experiment-design.md` 的细粒度执行清单。
+> 本文档是 `research/experiment-design.md` 的细粒度执行清单。
 > AI Co-Author 在实验阶段直接依据此文档执行，逐项完成并标记状态。
 > 状态: [ ] 待做 | [x] 完成 | [!] 阻塞 | [-] 跳过
 >
 > **铁律**:
 > 1. 每次实验运行后，**立即**更新本文档的状态和结果
-> 2. 每次结果产出后，**立即**同步到 `experiment-design.md` 对应章节
+> 2. 每次结果产出后，**立即**同步到 `research/experiment-design.md` 对应章节
 > 3. 不要"跑完再记"——实时记录，绝不拖延
 
 ---

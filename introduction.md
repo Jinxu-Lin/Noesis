@@ -405,12 +405,12 @@ Research 模块由：
 
 | 阶段 | 核心输出 |
 |------|----------|
-| `R1` | `gap-analysis.md` |
-| `R2` | `gap-review.md` + 路由决策 |
-| `R3` | `method-design.md` |
-| `R4` | `method-review.md` + 路由决策 |
-| `R5` | `experiment-design.md` |
-| `R6` | `experiment-review.md` + 路由决策 |
+| `R1` | `research/gap-analysis.md` |
+| `R2` | `inner-reviews/gap-review.md` + 路由决策 |
+| `R3` | `research/method-design.md` |
+| `R4` | `inner-reviews/method-review.md` + 路由决策 |
+| `R5` | `research/experiment-design.md` |
+| `R6` | `inner-reviews/experiment-review.md` + 路由决策 |
 | `R7` | `Codes/code-todo.md` + `Codes/experiment-todo.md` |
 | `R8` | `retrospective.md` |
 
@@ -571,7 +571,7 @@ Noesis 先用 `P1` 建立叙事脊柱和符号表，再用 `P2` 分章节写作�
 
 Paper 阶段的基本原则是：
 
-- 从 `gap-analysis.md`、`method-design.md`、`experiment-design.md` 和 `Codes/` 提取素材
+- 从 `research/gap-analysis.md`、`research/method-design.md`、`research/experiment-design.md` 和 `Codes/` 提取素材
 - 保持 `Gap → 根因 → 方法 → 验证 → 贡献` 的叙事一致性
 - 不在论文阶段凭空发明研究贡献
 
@@ -779,12 +779,16 @@ python3 ~/Research/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase 
 ├── CLAUDE.md
 ├── pipeline-status.json
 ├── project-startup.md
-├── gap-analysis.md
-├── gap-review.md
-├── method-design.md
-├── method-review.md
-├── experiment-design.md
-├── experiment-review.md
+├── research/
+│   ├── gap-analysis.md
+│   ├── method-design.md
+│   ├── experiment-design.md
+│   ├── contribution.md
+│   └── result.md
+├── inner-reviews/
+│   ├── gap-review.md
+│   ├── method-review.md
+│   └── experiment-review.md
 ├── retrospective.md
 ├── iteration-log.md
 ├── pipeline-evolution-log.md

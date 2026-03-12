@@ -133,29 +133,30 @@ def _load_reflect_prompt() -> str:
 # Maps work phases to the review file produced by the preceding review phase.
 # Presence of this file → Revise mode.
 _PHASE_REVIEW_FILES: dict[str, str] = {
-    "R1": "gap-review.md",
-    "R3": "method-review.md",
-    "R5": "experiment-review.md",
+    "R1": "inner-reviews/gap-review.md",
+    "R3": "inner-reviews/method-review.md",
+    "R5": "inner-reviews/experiment-review.md",
 }
 
 # Maps work phases to downstream documents produced in later phases.
 # On Pivot restart, agent should read these for full iteration context.
 _PHASE_DOWNSTREAM_DOCS: dict[str, list[str]] = {
-    "R1": ["method-design.md", "experiment-design.md"],
-    "R3": ["experiment-design.md"],
+    "R1": ["research/method-design.md", "research/experiment-design.md", "research/result.md"],
+    "R3": ["research/experiment-design.md", "research/result.md"],
+    "R5": ["research/result.md"],
 }
 
 
 def _build_iteration_context(project_path: Path, phase: str, iter_count: int) -> str:
     """Detect execution mode from project state and return an injection block.
 
-    Three modes (priority order: Pivot > Revise > Fresh):
+    Three modes:
+      Revise    — review file present AND newer than iteration-log (fresh review feedback)
       Pivot     — iteration-log.md present AND iter_count > 0 (hot-restart after coding failure)
-      Revise    — review file present (came back from review phase)
       首次执行  — neither condition met → empty string
 
-    Pivot takes priority because /praxis-conclude resets state from coding phase,
-    and any existing review file is stale (from a previous cycle, not a fresh review).
+    When both files exist, the newer one wins: a fresh review file (written by R2/R4/R6)
+    means Revise mode; a newer iteration-log (written by /praxis-conclude) means Pivot mode.
     """
     review_file_name = _PHASE_REVIEW_FILES.get(phase)
     if not review_file_name:
@@ -164,7 +165,21 @@ def _build_iteration_context(project_path: Path, phase: str, iter_count: int) ->
     review_file = project_path / review_file_name
     iter_log    = project_path / "iteration-log.md"
 
-    # Pivot mode takes priority: /praxis-conclude hot-restart overrides stale review files
+    # When both files exist, compare modification times to determine which is more recent
+    if review_file.exists() and iter_count > 0 and iter_log.exists():
+        if review_file.stat().st_mtime > iter_log.stat().st_mtime:
+            # Review file is newer → came from a fresh review cycle → Revise mode
+            return (
+                f"\n## 迭代模式：Revise（基于审查意见修改）\n\n"
+                f"前序审查已完成，意见文件：`{review_file}`（必须全文读取）\n\n"
+                f"执行要点：\n"
+                f"- 逐条理解每个 Revise / Block 级问题，定位对应段落，针对性修改\n"
+                f"- **不从零开始**——保留已通过审查的内容\n"
+                f"- Pass 级建议可选择性采纳\n"
+            )
+        # else: iteration-log is newer → /praxis-conclude hot-restart → fall through to Pivot
+
+    # Pivot mode: iteration-log exists and is the most recent context source
     if iter_count > 0 and iter_log.exists():
         # Build downstream docs reference
         downstream_lines = ""

@@ -16,10 +16,10 @@ Before calling Codex, read and summarize the following into a compact context bl
 |------|---------|
 | `Papers/outline.md` | Section structure, content mapping, figure plans |
 | `Papers/notation.md` | Symbol table — Codex must use these symbols exactly |
-| `method-design.md` | Primary source for Method section |
-| `experiment-design.md` | Primary source for Experiments section |
-| `gap-analysis.md` | Primary source for Introduction/Related Work |
-| `contribution.md` | Canonical contribution list |
+| `research/method-design.md` | Primary source for Method section |
+| `research/experiment-design.md` | Primary source for Experiments section |
+| `research/gap-analysis.md` | Primary source for Introduction/Related Work |
+| `research/contribution.md` | Canonical contribution list |
 | `project-startup.md` | Background, motivation, task definition |
 
 Codex context limit is generous but not unlimited — keep the injected context focused and relevant to each section.
@@ -54,7 +54,7 @@ You are a senior academic paper author. Draft the "{section_name}" section of th
 {The specific section plan from Papers/outline.md, including target length, key content, and figure/table plans}
 
 ## Primary Source Material
-{Relevant research document content — method-design.md for Method, experiment-design.md for Experiments, gap-analysis.md for Introduction/Related Work}
+{Relevant research document content — research/method-design.md for Method, research/experiment-design.md for Experiments, research/gap-analysis.md for Introduction/Related Work}
 
 ## Symbol & Notation Table
 {Full contents of Papers/notation.md}
@@ -77,15 +77,15 @@ Please draft the "{section_name}" section now.
 
 ## Section-Specific Instructions
 
-**Method**: Inject full `method-design.md`. Emphasize: preserve all mathematical formulations exactly, include figure description for Framework Figure.
+**Method**: Inject full `research/method-design.md`. Emphasize: preserve all mathematical formulations exactly, include figure description for Framework Figure.
 
-**Experiments**: Inject `experiment-design.md` + available results from `Codes/`. If actual numbers are unavailable, use placeholders like `[RESULT: main_table_accuracy]` — Claude will fill these in during refinement.
+**Experiments**: Inject `research/experiment-design.md` + available results from `Codes/`. If actual numbers are unavailable, use placeholders like `[RESULT: main_table_accuracy]` — Claude will fill these in during refinement.
 
-**Introduction**: Inject `gap-analysis.md` + `contribution.md`. Emphasize: contribution list must come verbatim from `contribution.md`, no additions.
+**Introduction**: Inject `research/gap-analysis.md` + `research/contribution.md`. Emphasize: contribution list must come verbatim from `research/contribution.md`, no additions.
 
 **Related Work**: Inject `project-startup.md` background + relevant Episteme content if available. Build technical genealogy, not a citation list.
 
-**Conclusion**: Inject `contribution.md` + note limitations honestly.
+**Conclusion**: Inject `research/contribution.md` + note limitations honestly.
 
 **Abstract**: Inject all 5 previously drafted section summaries. Structure: Problem → Method → Results → Contribution. 150-250 words.
 

@@ -16,9 +16,9 @@ You will receive a project context and the current phase description. Based on t
 
 Review the relevant research artifact from an external AI perspective:
 
-- **R3 (Gap Review)**: Assess `gap-analysis.md` — Are the identified gaps genuinely open? Is the problem scope well-defined? Are there overlooked competing approaches?
-- **R5 (Method Review)**: Assess `method-design.md` — Is the proposed method technically sound? Are there known failure modes? Does it map cleanly to the identified gaps?
-- **R7 (Experiment Review)**: Assess `experiment-design.md` — Are the experiments sufficient to validate the method? Are baselines complete? Are evaluation metrics appropriate?
+- **R3 (Gap Review)**: Assess `research/gap-analysis.md` — Are the identified gaps genuinely open? Is the problem scope well-defined? Are there overlooked competing approaches?
+- **R5 (Method Review)**: Assess `research/method-design.md` — Is the proposed method technically sound? Are there known failure modes? Does it map cleanly to the identified gaps?
+- **R7 (Experiment Review)**: Assess `research/experiment-design.md` — Are the experiments sufficient to validate the method? Are baselines complete? Are evaluation metrics appropriate?
 
 ### Paper Review Phases (P3 / P7)
 

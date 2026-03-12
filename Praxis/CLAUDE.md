@@ -90,7 +90,7 @@ Praxis 是 Noesis 的**研究执行子系统**，独立于 Logos 运行。分为
 /praxis-conclude <项目路径>
 ```
 
-交互式分析失败原因（L2 换组件 / L3 换框架 / L4 换方向），写入 `iteration-log.md`，重置状态，然后 `/praxis-research` 热重启。
+交互式分析失败原因（L2 换组件 / L3 换框架 / L4 换方向），写入 `iteration-log.md` + `research/result.md`，统一重置状态到 R1，然后 `/praxis-research` 热重启。
 
 ### 4. 论文写作
 
@@ -201,7 +201,7 @@ R6 review 出口：`pass`→R7 / `revise`→R5 / `continue_R3`→R3 / `abandon`�
 | coding | — | manual 🔧 | — |
 | paper_writing | — | manual 🔧 | — |
 
-coding 出口：`success`→paper_writing / `iterate_R3`→R3 / `iterate_R1`→R1 / `abandon`→complete
+coding 出口：`success`→paper_writing / `iterate`→R1 / `abandon`→complete
 
 **Module 4: Paper**
 
@@ -277,6 +277,7 @@ Praxis/
     ├── experiment-design.md            ← R5 输出模板
     ├── contribution.md                 ← 跨阶段贡献跟踪
     ├── iteration-log.md                ← 迭代历史（conclude 追加）
+    ├── result.md                       ← 实验结果与洞察（conclude 追加）
     ├── retrospective.md                ← R8 输出模板
     ├── proposal.md                     ← 提案模板
     ├── experiment-todo.md              ← 实验待办（R7 产出）
@@ -296,7 +297,7 @@ Praxis/
 **Pipeline 流程**
 - **五大模块**：Startup (`/praxis-start`) → Research (`/praxis-research`, R1→R8) → Code (人工) → Paper (`/praxis-paper`, P1→P7) → Evolution (`/praxis-evolve`)
 - **R8 Retrospective 时机**：在 R7 impl-planning 完成后、coding 开始前执行，不是在论文完成后
-- **coding 热重启**：`/praxis-conclude` 写入 `iteration-log.md` 并通过 `init-phase` 重置状态（L2→R3 / L3→R3 / L4→R1），`/praxis-research` 读取迭代日志避免重复已排除方向
+- **coding 热重启**：`/praxis-conclude` 写入 `iteration-log.md` + `research/result.md` 并通过 `init-phase` 重置状态（**所有级别统一回到 R1**），`/praxis-research` 读取迭代日志和实验结果避免重复已排除方向。L2/L3/L4 仅作为诊断标签记录失败性质，但目标 Phase 始终为 R1，确保叙事脊柱完整
 
 **Startup 六维辩论**
 - `/praxis-start` 的 Step 4 并行召唤 6 个辩论 Agent（创新者、务实者、理论家、反对者、跨学科者、实验主义者），再由综合者汇总判定（方向确认/强化/修正/HIGH RISK）
@@ -304,7 +305,7 @@ Praxis/
 - Step 7 完成 Git 初始化 + GitHub repo 创建，设状态为 R1
 
 **迭代模式（Runner 自动注入上下文）**
-- **Revise 模式**：review 文件存在（如 `gap-review.md`）→ 工作阶段（R1/R3/R5）提示"基于审查意见修改，不从零开始"
+- **Revise 模式**：review 文件存在（如 `inner-reviews/gap-review.md`）→ 工作阶段（R1/R3/R5）提示"基于审查意见修改，不从零开始"
 - **Pivot 模式**：`iteration-log.md` 存在且阶段已迭代 → 提示"热重启第 N 轮，严禁重复已排除方向"
 - **迭代守卫**：研究 pipeline ≥ 3 次迭代发警告；论文 pipeline ≥ 5 次迭代发警告
 

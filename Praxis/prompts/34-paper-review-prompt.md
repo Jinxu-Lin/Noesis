@@ -6,7 +6,7 @@ P4 整合完成，需要以**会议审稿人**身份对完整论文进行终审�
 ## 输入
 - `Papers/paper.md` — 完整论文
 - `Papers/critique/summary.md` — P3 审查汇总（查看之前的问题是否已修复）
-- `contribution.md` — 贡献列表
+- `research/contribution.md` — 贡献列表
 - `Papers/paper-status.json` — 查看当前修订轮次
 
 ## 角色设定

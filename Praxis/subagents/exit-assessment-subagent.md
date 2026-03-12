@@ -16,9 +16,9 @@
 
 你将收到以下文档（全部或部分）：
 - `iteration-log.md` — 完整迭代历史（最关键的输入）
-- `gap-analysis.md` — 当前的研究空白定义
-- `method-design.md` — 当前的方法设计
-- `contribution.md` — 已有贡献记录
+- `research/gap-analysis.md` — 当前的研究空白定义
+- `research/method-design.md` — 当前的方法设计
+- `research/contribution.md` — 已有贡献记录
 - `知识库索引` — 用于评估剩余方案空间
 - `触发来源` — 是哪个 Phase 的什么判定触发了本关卡
 

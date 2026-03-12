@@ -4,9 +4,9 @@
 
 **基础输入（所有模式共用）**：`project-startup.md` + 知识库 (Gaps & Assumptions, Cross-Paper Connections)
 
-**Revise 模式额外输入**：`gap-review.md`（审查意见，由 runner 在上方注入时说明）
+**Revise 模式额外输入**：`inner-reviews/gap-review.md`（审查意见，由 runner 在上方注入时说明）
 
-**Pivot 模式额外输入**：`iteration-log.md` + 当前 `gap-analysis.md` + 前序迭代产出文档（如 `method-design.md`、`experiment-design.md`，由 runner 在上方注入时说明）
+**Pivot 模式额外输入**：`iteration-log.md` + 当前 `research/gap-analysis.md` + 前序迭代产出文档（如 `research/method-design.md`、`research/experiment-design.md`，由 runner 在上方注入时说明）
 
 ## 执行流程
 
@@ -37,27 +37,32 @@
 **Step 4: RQ 公式化**
 将 Gap 转化为具体的、可回答的、可验证的研究问题。
 
-**Step 5: 初始化 contribution.md**
+**Step 5: 初始化 research/contribution.md**
 按 `templates/contribution.md` 模板初始化，记录当前阶段可见的潜在贡献。
 
-**Step 6: 生成 gap-analysis.md**
+**Step 6: 生成 research/gap-analysis.md**
 按 `templates/gap-analysis.md` 模板输出。
 
 ### Revise 迭代（R3 审查返回）
 
-1. 读 `gap-review.md`，逐条理解审查意见
-2. 定位 `gap-analysis.md` 中的对应段落，针对性修改
+1. 读 `inner-reviews/gap-review.md`，逐条理解审查意见
+2. 定位 `research/gap-analysis.md` 中的对应段落，针对性修改
 3. 重点修复 Revise / Block 级维度；**不从零开始**
-4. 更新 `gap-analysis.md`
+4. 更新 `research/gap-analysis.md`
 
-### Pivot 迭代（L4 重启）
+### Pivot 迭代（热重启）
 
-1. 读完整 `iteration-log.md`，理解所有已排除的 Gap 方向和根因
-2. **读 runner 注入的前序迭代产出文档**（如 `method-design.md`、`experiment-design.md`），从中提取上一轮的完整设计细节和实验洞察——这些信息比 iteration-log 摘要更丰富
-3. 读当前 `gap-analysis.md` 作参考
-4. **严禁**重复 iteration-log.md 中已排除的方向
-5. 在约束下重新从知识库组合推导新 Gap，充分利用前序迭代中积累的实验发现
-6. 更新 `gap-analysis.md` 和 `contribution.md`
+1. 读完整 `iteration-log.md`，理解失败级别（L2/L3/L4）、所有已排除的方向和根因
+2. **读 `research/result.md`**（如存在），获取实验过程中的完整洞察和发现——这些是最宝贵的一手信息
+3. **读 runner 注入的前序迭代产出文档**（如 `research/method-design.md`、`research/experiment-design.md`），从中提取上一轮的完整设计细节和实验洞察
+4. 读当前 `research/gap-analysis.md` 作参考
+5. **严禁**重复 iteration-log.md 中已排除的方向
+6. 根据失败级别决定调整幅度：
+   - **L2 Swap**：原 Gap 方向基本正确，只需微调 Gap 表述以适应组件替换
+   - **L3 Redesign**：Gap 方向可能需要重新框架化，但不必完全换方向
+   - **L4 Pivot**：必须寻找全新的 Gap 方向
+7. 充分利用 `research/result.md` 中的实验发现——失败的实验也产出有价值的信息
+8. 更新 `research/gap-analysis.md` 和 `research/contribution.md`
 
 ## AI Co-Author 关键行为
 - 主动从知识库做组合搜索——人类难以同时关联 10+ 篇论文，AI 可以
@@ -66,12 +71,12 @@
 - 迭代时：严格遵守 iteration-log.md 中的"已排除方案"约束
 
 ## 输出
-- `gap-analysis.md`
-- `contribution.md`（初始化或更新）
+- `research/gap-analysis.md`
+- `research/contribution.md`（初始化或更新）
 
 ## Exit Criteria
 - [ ] 能用一句话说清"现有方法做了X，但因为Y所以存在Z问题"
 - [ ] Gap 有明确的根因分析（技术限制 / 错误假设 / 被忽视维度）
 - [ ] RQ 是具体的、可回答的、可验证的
 - [ ] Gap 候选经过评估矩阵筛选
-- [ ] contribution.md 已初始化
+- [ ] research/contribution.md 已初始化

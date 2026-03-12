@@ -46,13 +46,13 @@
 
 **按存在情况读取**：
 - `<project_path>/project-startup.md` ← P1 产出
-- `<project_path>/contribution.md` ← 贡献跟踪
-- `<project_path>/gap-analysis.md` ← P2 产出
-- `<project_path>/gap-review.md` ← P3 产出（含评审意见）
-- `<project_path>/method-design.md` ← P4 产出
-- `<project_path>/method-review.md` ← P5 产出（含评审意见）
-- `<project_path>/experiment-design.md` ← P6 产出
-- `<project_path>/experiment-review.md` ← P7 产出（含评审意见）
+- `<project_path>/research/contribution.md` ← 贡献跟踪
+- `<project_path>/research/gap-analysis.md` ← P2 产出
+- `<project_path>/inner-reviews/gap-review.md` ← P3 产出（含评审意见）
+- `<project_path>/research/method-design.md` ← P4 产出
+- `<project_path>/inner-reviews/method-review.md` ← P5 产出（含评审意见）
+- `<project_path>/research/experiment-design.md` ← P6 产出
+- `<project_path>/inner-reviews/experiment-review.md` ← P7 产出（含评审意见）
 - `<project_path>/Codes/code-todo.md` ← P8 产出
 - `<project_path>/Codes/experiment-todo.md` ← P8 产出（实验 checklist）
 - `<project_path>/iteration-log.md` ← 迭代历史（如有失败迭代）
@@ -144,7 +144,7 @@ status_snapshot: [从 phase-outcomes/*.json 压缩生成，格式：P1:done | P2
 ```
 
 **内容来源**：
-- 主：`gap-analysis.md`（Gap 陈述节、根因分析节、Research Questions 节）
+- 主：`research/gap-analysis.md`（Gap 陈述节、根因分析节、Research Questions 节）
 - 辅：`project-startup.md`（研究动机节）
 - 注意：若 P3 曾有 Revise，使用最终修订版的 gap 陈述（不是初稿）
 
@@ -176,8 +176,8 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 ```
 
 **内容来源**：
-- 主：`method-design.md`（概述节、因果论证节、组件列表、与已有方法对比节）
-- 辅：`contribution.md`（方法贡献节）
+- 主：`research/method-design.md`（概述节、因果论证节、组件列表、与已有方法对比节）
+- 辅：`research/contribution.md`（方法贡献节）
 - 辅（有迭代时）：`iteration-log.md` 最新 Entry 的"当前版本快照"
 
 ---
@@ -202,8 +202,8 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 ```
 
 **内容来源**：
-- 主：`experiment-design.md`（RQ 与实验映射表、Baselines 节、Dim 0 节）
-- 辅：`experiment-review.md`（确认实验设计通过；注意审查意见可能修改了实验）
+- 主：`research/experiment-design.md`（RQ 与实验映射表、Baselines 节、Dim 0 节）
+- 辅：`inner-reviews/experiment-review.md`（确认实验设计通过；注意审查意见可能修改了实验）
 
 ---
 
@@ -253,9 +253,9 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 
 **内容来源**（按优先级）：
 1. `phase-outcomes/*.json` 的 `notes` 字段
-2. `gap-review.md`、`method-review.md`、`experiment-review.md` 中 Revise/Block 意见
+2. `inner-reviews/gap-review.md`、`inner-reviews/method-review.md`、`inner-reviews/experiment-review.md` 中 Revise/Block 意见
 3. `iteration-log.md` 中的"建议方向"（失败迭代的教训）
-4. `method-design.md` 风险评估节、`experiment-design.md` 风险与预案节
+4. `research/method-design.md` 风险评估节、`research/experiment-design.md` 风险与预案节
 
 **每个 DECISION NEEDED 问题必须包含"我们的倾向"**，不把决策完全甩给导师。
 
@@ -327,7 +327,7 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 **内容来源**：
 - pipeline-status.json（history）
 - Codes/experiment-todo.md（checkbox 完成状态）
-- experiment-design.md（各 Dim 的"实际结果"字段，若已填写）
+- research/experiment-design.md（各 Dim 的"实际结果"字段，若已填写）
 - iteration-log.md（如有迭代历史）
 
 ---
@@ -343,17 +343,17 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 
 | # | 贡献描述 | 验证状态 | 支撑证据 |
 |---|---------|---------|---------|
-| C1 | 提出 [方法名]，解决 [Gap] | 理论完成，实验[待验证/进行中/已验证] | method-design.md |
-| C2 | [理论证明 / 算法分析] | [状态] | method-design.md §[N] |
+| C1 | 提出 [方法名]，解决 [Gap] | 理论完成，实验[待验证/进行中/已验证] | research/method-design.md |
+| C2 | [理论证明 / 算法分析] | [状态] | research/method-design.md §[N] |
 | C3 | 在 [Benchmark] 超越 SOTA [X%] | [待验证/已达到] | [结果文件，若有] |
 
 **目标会议**：[Venue] | **截稿**：[Date，若已知]
 ```
 
 **内容来源**：
-- 主：contribution.md（全部贡献条目）
-- 辅：method-review.md、experiment-review.md（审查者认可的贡献点）
-- coding/paper_writing 阶段：experiment-design.md 或 Papers/ 的实际结果数字
+- 主：research/contribution.md（全部贡献条目）
+- 辅：inner-reviews/method-review.md、inner-reviews/experiment-review.md（审查者认可的贡献点）
+- coding/paper_writing 阶段：research/experiment-design.md 或 Papers/ 的实际结果数字
 
 ---
 
@@ -387,7 +387,7 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 ```
 
 **内容来源**：
-- 主：experiment-design.md（各 Dim 模板的"实际结果"字段）
+- 主：research/experiment-design.md（各 Dim 模板的"实际结果"字段）
 - 主：Codes/experiment-todo.md（checkbox 状态 + 实验配置备注）
 - 辅：iteration-log.md（历次迭代的实验数据快照，若有）
 
@@ -449,7 +449,7 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 **内容来源**：
 - 主：基于 S4 Open Questions 生成行动项
 - 辅：Codes/experiment-todo.md（未完成的实验 checklist）
-- 辅：experiment-design.md §风险与预案节（对应条件分支）
+- 辅：research/experiment-design.md §风险与预案节（对应条件分支）
 - AI 自主推导：根据当前阶段和 blocking issues 给出合理的下一步
 
 ---

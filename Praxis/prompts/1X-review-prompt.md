@@ -9,9 +9,9 @@
 ## 触发场景
 
 前序工作 Phase 完成后，由 runner 自动触发（或用户手动调用）：
-- R3: 审查 `gap-analysis.md`      → 加载 `review-configs/gap-review.yaml`
-- R5: 审查 `method-design.md`     → 加载 `review-configs/method-review.yaml`
-- R7: 审查 `experiment-design.md` → 加载 `review-configs/experiment-review.yaml`
+- R3: 审查 `research/gap-analysis.md`      → 加载 `review-configs/gap-review.yaml`
+- R5: 审查 `research/method-design.md`     → 加载 `review-configs/method-review.yaml`
+- R7: 审查 `research/experiment-design.md` → 加载 `review-configs/experiment-review.yaml`
 
 ---
 

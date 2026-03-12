@@ -33,7 +33,7 @@
 **高价值文件（全文读取）**：
 - `README.md`、`OVERVIEW.md`、`proposal.md`
 - `*.pdf`（若可读）、`main.tex`、`paper.tex`、`draft.md`
-- `gap-analysis.md`、`method-design.md`、`experiment-design.md`、`contribution.md`
+- `research/gap-analysis.md`、`research/method-design.md`、`research/experiment-design.md`、`research/contribution.md`
 - `related-work.md`、`literature-review.md`、`survey.md`
 - `retrospective.md`、`iteration-log.md`
 
@@ -73,11 +73,11 @@
 
 同化计划：
   [重建] project-startup.md — 从 README.md 提炼
-  [重建] gap-analysis.md — 从论文 Related Work 段落提炼
+  [重建] research/gap-analysis.md — 从论文 Related Work 段落提炼
   [评审] 运行 R3 Gap 评审
-  [重建] method-design.md — 从论文 Method 章节提炼
+  [重建] research/method-design.md — 从论文 Method 章节提炼
   [评审] 运行 R5 Method 评审
-  [重建] experiment-design.md — 从实验配置和结果提炼
+  [重建] research/experiment-design.md — 从实验配置和结果提炼
   [评审] 运行 R7 Experiment 评审
   [重建] Codes/ 规划文档 — 从现有代码结构提炼
   → 最终设置状态：coding
@@ -111,7 +111,7 @@
 - 预期贡献
 - 目标 venue（若已知）
 
-#### Step 3.2：gap-analysis.md
+#### Step 3.2：research/gap-analysis.md
 
 若不存在：从以下来源提炼：
 - 论文 Related Work / Introduction 中的 gap 陈述
@@ -120,7 +120,7 @@
 
 提炼格式遵循 `<noesis_root>/Praxis/templates/gap-analysis.md` 模板。
 
-#### Step 3.3：method-design.md
+#### Step 3.3：research/method-design.md
 
 若不存在：从以下来源提炼：
 - 论文 Method/Approach 章节
@@ -129,7 +129,7 @@
 
 提炼时保留数学公式，分析各组件的可解耦性。
 
-#### Step 3.4：experiment-design.md
+#### Step 3.4：research/experiment-design.md
 
 若不存在：从以下来源提炼：
 - 论文 Experiments 章节（baselines、datasets、metrics）
@@ -151,21 +151,21 @@
 #### Step 4.1：R3 Gap 评审
 
 Fork 一个重量级评审 agent，传入：
-- `gap-analysis.md` 全文
+- `research/gap-analysis.md` 全文
 - `<noesis_root>/Praxis/skills/1X-review-skill.md` 内容（review_type=gap）
 - 评审任务：对 gap analysis 进行严格独立评审，输出 pass/revise
 
 **若评审结果为 pass** → 写入 `phase-outcomes/R3.json: {"outcome": "pass", ...}`
 
-**若评审结果为 revise** → 根据评审意见修订 `gap-analysis.md`，然后重新评审（最多 1 轮修订；若仍 revise，写入 `{"outcome": "revise_flagged", ...}` 并在报告中提示用户）
+**若评审结果为 revise** → 根据评审意见修订 `research/gap-analysis.md`，然后重新评审（最多 1 轮修订；若仍 revise，写入 `{"outcome": "revise_flagged", ...}` 并在报告中提示用户）
 
 #### Step 4.2：R5 Method 评审
 
-同上，fork agent 评审 `method-design.md`。
+同上，fork agent 评审 `research/method-design.md`。
 
 #### Step 4.3：R7 Experiment 评审
 
-同上，fork agent 评审 `experiment-design.md`。
+同上，fork agent 评审 `research/experiment-design.md`。
 
 **注意**：若项目已发表/已投稿，评审时在 prompt 中注明"该方法已经过同行评审并发表"，评审者应以更宽松的标准处理（重点在于文档质量而非方法本身）。
 
@@ -233,9 +233,9 @@ Fork 一个重量级评审 agent，传入：
 
 重建的文档：
   ✓ project-startup.md [从 README.md + Abstract 生成]
-  ✓ gap-analysis.md [从 Related Work 提炼]
-  ✓ method-design.md [从 Method 章节 + src/models/ 提炼]
-  ✓ experiment-design.md [从 Experiments 章节 + configs/ 提炼]
+  ✓ research/gap-analysis.md [从 Related Work 提炼]
+  ✓ research/method-design.md [从 Method 章节 + src/models/ 提炼]
+  ✓ research/experiment-design.md [从 Experiments 章节 + configs/ 提炼]
   ✓ Codes/code-todo.md [从现有代码结构反向生成，全部标注已完成]
 
 评审结果：
@@ -258,7 +258,7 @@ Fork 一个重量级评审 agent，传入：
 
 - [ ] 已深度阅读项目全部相关文件
 - [ ] 已与用户完成单轮确认
-- [ ] 所有缺失的 Noesis 阶段文档已生成（project-startup.md、gap-analysis.md、method-design.md、experiment-design.md）
+- [ ] 所有缺失的 Noesis 阶段文档已生成（project-startup.md、research/gap-analysis.md、research/method-design.md、research/experiment-design.md）
 - [ ] R3/R5/R7 真实评审已运行（fork agent），结果已记录
 - [ ] 所有 phase-outcomes/*.json 已写入（不覆盖已有文件）
 - [ ] pipeline-status.json 已写入正确的当前阶段

@@ -34,7 +34,8 @@ mkdir -p ~/Research/<project_name>/phase-outcomes
 ~/Research/<project_name>/
 ├── CLAUDE.md                  ← 本步骤创建（项目入口文件）
 ├── phase-outcomes/            ← fork agent 写入 outcome JSON
-├── contribution.md            ← 空文件，Phase 2 时填写
+├── research/
+│   └── contribution.md        ← 空文件，Phase 2 时填写
 └── pipeline-evolution-log.md  ← 空文件，各阶段反思记录
 ```
 
@@ -221,7 +222,7 @@ project_path: <project_path>
 cd ~/Research/<project_name>
 git init
 gh repo create <project_name> --private --source=. --remote=origin
-git add CLAUDE.md project-startup.md contribution.md pipeline-evolution-log.md phase-outcomes/
+git add CLAUDE.md project-startup.md research/ pipeline-evolution-log.md phase-outcomes/
 git commit -m "phase/1: project startup complete"
 git push -u origin main
 ```

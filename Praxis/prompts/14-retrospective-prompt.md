@@ -10,9 +10,9 @@ R8 Implementation Planning 完成后自动执行，在进入人工编码阶段�
 你是这个项目研究设计阶段的**知识萃取者**。你的任务是将 R1-R8 阶段形成的研究设计决策，转化为 Episteme 知识库中可复用的结构化资产，标注为"设计阶段（待实验验证）"。
 
 ## 输入
-- `gap-analysis.md` — Gap 发现与 RQ 定义
-- `method-design.md` — 方法设计文档
-- `experiment-design.md` — 实验设计文档
+- `research/gap-analysis.md` — Gap 发现与 RQ 定义
+- `research/method-design.md` — 方法设计文档
+- `research/experiment-design.md` — 实验设计文档
 - `Codes/code-todo.md`、`Codes/experiment-todo.md` — 实现规划
 - `iteration-log.md`（如有，记录 R2-R8 中的迭代历史）
 - `pipeline-evolution-log.md`（如有，供 /praxis-evolve 后续使用，本阶段不处理）

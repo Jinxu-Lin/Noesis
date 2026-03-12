@@ -2,23 +2,21 @@
 
 ## 输入
 
-**基础输入（所有模式共用）**：`gap-analysis.md` + `project-startup.md` + 知识库 (Methods Bank)
+**基础输入（所有模式共用）**：`research/gap-analysis.md` + `project-startup.md` + 知识库 (Methods Bank)
 
-**Revise 模式额外输入**：`method-review.md`（审查意见，由 runner 在上方注入时说明）
-
-**Pivot 模式额外输入**：`iteration-log.md` + 当前 `method-design.md` + 前序迭代产出文档（如 `experiment-design.md`，由 runner 在上方注入时说明）
+**Revise 模式额外输入**：`inner-reviews/method-review.md`（审查意见，由 runner 在上方注入时说明）
 
 ## 执行流程
 
 ### 首次执行
 
 **Step 1: 方案空间探索**
-基于 Gap 根因（来自 `gap-analysis.md`），从知识库 Methods Bank 检索相关方法/技术。
+基于 Gap 根因（来自 `research/gap-analysis.md`），从知识库 Methods Bank 检索相关方法/技术。
 不限于本领域——跨领域的方法迁移往往是 novelty 来源。
 
 **Step 2: 方法框架搭建**
 ```
-Gap 根因 (来自 gap-analysis.md)
+Gap 根因 (来自 research/gap-analysis.md)
     ↓ 查询知识库 Methods Bank
 方法 A 的核心机制 + 方法 B 的某个组件 + 新的理论连接
     ↓ 组合与适配
@@ -48,10 +46,10 @@ Gap 根因 (来自 gap-analysis.md)
 **Step 6: 方法定位**
 在技术谱系中定位：继承了什么、改变了什么、与最相近方法的差异。
 
-**Step 7: 更新 contribution.md**
+**Step 7: 更新 research/contribution.md**
 记录方法层面的技术贡献（方法创新、理论分析等）。
 
-**Step 8: 生成 method-design.md**
+**Step 8: 生成 research/method-design.md**
 按 `templates/method-design.md` 模板输出，包含：
 - 方法框架总览（组件拆解、各组件 I/O）
 - 核心机制详述（含数学公式）
@@ -62,29 +60,13 @@ Gap 根因 (来自 gap-analysis.md)
 
 ### Revise 迭代（R5 审查返回）
 
-1. 读 `method-review.md`，逐条理解审查意见
-2. 针对性修改 `method-design.md`，保留通过审查的部分
+1. 读 `inner-reviews/method-review.md`，逐条理解审查意见
+2. 针对性修改 `research/method-design.md`，保留通过审查的部分
 3. 重点修复逻辑跳跃、组件必要性、差异化等被标记的问题；**不从零开始**
 
-### Pivot 迭代（L2 / L3 热重启）
+### 注意：热重启
 
-读 `iteration-log.md`，确认失败层级。**同时读 runner 注入的前序迭代产出文档**（如 `experiment-design.md`），从中提取上一轮实验设计的完整细节——哪些实验配置有效、哪些 metric 有诊断价值、哪些 baseline 行为符合预期。这些信息对方法修改至关重要。
-
-然后执行对应操作：
-
-**L2 Swap（组件替换）**：
-1. 定位**失败组件**，确认其余组件仍然有效
-2. 结合 `experiment-design.md` 中的实验洞察，理解失败组件在实验中的具体表现
-3. **仅替换失败组件**——从知识库搜索替代方案
-4. 验证新组件与框架其他部分的接口兼容性
-5. 更新 `method-design.md`（最小改动）
-
-**L3 Redesign（框架重设计）**：
-1. 理解整体失败原因和已排除约束
-2. 读当前 `method-design.md` 作参考，保留被标记为"已验证可行"的组件
-3. 从 `experiment-design.md` 中提取可复用的实验发现（如有效的评估维度、baseline 行为规律）
-4. 在已排除约束下**重新设计方法框架**
-5. 重写 `method-design.md`
+本阶段不再接收 Pivot 热重启。所有编码失败后的重启统一从 R1（Gap Discovery）开始，确保叙事脊柱完整。
 
 ## AI Co-Author 关键行为
 - 不被人类知识边界限制，主动搜索跨领域替代组件
@@ -93,8 +75,8 @@ Gap 根因 (来自 gap-analysis.md)
 - 迭代时：先读 iteration-log.md 确认失败层级和约束，再决定改动范围
 
 ## 输出
-- `method-design.md`
-- `contribution.md`（更新）
+- `research/method-design.md`
+- `research/contribution.md`（更新）
 
 ## Exit Criteria
 - [ ] 叙事脊柱完整：Gap → 根因 → 方法 → 为什么能解决 → 怎么验证
@@ -102,4 +84,4 @@ Gap 根因 (来自 gap-analysis.md)
 - [ ] 组件级审查已完成（每个可解耦组件经过替代方案评估）
 - [ ] 方法定位清晰（与最相近方法的差异）
 - [ ] 理论分析已完成（如适用）
-- [ ] contribution.md 已更新
+- [ ] research/contribution.md 已更新

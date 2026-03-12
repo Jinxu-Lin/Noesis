@@ -21,14 +21,14 @@ debate_output_subdir: R5   # phase-outcomes/debate/R5/
 # SubAgent 需要读取的文档
 input_docs:
   required:
-    - gap-analysis.md
-    - method-design.md
-    - contribution.md
+    - research/gap-analysis.md
+    - research/method-design.md
+    - research/contribution.md
   optional:
     - project-startup.md  # 供验证假设链一致性（含 P1 三帽检验）
 
 # 审查报告输出文件名
-output_doc: method-review.md
+output_doc: inner-reviews/method-review.md
 
 # 审查维度
 review_dimensions:

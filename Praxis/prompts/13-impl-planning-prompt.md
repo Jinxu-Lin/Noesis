@@ -4,17 +4,17 @@
 
 ## 输入
 
-- `method-design.md` — 方法的组件结构、核心机制、理论分析
-- `experiment-design.md` — 实验体系（Dim 0-4）、baselines、metrics、数据集
+- `research/method-design.md` — 方法的组件结构、核心机制、理论分析
+- `research/experiment-design.md` — 实验体系（Dim 0-4）、baselines、metrics、数据集
 - （可选）知识库中的 Experimental Patterns — 实验实施的经验模式
 
 ## 执行流程
 
 ### Step 1: 代码架构拆解
 
-基于 `method-design.md` 的组件结构，设计代码模块划分：
+基于 `research/method-design.md` 的组件结构，设计代码模块划分：
 
-1. **模块映射**：method-design.md 中的每个组件 → 对应的代码模块/文件
+1. **模块映射**：research/method-design.md 中的每个组件 → 对应的代码模块/文件
 2. **接口定义**：每个模块的输入/输出类型、维度、数据流
 3. **依赖分析**：模块间依赖关系、执行顺序
 4. **代码起点评估**：
@@ -26,7 +26,7 @@
 
 ### Step 2: 实验方案细化
 
-基于 `experiment-design.md`，将每个实验拆解为具体可执行的步骤：
+基于 `research/experiment-design.md`，将每个实验拆解为具体可执行的步骤：
 
 1. **Dim 0 快速验证**：最优先、最小实验，验证核心假设
 2. **Dim 1 核心验证**：主实验 + 消融 + 反事实
@@ -134,7 +134,7 @@
 [一句话描述本项目的核心方法和目标]
 
 ## 代码架构
-[模块结构图、组件与 method-design.md 的映射]
+[模块结构图、组件与 research/method-design.md 的映射]
 
 ## 环境配置
 [Python 版本、依赖、硬件需求、远程服务器信息]
@@ -145,7 +145,7 @@
 3. 先完成 Dim 0 快速验证，通过后再推进后续
 
 ## 关键约束
-[来自 method-design.md 和 experiment-design.md 的核心约束]
+[来自 research/method-design.md 和 research/experiment-design.md 的核心约束]
 
 ## 数据
 [数据集路径、格式、预处理说明]
@@ -154,7 +154,7 @@
 [训练、评估、可视化的命令模板]
 ```
 
-### Step 6: 更新 contribution.md
+### Step 6: 更新 research/contribution.md
 
 记录实验规划层面的贡献（如有新发现的实验设计创新）。
 
@@ -170,10 +170,10 @@
   - `Codes/code-todo.md`
   - `Codes/experiment-todo.md`
   - `Codes/CLAUDE.md`
-- `contribution.md`（更新，如有）
+- `research/contribution.md`（更新，如有）
 
 ## Exit Criteria
-- [ ] 代码模块与 method-design.md 组件一一对应
+- [ ] 代码模块与 research/method-design.md 组件一一对应
 - [ ] 每个 code-todo 项有明确的输入/输出定义
 - [ ] code-todo 按优先级排列（Dim 0 → Dim 1 → ...）
 - [ ] 每个 experiment-todo 项有通过标准和预期结果

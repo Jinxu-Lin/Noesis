@@ -2,9 +2,9 @@
 
 ## 输入
 
-**基础输入**：`gap-analysis.md` + `method-design.md` + 知识库 (Experimental Patterns)
+**基础输入**：`research/gap-analysis.md` + `research/method-design.md` + 知识库 (Experimental Patterns)
 
-**Revise 模式额外输入**：`experiment-review.md`（审查意见，由 runner 在上方注入时说明）
+**Revise 模式额外输入**：`inner-reviews/experiment-review.md`（审查意见，由 runner 在上方注入时说明）
 
 ## 执行流程
 
@@ -20,7 +20,7 @@
 **Step 2: Dimension 1 — 核心验证**
 每个 RQ 对应至少一个实验：
 - 主实验：与 baselines 的定量对比
-- 消融实验：每个组件的必要性（与 method-design.md 组件一一对应）
+- 消融实验：每个组件的必要性（与 research/method-design.md 组件一一对应）
 - 反事实验证：ground-truth 级别的验证（如可行）
 
 **Step 3: Baseline 选择**
@@ -53,14 +53,14 @@
 - 如果结果不如预期，说明什么？
 - 失败时的诊断线索
 
-**Step 10: 生成 experiment-design.md**
+**Step 10: 生成 research/experiment-design.md**
 按 `templates/experiment-design.md` 模板输出。
 
 ### Revise 迭代（R7 审查返回）
 
-1. 读 `experiment-review.md`，逐条理解审查意见
+1. 读 `inner-reviews/experiment-review.md`，逐条理解审查意见
 2. 针对性修改：补充遗漏实验、调整 baseline、修正 metrics 等；**不从零开始**
-3. 更新 `experiment-design.md`
+3. 更新 `research/experiment-design.md`
 
 ## AI Co-Author 关键行为
 - 从知识库 Experimental Patterns 中复用已验证的实验设计模式
@@ -70,7 +70,7 @@
 - 设计明确的 Dim 0 快速验证方案——定义通过标准和时间预算
 
 ## 输出
-- `experiment-design.md`
+- `research/experiment-design.md`
 
 ## Exit Criteria
 - [ ] Dim 0 有明确方案、通过标准和时间预算

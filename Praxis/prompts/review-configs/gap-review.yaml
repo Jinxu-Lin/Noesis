@@ -21,13 +21,13 @@ debate_output_subdir: R3   # phase-outcomes/debate/R3/
 # SubAgent 需要读取的文档
 input_docs:
   required:
-    - gap-analysis.md
-    - contribution.md
+    - research/gap-analysis.md
+    - research/contribution.md
   optional:
     - project-startup.md  # 供参考背景（含 P1 三帽检验结果和初始假设清单）
 
 # 审查报告输出文件名
-output_doc: gap-review.md
+output_doc: inner-reviews/gap-review.md
 
 # 审查维度
 review_dimensions:
