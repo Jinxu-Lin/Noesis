@@ -1,8 +1,8 @@
-# Skill: Praxis 编码阶段总结（Conclude）
+# Skill: Praxis 实验阶段总结（Conclude）— v2
 
 ## 前置条件
 
-项目当前状态应为 `coding` 阶段（R8 完成后的人工编码阶段）。
+项目当前状态应为 `E`（实验执行）阶段。
 
 ---
 
@@ -16,70 +16,204 @@
 <project_path>/pipeline-status.json
 ```
 
-取 `"phase"` 字段，确认当前 phase 为 `coding`。如果不是，提示用户当前状态并询问是否继续。
+取 `"phase"` 字段，确认当前 phase 为 `E`。如果不是，提示用户当前状态并询问是否继续。
 
-> research_runner 的职责在 R8 完成后已结束，无需调用。状态直接从 `pipeline-status.json` 读取即可。
+### Step 2: 收集实验阶段信息
 
-### Step 2: 收集编码阶段信息
-
-与用户交互，了解编码阶段发生了什么：
+与用户交互，了解实验阶段发生了什么：
 
 1. **实现了什么？** — 哪些 code-todo.md 项目已完成
 2. **验证了什么？** — 运行了哪些实验（Dim 0 或更多）
 3. **失败了什么？** — 具体的失败现象、指标数据
-4. **失败原因分析** — 与用户讨论：
-   - 是某个组件不 work？（→ L2 Swap，回到 R1，R1 agent 会根据 L2 标签微调 Gap）
-   - 是整体方法框架有问题？（→ L3 Redesign，回到 R1，R1 agent 重新框架化 Gap）
-   - 是 Gap/RQ 方向本身有问题？（→ L4 Pivot，回到 R1，换全新方向）
-   - 是否应该放弃该项目？（→ Abandon，进入 R8 回顾）
 
-同时读取项目中的现有文档（`research/method-design.md`、`research/experiment-design.md`、`Codes/` 下的文件）来辅助分析。
+同时读取项目中的现有文档（`research/method-design.md`、`research/experiment-design.md`、`research/probe-results.md`、`Codes/` 下的文件）来辅助分析。
 
-### Step 3: 写入 iteration-log.md
+#### 深度追问清单
 
-按 `<noesis_root>/Praxis/templates/iteration-log.md` 模板格式，在项目的 `iteration-log.md` 中追加一个新 Entry：
+收集信息时，不要满足于表面描述，要追问到能做出诊断的深度：
 
-- **迭代级别**：L2 / L3 / L4 / Abandon
-- **目标 Phase**：R1 / R8
-- **失败诊断**：核心发现、失败定位、根因分析、证据
-- **约束传递**：已验证可行的部分、已排除方案、建议方向
-- **当前版本快照**：research/method-design.md 摘要、关键实验结果
+**关于训练过程**：
+- loss 曲线的形状如何？是完全不下降、下降后平台、还是下降后发散？
+- 是否在多个 random seed 下复现了同样的行为？单次实验的失败可能只是运气不好
+- gradient norm 随训练的变化趋势？是否出现了梯度爆炸/消失？
+- 训练速度（samples/sec, iterations/sec）是否符合预期？是否存在 data loading bottleneck？
 
-同时写入 `research/result.md`（追加模式）：
+**关于实验结果**：
+- 失败是"完全不 work"还是"work 但不够好"？这两种诊断方向完全不同
+- 与 baseline 的差距有多大？是 1% 的差距还是 10% 的差距？
+- 在不同数据集/任务上的表现是否一致？如果某些场景下 work 某些不 work，这是重要的诊断线索
+- Ablation 中各组件的贡献是否符合预期？如果核心组件没有贡献，问题很可能在方法层
 
-将实验过程中所有有价值的发现和洞察记录在此文件中。与 iteration-log.md 不同，result.md 不受结构化格式限制，可以详细记录：
-- 实验观察到的现象和数据
-- 与用户讨论中产生的 insight
-- 各组件的实际行为 vs 预期行为
-- 意外发现（即使方法失败，这些发现可能指向新方向）
-- 具体的实验数据、图表描述、日志片段等
+**关于工程实现**：
+- 是否确认了代码实现与 method-design.md 的一致性？DL 研究中，实现 bug 是失败的最常见原因之一
+- 是否做过 gradient check / unit test？特别是自定义 loss function 和自定义 layer
+- 数据预处理 pipeline 是否经过验证？（数据泄漏、标签错误、normalization 不一致）
 
-> 这些一手信息是后续研究迭代最宝贵的输入。
+### Step 3: 失败层次诊断
 
-### Step 4: 设置状态
+与用户讨论，确定失败层次。**必须明确选择一个层次**：
 
-根据诊断结果，使用状态机设置下一阶段：
+```markdown
+## 失败诊断
+
+### 失败层次（必选一项）
+- [ ] 执行层（bug、工程问题）→ 留在 E 修复
+- [ ] 方法层（某组件不 work，但方向正确）→ iterate_method → D
+- [ ] 方向层（核心假设不成立，方向有问题）→ iterate_direction → C
+
+### 诊断依据
+[具体的实验证据：哪个实验、什么结果、与预期的偏差]
+
+### 如果回退到 D（方法层）
+- 需要修改的组件: [列表]
+- 应该保留的组件: [列表 + 理由]
+- 已排除的替代方案: [列表 + 理由]
+
+### 如果回退到 C（方向层）
+- Gap 定义是否仍然有效: [是/否 + 理由]
+- 攻击角度的失败原因: [具体分析]
+- 从失败中获得的关键洞察: [用于指导下一轮 C]
+```
+
+#### DL 领域中各层次失败的具体表现
+
+准确的层次诊断是 conclude 最关键的产出。以下是 DL 研究中各层次失败的典型症状，帮助区分：
+
+**执行层失败**（留在 E 修复，不需要回退设计）：
+
+这类失败的本质是"设计是对的，但实现有问题"。特征是修复后预期能恢复到设计时的预期性能。
+
+- **OOM / CUDA 错误**：模型/batch size 超出 GPU 内存，或存在内存泄漏（tensor 未释放）。解决方案通常是 gradient accumulation、mixed precision、activation checkpointing，不涉及方法改动
+- **训练不收敛但可定位到实现 bug**：例如 loss function 的 reduction 模式错误（mean vs sum）、维度不匹配导致 broadcasting 行为异常、data loader 的 shuffle 设置不当导致 batch 内样本高度相关
+- **数据 pipeline 问题**：数据泄漏（train/test 有重叠）、预处理不一致（训练和推理用了不同的 normalization）、数据格式错误（标签偏移了一位）
+- **环境/依赖问题**：库版本不兼容、CUDA 版本不匹配、分布式训练的通信错误
+- **数值不稳定但可通过简单 fix 解决**：加 epsilon、gradient clipping、换 numerical-stable 实现（如 log_softmax 替代 log(softmax)）
+
+**方法层失败**（回退到 D 重新设计方法，保留 problem-statement）：
+
+这类失败的本质是"方向是对的，但技术方案需要调整"。特征是 Gap 仍然存在且重要，但当前方法的核心假设或组件设计需要修改。
+
+- **核心组件在 ablation 中无信号**：去掉你的核心贡献组件后，性能几乎不变 → 说明该组件不是解决 gap 的关键设计，需要重新思考技术方案。但注意区分"组件确实无效"和"组件的作用被其他因素掩盖"
+- **训练不稳定且根因在方法设计**：例如 GAN 的模式崩塌、强化学习的 reward hacking、对比学习的表征坍缩（全部映射到同一点）。这些是方法架构层面的问题，单纯调参无法根治
+- **性能提升来自非核心组件**：例如发现主要的提升来自一个通用的数据增强策略或者更大的模型容量，而非你设计的核心机制 → 核心贡献 claim 站不住，需要重新设计
+- **方法在目标场景下 work 但代价过高**：需要 10x 计算量才比 baseline 好 2% → 方法的效率特性需要重新设计
+- **方法只在特定条件下 work**：只在某个数据集/某个超参范围/某个模型规模下有效 → 需要理解为什么，然后改进泛化性
+- **组件之间存在冲突**：多个 loss 项互相拉扯导致训练振荡，或者不同组件的最优超参互相矛盾
+
+**方向层失败**（回退到 C 重新审视方向，problem-statement 需要重写）：
+
+这类失败的本质是"我们对问题的理解有根本性错误"。特征是即使换一种方法，同样的问题定义下也不太可能成功。
+
+- **Gap 被证明不存在**：你想解决的"问题"实际上已经被 SOTA 充分解决了。例如你认为长文本建模存在瓶颈，但实验发现扩大 context window + 充分训练后问题就消失了
+- **问题定义有误**：你以为 bottleneck 是 A，但实验表明真正的 bottleneck 是 B。例如你以为性能瓶颈在模型架构上，但实验表明瓶颈在数据质量上
+- **攻击角度在理论上行不通**：例如你想用局部信息解决本质上需要全局信息的任务，或者你想用无监督方法解决一个被证明需要监督信号的问题
+- **核心假设被实验证伪**：例如你假设"attention 模式是稀疏的"，但 probing 实验发现在目标任务上 attention 是稠密的
+- **评估范式的根本问题**：发现你选用的 benchmark/metric 不能反映真正要解决的问题，而重新定义评估后原来的 gap 消失了
+- **信息论/理论下界约束**：发现你试图突破的性能天花板实际上是理论下界，不存在方法级别的突破空间
+
+#### 如何从失败中提取最大价值
+
+即使项目失败，实验数据和过程本身也具有巨大的复用价值。在写 iteration-log 和 result.md 时，要特别记录以下信息：
+
+**负面结果的知识价值**：
+- "这个方法不 work"本身就是有价值的知识，能防止未来项目重复尝试
+- 记录不 work 的具体条件和阈值：不是"X 方法不行"，而是"X 方法在数据规模 < 10K 时不行，但在 100K 时可能值得重试"
+- 如果可能，分析"如果 work 需要什么条件"——这为未来工作指明了方向
+
+**实验设施的复用价值**：
+- 训练好的 baseline 模型可以复用（节省未来几十 GPU-hours）
+- 数据预处理 pipeline 可以复用
+- evaluation code 和 metric 计算代码可以复用
+- 实验配置和超参搜索结果可以为未来的 ablation study 提供参考
+
+**意外发现的记录**：
+- 实验中经常会观察到与主研究问题无关但有趣的现象，例如"模型在任务 A 上失败但在任务 B 上意外成功" → 这可能是一个新的研究种子
+- 训练过程中的异常行为（如特定 epoch 出现性能骤降、特定数据子集导致行为异常）可能揭示了模型或数据的深层特性
+
+### Step 4: 迭代守卫检查
+
+读取 `pipeline-status.json` 的 `history` 字段，统计迭代次数：
+
+- **D 回退 ≥ 2 次** → 告知用户"方法层多次失败，建议升级到方向层（C）回退"
+- **C 回退 ≥ 3 次** → 告知用户"方向层多次失败，建议评估是否 abandon 项目"
+
+#### 迭代守卫的深层逻辑
+
+迭代守卫不是机械的计数器，而是基于研究经验的风险信号：
+
+**D 回退 ≥ 2 次意味着什么**：两次方法层回退后仍然失败，大概率说明问题不在方法设计的细节上，而在更上层——要么 Gap 的分析不准确（导致所有方法都在解决错误的问题），要么攻击角度不可行（导致同一条路线上的不同方法都走不通）。此时应该升级到 C 回退，重新审视 Gap 定义和攻击角度。
+
+**C 回退 ≥ 3 次意味着什么**：三次方向级别的重启仍然失败，可能的原因包括：(1) 研究者对这个领域的理解不够深入，需要更多阅读和探索；(2) 问题本身在当前技术条件下不可解；(3) 问题可解但需要的资源远超当前可用。此时应该认真评估是否 abandon，而不是继续消耗时间和资源。
+
+**Abandon 不是耻辱**：DL 研究中，知道什么方向走不通与知道什么方向走得通同样有价值。一个被充分记录的 abandoned 项目可以：(1) 防止未来的研究者重复尝试；(2) 提供 negative results 用于论文（如果失败本身揭示了有价值的洞察）；(3) 为 Episteme 知识库贡献排除性知识。
+
+### Step 5: 写入 iteration-log.md
+
+按 v2 格式，在项目的 `iteration-log.md` 中**倒序追加**一条记录：
+
+**Major 版本变更（方向层回退）**：
+```markdown
+## [X.0] — YYYY-MM-DD — Direction Pivot (E → C)
+
+- **触发**: [什么实验失败了，具体现象]
+- **诊断层次**: direction_level
+- **变更文档**: problem-statement.md (X.0), method-design.md (X.0), experiment-design.md (X.0)
+- **排除方向**: [方向/攻击角度名] — 原因: [具体分析]
+- **从失败中获得的关键洞察**: [最有价值的发现]
+- **实验数据保留**: `experiments/iter-<N>/` 目录保留完整实验日志
+```
+
+**Major 版本变更（方法层回退）**：
+```markdown
+## [X.0] — YYYY-MM-DD — Method Iterate (E → D)
+
+- **触发**: [什么组件失败了，具体现象]
+- **诊断层次**: method_level
+- **变更文档**: method-design.md (X.0), experiment-design.md (X.0)
+- **排除方案**: [组件/方法名] — 原因: [具体分析]
+- **应保留组件**: [列表 + 理由]
+- **从失败中获得的关键洞察**: [最有价值的发现]
+```
+
+#### 写好 iteration-log 的要点
+
+iteration-log 不是流水账，而是给未来的自己（和 AI agent）的诊断手册。以下内容必须足够具体，避免模糊表述：
+
+**"排除方向/方案"必须写清为什么排除**：
+- 坏的写法："方法 A 不 work"
+- 好的写法："方法 A（基于 linear attention 的 O(n) 近似）在序列长度 > 4096 时性能急剧下降（PPL 从 15.2 升到 45.7），原因是线性近似在 long-range dependency 场景下信息损失过大。因此排除所有基于 linear kernel approximation 的路线"
+
+**"关键洞察"应该是可迁移的知识**：
+- 坏的写法："这次实验让我们学到了很多"
+- 好的写法："发现在 multi-task 训练中，如果各任务的 loss scale 差异超过 10x，梯度冲突会导致训练振荡。需要在 D 阶段加入 loss balancing 策略（如 GradNorm 或 uncertainty weighting）"
+
+同时写入 `research/result.md`（追加模式），记录所有实验过程中的一手信息。
+
+### Step 6: 设置状态
+
+使用 runner 的 advance 命令推进状态：
 
 ```bash
-python3 <noesis_root>/Praxis/orchestrator/research_state_machine.py init-phase <project_path> <target_phase>
+python3 <noesis_root>/Praxis/orchestrator/research_runner.py advance <project_path> --outcome <outcome>
 ```
 
-| 诊断结果 | 目标 Phase | 说明 |
-|---------|-----------|------|
-| L2 Swap（换组件） | R1 | gap-discovery 读 iteration-log + result.md，微调 Gap 后重建完整叙事 |
-| L3 Redesign（换框架） | R1 | gap-discovery 读 iteration-log + result.md，重新框架化 Gap |
-| L4 Pivot（换方向） | R1 | gap-discovery 读 iteration-log + result.md，避免已排除方向 |
-| Abandon | R8 | 进入回顾，提取经验教训 |
+| 诊断结果 | outcome | 目标 Phase | 说明 |
+|---------|---------|-----------|------|
+| 执行层（bug） | — | 留在 E | 不需要 advance，用户自行修复 |
+| 方法层 | iterate_method | D | 联合设计读 result.md + iteration-log，修改失败组件 |
+| 方向层 | iterate_direction | C | 问题锐化读 result.md + iteration-log，重新审视方向 |
+| 成功 | success | W | 进入论文写作 |
+| 放弃 | abandon | R | 进入知识回收 |
 
-### Step 5: 提示下一步
+### Step 7: 提示下一步
 
 ```
-✅ 编码阶段总结完成。
-   迭代级别：[L2/L3/L4/Abandon]
-   iteration-log.md 已更新。
-   状态已设置为 [target_phase]。
+实验阶段总结完成。
+   诊断层次：[执行层/方法层/方向层]
+   iteration-log.md 已更新（版本 X.0）。
+   状态已推进到 [target_phase]。
 
-   下一步：运行 /praxis-research <project_path> 重启研究模块。
+   下一步：运行 /praxis-research <project_path> 继续研究流程。
 ```
 
 （如果是 Abandon：提示运行 `/praxis-evolve <project_path>` 提取经验教训）
@@ -89,6 +223,10 @@ python3 <noesis_root>/Praxis/orchestrator/research_state_machine.py init-phase <
 ## 注意事项
 
 - 这是一个**交互式** skill，需要与用户深入讨论失败原因
-- iteration-log.md 是**追加模式**，不要覆盖已有的 Entry
-- 已排除方案的列表非常重要——确保后续研究不会重复犯错
-- 如果用户不确定迭代级别，帮助分析并给出建议
+- iteration-log.md 是**倒序追加**（最新在最上方）
+- 排除方向/方案的列表非常重要——确保后续研究不会重复犯错
+- v2 的分层回退（D vs C）比 v1 统一回到 R1 更精确
+- 迭代守卫规则必须检查并告知用户
+- 在 DL 研究中，区分方法层 vs 方向层失败最有效的判据是 ablation：如果核心组件在 ablation 中有信号但不够强，是方法层问题（组件设计需优化）；如果核心组件完全没有信号，且即使在理想条件下（如 oracle 输入）也无改善，更可能是方向层问题
+- 不要过早放弃：DL 研究中，很多"失败"实际上是超参数或训练技巧的问题。在诊断为方法层失败之前，确认已经尝试了合理范围的 learning rate、batch size、warmup schedule 等关键超参
+- 也不要过晚放弃：如果连续三次不同的方法变体都无法在 Dim 0 上超过 simple baseline，强烈信号表明方向需要重新审视

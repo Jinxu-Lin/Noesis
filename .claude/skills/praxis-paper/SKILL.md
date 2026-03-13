@@ -28,7 +28,7 @@ description: "Praxis 论文写作模块：自动化执行 P1→P7 论文写作�
 python3 <noesis_path>/Praxis/orchestrator/research_runner.py status <project_path>
 ```
 
-确认当前 phase 为 `paper_writing`。如果不是，向用户展示当前状态并询问是否继续。
+确认当前 phase 为 `W`。如果不是，向用户展示当前状态并询问是否继续。
 
 ---
 

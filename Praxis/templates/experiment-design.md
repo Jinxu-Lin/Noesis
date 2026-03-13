@@ -1,7 +1,17 @@
 # Experiment Design: [项目名称]
 
+---
+version: "1.0"
+created: "<date>"
+last_modified: "<date>"
+entry_mode: "first"
+iteration_major: 1
+iteration_minor: 0
+---
+
 > 本文档是实验的完整 spec，同时也是实验结果的记录地。
-> 基于 `gap-analysis.md` 的 RQ 和 `method-design.md` 的方法设计。
+> 基于 `problem-statement.md` 的 RQ 和 `method-design.md` 的方法设计。
+> 与 `method-design.md` 通过反向引用关联：每个 ablation 指向其对应的方法组件。
 > **铁律**: 每次实验结果产出后，立即记录到本文档对应章节的"实际结果"区域。
 
 ---
@@ -41,35 +51,14 @@
 
 ---
 
-## 5. 快速验证 (Dimension 0: Sanity Check Spec)
+## 5. Dim 0 → Dim 1 衔接
+<!-- 探针实验（Dim 0）到正式实验（Dim 1）的衔接说明 -->
 
-> 本节为 Phase 9 (Sanity Check) 提供明确的验证 spec。
+### 5.1 探针信号如何指导实验设计
+<!-- 从 probe-results.md 中提取的关键发现对实验设计的影响 -->
 
-### 5.1 验证的核心假设
-<!-- 方法最核心的 1-2 个假设是什么？如果这些假设不成立，方法就不可能 work -->
-
-### 5.2 最小实验方案
-<!-- 用什么数据、什么规模、什么配置来快速验证？ -->
-
-| 项目 | 设置 |
-|------|------|
-| 数据集 | <!-- 小数据集/子集 --> |
-| 模型规模 | <!-- 最小可用规模 --> |
-| 训练量 | <!-- 少 epoch / 少 iteration --> |
-| 对比方法 | <!-- 至少一个 baseline --> |
-
-### 5.3 通过标准
-<!-- 具体的量化标准，不是"看起来 work" -->
-- 标准 1:
-- 标准 2:
-
-### 5.4 时间预算
-<!-- 应控制在数小时内 -->
-- 预计时间:
-
-**实际结果**:
-<!-- Phase 9 完成后在此记录 -->
-
+### 5.2 规模扩展方案
+<!-- 从探针的小规模设置到正式实验的完整规模，需要哪些调整 -->
 
 ---
 
@@ -91,10 +80,12 @@
 ---
 
 ## 7. 消融实验 (Dimension 1: 组件必要性)
+<!-- 每个 ablation 反向引用 method-design.md 中的对应组件 -->
 
-| 消融项 | 移除/替换什么 | 对应方法组件 | 预期影响 |
-|--------|-------------|------------|---------|
-| | | | |
+| Ablation ID | 移除/替换什么 | ← 方法组件 | 预期影响 |
+|-------------|-------------|-----------|---------|
+| Ablation-1 | | `← method-design.md §2.1 Component-X` | |
+| Ablation-2 | | `← method-design.md §2.1 Component-Y` | |
 
 ---
 
@@ -140,3 +131,11 @@
 | 核心实验结果不显著 | | | |
 | 计算资源不足 | | | |
 | | | | |
+
+---
+
+## Metadata
+- **基于**: `problem-statement.md`, `probe-results.md`, `method-design.md`
+- **反向引用**: `method-design.md`（ablation → 组件映射）
+- **状态**: Draft / Under Review / Finalized
+- **Technical Review 判定**: 待审查 / Pass / Revise / Block

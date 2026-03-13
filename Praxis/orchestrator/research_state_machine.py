@@ -1,22 +1,24 @@
-"""Research Pipeline State Machine
+"""Research Pipeline State Machine — v2
 
-Tracks project phase state (R1→R8 + coding/paper_writing) and computes next actions.
+Tracks project phase state and computes next actions.
 Does NOT execute anything — research_runner.py calls this and executes.
 
-Phase numbering (Startup is independent via /praxis-start):
-  R1 Gap Discovery → R2 Gap Review → R3 Method Design → R4 Method Review
-  → R5 Experiment Design → R6 Experiment Review → R7 Impl Planning
-  → R8 Retrospective → coding → paper_writing → complete
+v2 Phase flow:
+  S (Startup, independent) → C (Crystallize) → RS (Strategic Review)
+  → P (Probe, manual) → D (Joint Design) → RT (Technical Review)
+  → I (Implementation) → E (Execution, manual) → W (Paper Writing, manual)
+  → R (Retrospective) → complete
 
 Single source of truth: pipeline-status.json
 Outcomes: phase-outcomes/<phase>.json (written by fork agents)
 
 CLI:
-    python research_state_machine.py next      <project_path>
-    python research_state_machine.py advance   <project_path> <phase> <outcome>
-    python research_state_machine.py status    <project_path>
-    python research_state_machine.py init      <project_path>
+    python research_state_machine.py next       <project_path>
+    python research_state_machine.py advance    <project_path> [--outcome <outcome>]
+    python research_state_machine.py status     <project_path>
+    python research_state_machine.py init       <project_path>
     python research_state_machine.py init-phase <project_path> <phase>
+    python research_state_machine.py phases
 """
 
 import json
@@ -25,134 +27,130 @@ from datetime import datetime
 from pathlib import Path
 
 # ─────────────────────────────────────────────────────────────────
-# Phase configuration table
+# Phase configuration table (v2)
 # ─────────────────────────────────────────────────────────────────
 
 PHASES = {
-    "R1": {
-        "skill": "10-gap-discovery",
+    "C": {
+        "skill": "crystallize",
         "skill_args": "",
-        "description": "Phase 1: Gap Discovery — 研究空白发现",
-        "output_doc": "research/gap-analysis.md",
+        "description": "问题锐化 — Gap + 攻击角度 + 探针方案",
+        "output_doc": "research/problem-statement.md",
         "outcome_type": "work",
         "tier": "heavy",
-        "next": {"done": "R2"},
-    },
-    "R2": {
-        "skill": "1X-review",
-        "skill_args": "gap",
-        "codex_agent": "codex-reviewer",
-        "description": "Phase 2: Gap Review — 研究空白审查 🔒",
-        "output_doc": "inner-reviews/gap-review.md",
-        "outcome_type": "review",
-        "tier": "heavy",
         "next": {
-            "pass": "R3",
-            "revise": "R1",
-            "abandon": "R8",
+            "done": "RS",
+            "abandon": "R",       # iteration guard: C ≥ 3 次 → 用户选择放弃
         },
     },
-    "R3": {
-        "skill": "11-method-design",
+    "RS": {
+        "skill": "strategic-review",
         "skill_args": "",
-        "description": "Phase 3: Method Design — 方法设计",
-        "output_doc": "research/method-design.md",
+        "codex_agent": "codex-reviewer",
+        "debate_agents": ["contrarian", "comparativist", "pragmatist", "interdisciplinary"],
+        "description": "战略审查 — 方向+攻击角度+探针审查 🔒",
+        "output_doc": "inner-reviews/strategic-review.md",
+        "outcome_type": "strategic_review",
+        "tier": "heavy",
+        "next": {
+            "pass": "P",
+            "revise": "C",        # entry_context: rs_revise
+            "abandon": "R",
+        },
+    },
+    "P": {
+        "skill": None,            # manual phase
+        "skill_args": "",
+        "description": "探针实验 — 用最小成本验证核心直觉 🔧",
+        "output_doc": "research/probe-results.md",
+        "outcome_type": "manual",
+        "tier": None,
+        "next": {
+            "signal": "D",
+            "pivot": "C",         # entry_context: probe_pivot
+            "abandon": "R",
+        },
+    },
+    "D": {
+        "skill": "joint-design",
+        "skill_args": "",
+        "description": "联合设计 — 方法+实验同步设计",
+        "output_doc": ["research/method-design.md", "research/experiment-design.md"],
         "outcome_type": "work",
         "tier": "heavy",
-        "next": {"done": "R4"},
-    },
-    "R4": {
-        "skill": "1X-review",
-        "skill_args": "method",
-        "codex_agent": "codex-reviewer",
-        "description": "Phase 4: Method Review — 方法审查 🔒",
-        "output_doc": "inner-reviews/method-review.md",
-        "outcome_type": "review",
-        "tier": "heavy",
         "next": {
-            "pass": "R5",
-            "revise": "R3",
-            "continue_R1": "R1",
-            "abandon": "R8",
+            "done": "RT",
+            "escalate": "C",      # iteration guard: D ≥ 2 次 → 强制升级到 C
         },
     },
-    "R5": {
-        "skill": "12-experiment-design",
+    "RT": {
+        "skill": "technical-review",
         "skill_args": "",
-        "description": "Phase 5: Experiment Design — 实验设计",
-        "output_doc": "research/experiment-design.md",
-        "outcome_type": "work",
-        "tier": "heavy",
-        "next": {"done": "R6"},
-    },
-    "R6": {
-        "skill": "1X-review",
-        "skill_args": "experiment",
         "codex_agent": "codex-reviewer",
-        "description": "Phase 6: Experiment Review — 实验审查 🔒",
-        "output_doc": "inner-reviews/experiment-review.md",
-        "outcome_type": "review",
+        "debate_agents": ["theorist", "methodologist", "empiricist", "skeptic", "pragmatist", "contrarian"],
+        "description": "技术审查 — 方法逻辑+实验有效性 🔒",
+        "output_doc": "inner-reviews/technical-review.md",
+        "outcome_type": "technical_review",
         "tier": "heavy",
         "next": {
-            "pass": "R7",
-            "revise": "R5",
-            "continue_R3": "R3",
-            "abandon": "R8",
+            "pass": "I",
+            "revise": "D",        # entry_context: rt_revise
+            "fundamental": "C",   # entry_context: execute_pivot (direction)
+            "abandon": "R",
         },
     },
-    "R7": {
-        "skill": "13-impl-planning",
+    "I": {
+        "skill": "implementation",
         "skill_args": "",
-        "description": "Phase 7: Implementation Planning — 实验规划",
-        "output_doc": None,
+        "description": "实现规划 — 代码架构+实验方案",
+        "output_doc": ["Codes/code-todo.md", "Codes/experiment-todo.md", "Codes/CLAUDE.md"],
         "outcome_type": "work",
         "tier": "standard",
-        "next": {"done": "R8"},
+        "next": {"done": "E"},
     },
-    "R8": {
-        "skill": "14-retrospective",
+    "E": {
+        "skill": None,            # manual phase
         "skill_args": "",
-        "description": "Phase 8: Research Retrospective — 研究设计回顾与知识回收",
-        "output_doc": "retrospective.md",
+        "description": "实验执行 — 编码与实验 🔧",
+        "output_doc": "research/result.md",
+        "outcome_type": "manual",
+        "tier": None,
+        "next": {
+            "success": "W",
+            "iterate_method": "D",      # entry_context: execute_iterate
+            "iterate_direction": "C",   # entry_context: execute_pivot
+            "abandon": "R",
+        },
+    },
+    "W": {
+        "skill": None,            # independent paper pipeline
+        "skill_args": "",
+        "description": "论文写作 — 独立 Paper Pipeline 🔧",
+        "output_doc": None,
+        "outcome_type": "manual",
+        "tier": None,
+        "next": {"done": "R"},
+    },
+    "R": {
+        "skill": "retrospective",
+        "skill_args": "",
+        "description": "知识回收 — 项目生命周期知识提取",
+        "output_doc": "research/retrospective.md",
         "outcome_type": "work",
         "tier": "heavy",
-        "next": {"done": "coding"},
-    },
-    "coding": {
-        "skill": None,
-        "skill_args": "",
-        "description": "Code & Experiment — 人工编码与实验阶段",
-        "output_doc": None,
-        "outcome_type": "manual",
-        "tier": None,
-        "next": {
-            "success": "paper_writing",
-            "iterate": "R1",
-            "abandon": "complete",
-        },
-    },
-    "paper_writing": {
-        "skill": None,
-        "skill_args": "",
-        "description": "Paper Writing — 论文写作阶段",
-        "output_doc": None,
-        "outcome_type": "manual",
-        "tier": None,
-        "next": {
-            "done": "complete",
-        },
+        "next": {"done": "complete"},
     },
     "complete": {
         "skill": None,
-        "description": "Pipeline complete — 研究流程已完成",
+        "skill_args": "",
+        "description": "Pipeline complete — 研究全流程已完成",
         "outcome_type": "terminal",
         "next": {},
     },
 }
 
 # Phases that require human confirmation before auto-proceeding
-# (runner will pause and ask user before spawning the next fork agent)
-HUMAN_CHECKPOINT_PHASES = set()  # no auto-checkpoint phases currently
+HUMAN_CHECKPOINT_PHASES = set()
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -166,14 +164,94 @@ def get_status(project_path: Path) -> dict:
     f = project_path / STATUS_FILE
     if f.exists():
         return json.loads(f.read_text(encoding="utf-8"))
-    # No status file → fresh project, start at R1
-    return {"phase": "R1", "initialized": False}
+    # No status file → fresh project, start at C
+    return {"phase": "C", "initialized": False}
 
 
 def save_status(project_path: Path, status: dict) -> None:
     status["last_updated"] = datetime.now().isoformat()
     f = project_path / STATUS_FILE
     f.write_text(json.dumps(status, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+# ─────────────────────────────────────────────────────────────────
+# Entry context computation
+# ─────────────────────────────────────────────────────────────────
+
+def _compute_entry_context(phase: str, outcome: str, status: dict) -> dict | None:
+    """Compute entry_context for the target phase based on current transition.
+
+    Returns a dict to be stored in pipeline-status.json, or None if no special context.
+    """
+    # Count iterations for iteration guards
+    history = status.get("history", [])
+    d_count = sum(1 for h in history if h.get("phase") == "D")
+    c_count = sum(1 for h in history if h.get("phase") == "C")
+
+    # RS → C (revise)
+    if phase == "RS" and outcome == "revise":
+        return {
+            "mode": "rs_revise",
+            "source_phase": "RS",
+            "c_iteration_count": c_count,
+        }
+
+    # P → C (pivot)
+    if phase == "P" and outcome == "pivot":
+        return {
+            "mode": "probe_pivot",
+            "source_phase": "P",
+            "c_iteration_count": c_count,
+        }
+
+    # RT → D (revise)
+    if phase == "RT" and outcome == "revise":
+        return {
+            "mode": "rt_revise",
+            "source_phase": "RT",
+            "d_iteration_count": d_count,
+        }
+
+    # RT → C (fundamental)
+    if phase == "RT" and outcome == "fundamental":
+        return {
+            "mode": "execute_pivot",
+            "source_phase": "RT",
+            "diagnosis": "direction_level",
+            "c_iteration_count": c_count,
+        }
+
+    # D → C (escalate, iteration guard)
+    if phase == "D" and outcome == "escalate":
+        return {
+            "mode": "execute_pivot",
+            "source_phase": "D",
+            "diagnosis": "direction_level",
+            "reason": "iteration_guard_escalate",
+            "d_iteration_count": d_count,
+            "c_iteration_count": c_count,
+        }
+
+    # E → D (iterate_method)
+    if phase == "E" and outcome == "iterate_method":
+        return {
+            "mode": "execute_iterate",
+            "source_phase": "E",
+            "diagnosis": "method_level",
+            "d_iteration_count": d_count,
+            "c_iteration_count": c_count,
+        }
+
+    # E → C (iterate_direction)
+    if phase == "E" and outcome == "iterate_direction":
+        return {
+            "mode": "execute_pivot",
+            "source_phase": "E",
+            "diagnosis": "direction_level",
+            "c_iteration_count": c_count,
+        }
+
+    return None
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -184,7 +262,7 @@ def get_next_action(project_path_str: str) -> dict:
     """Return the next action for the runner to execute."""
     path = Path(project_path_str)
     status = get_status(path)
-    phase = status.get("phase", "R1")
+    phase = status.get("phase", "C")
     cfg = PHASES.get(phase)
 
     if not cfg:
@@ -197,19 +275,31 @@ def get_next_action(project_path_str: str) -> dict:
                 "phase": phase}
 
     if cfg["outcome_type"] == "manual":
+        runner = str(Path(__file__).parent / "research_runner.py")
+        p = project_path_str
         messages = {
-            "coding": (
-                "当前处于人工编码与实验阶段。\n"
-                "请与 AI 协作完成代码编写和实验运行（参考 Codes/ 目录）。\n"
-                "完成后：\n"
-                "  - 验证通过 → 运行 /praxis-paper <path> 启动论文写作\n"
-                "  - 验证失败 → 运行 /praxis-conclude <path> 进行总结并重启研究"
+            "P": (
+                f"当前处于探针实验阶段（手动）。\n"
+                f"请阅读 research/problem-statement.md §3 探针方案，执行最小验证实验。\n"
+                f"完成后将结果写入 research/probe-results.md，然后推进状态：\n"
+                f"  - 有信号 → python3 {runner} advance {p} --outcome signal\n"
+                f"  - 换攻击角度 → python3 {runner} advance {p} --outcome pivot\n"
+                f"  - 放弃 → python3 {runner} advance {p} --outcome abandon"
             ),
-            "paper_writing": (
-                "当前处于论文写作阶段。\n"
-                "请运行 /praxis-paper <path> 启动论文写作模块（P1→P7）。\n"
-                "完成后：\n"
-                "  - 运行 /praxis-evolve <path> 提取跨项目经验教训"
+            "E": (
+                f"当前处于实验执行阶段（手动）。\n"
+                f"请与 AI 协作完成代码编写和实验运行（参考 Codes/ 目录）。\n"
+                f"完成后：\n"
+                f"  - 验证通过 → python3 {runner} advance {p} --outcome success\n"
+                f"  - 方法层失败 → /praxis-conclude {p}（诊断后选择 iterate_method）\n"
+                f"  - 方向层失败 → /praxis-conclude {p}（诊断后选择 iterate_direction）\n"
+                f"  - 放弃 → /praxis-conclude {p}（诊断后选择 abandon）"
+            ),
+            "W": (
+                f"当前处于论文写作阶段。\n"
+                f"请运行 /praxis-paper {p} 启动论文写作模块（P1→P7）。\n"
+                f"完成后运行：python3 {runner} advance {p} --outcome done\n"
+                f"然后继续运行 /praxis-research {p} 进入 R（知识回收）。"
             ),
         }
         return {
@@ -220,19 +310,27 @@ def get_next_action(project_path_str: str) -> dict:
         }
 
     requires_human = phase in HUMAN_CHECKPOINT_PHASES
-    return {
+
+    # Compute iteration count from history
+    history = status.get("history", [])
+    iter_count = sum(1 for h in history if h.get("phase") == phase)
+
+    result = {
         "action_type": "skill",
         "phase": phase,
         "skill_name": cfg["skill"],
         "skill_args": cfg.get("skill_args", ""),
-        "codex_agent": cfg.get("codex_agent"),  # optional: triggers skills_parallel in runner
+        "codex_agent": cfg.get("codex_agent"),
+        "debate_agents": cfg.get("debate_agents"),
         "description": cfg["description"],
         "output_doc": cfg.get("output_doc"),
         "outcome_type": cfg["outcome_type"],
         "tier": cfg.get("tier", "standard"),
         "requires_human_checkpoint": requires_human,
-        "iteration_count": status.get(f"iter_{phase}", 0),
+        "iteration_count": iter_count,
+        "entry_context": status.get("entry_context"),
     }
+    return result
 
 
 def advance(project_path_str: str, phase: str, outcome: str) -> dict:
@@ -246,30 +344,70 @@ def advance(project_path_str: str, phase: str, outcome: str) -> dict:
     next_phase = transitions.get(outcome_key)
 
     if next_phase is None:
-        # Unknown outcome — stay in place and flag it
         return {
             "error": f"No transition from {phase} on outcome '{outcome}'",
             "valid_outcomes": list(transitions.keys()),
             "phase_unchanged": phase,
         }
 
-    # Update status
-    iter_key = f"iter_{phase}"
-    status[iter_key] = status.get(iter_key, 0) + 1
-    status.setdefault("history", []).append({
+    # Compute entry_context for target phase
+    entry_context = _compute_entry_context(phase, outcome_key, status)
+
+    # Read document version if available
+    version = _read_doc_version(path, cfg.get("output_doc"))
+
+    # Append to history
+    history_entry = {
         "phase": phase,
-        "outcome": outcome,
+        "outcome": outcome_key,
+        "date": datetime.now().strftime("%Y-%m-%d"),
         "timestamp": datetime.now().isoformat(),
-    })
+    }
+    if entry_context and entry_context.get("mode"):
+        history_entry["mode"] = entry_context["mode"]
+    if version:
+        history_entry["version"] = version
+
+    status.setdefault("history", []).append(history_entry)
+
+    # Update status
     status["phase"] = next_phase
+    if entry_context:
+        status["entry_context"] = entry_context
+    else:
+        status.pop("entry_context", None)  # clear stale context
+
     save_status(path, status)
 
     return {
         "from_phase": phase,
-        "outcome": outcome,
+        "outcome": outcome_key,
         "next_phase": next_phase,
-        "iteration_count": status[iter_key],
+        "entry_context": entry_context,
     }
+
+
+def _read_doc_version(project_path: Path, output_doc) -> str | None:
+    """Try to read version from document frontmatter."""
+    if not output_doc:
+        return None
+    if isinstance(output_doc, list):
+        output_doc = output_doc[0]
+    doc_path = project_path / output_doc
+    if not doc_path.exists():
+        return None
+    try:
+        content = doc_path.read_text(encoding="utf-8")
+        if content.startswith("---"):
+            end = content.find("---", 3)
+            if end > 0:
+                frontmatter = content[3:end]
+                for line in frontmatter.splitlines():
+                    if line.strip().startswith("version:"):
+                        return line.split(":", 1)[1].strip().strip('"\'')
+    except Exception:
+        pass
+    return None
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -295,9 +433,9 @@ def _cli():
 
     elif cmd == "init" and len(args) >= 2:
         path = Path(args[1])
-        status = {"phase": "R1", "notes": "manually initialized"}
+        status = {"phase": "C", "notes": "manually initialized"}
         save_status(path, status)
-        result = {"initialized": True, "phase": "R1", "project": str(path)}
+        result = {"initialized": True, "phase": "C", "project": str(path)}
 
     elif cmd == "init-phase" and len(args) >= 3:
         path = Path(args[1])
@@ -309,10 +447,15 @@ def _cli():
             status = get_status(path)
             prev = status.get("phase", "?")
             status["phase"] = target_phase
-            status.setdefault("history", []).append({
-                "phase": prev, "outcome": f"goto:{target_phase}",
-                "timestamp": datetime.now().isoformat(),
-            })
+            status.pop("entry_context", None)  # clear context on manual override
+            # Only record history if actually changing phase (avoid polluting
+            # iteration count when e.g. startup calls init-phase C on a fresh
+            # project whose default phase is already C)
+            if prev != target_phase:
+                status.setdefault("history", []).append({
+                    "phase": prev, "outcome": f"goto:{target_phase}",
+                    "timestamp": datetime.now().isoformat(),
+                })
             save_status(path, status)
             result = {"forced_phase": target_phase, "previous": prev}
 

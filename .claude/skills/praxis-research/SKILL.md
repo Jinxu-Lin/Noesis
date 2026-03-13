@@ -1,8 +1,8 @@
 ---
-description: "Praxis 研究模块：自动化执行 R2→R8 研究流程"
+description: "Praxis 研究模块：自动化执行 C→R 研究流程"
 ---
 
-# Skill: Praxis 研究模块运行器 (R2→R8)
+# Skill: Praxis 研究模块运行器 (C→I, 自动化阶段)
 
 ## 触发
 
@@ -31,31 +31,47 @@ description: "Praxis 研究模块：自动化执行 R2→R8 研究流程"
 python3 $RUNNER next <project_path>
 ```
 
+**如果命令执行失败**（非零退出码、输出不是合法 JSON）→ 向用户报告错误，**退出循环**。
+
 解析返回 JSON：
 
 | `action_type` 值 | 行为 |
 |------------------|------|
 | `"done"` | 输出完成信息，**退出循环** |
 | `"error"` | 输出错误信息，**退出循环** |
-| `"manual"` | 输出 `message` 字段内容，**退出循环**（研究模块完成，进入人工编码阶段） |
+| `"manual"` | 输出 `message` 字段内容，**退出循环**（进入手动阶段：P 探针实验 / E 实验执行 / W 论文写作） |
 | `"skill"` | 继续步骤 2 |
 | `"skills_parallel"` | 继续步骤 2（并行模式） |
 
 ---
 
-### 步骤 2：人工检查点（仅当 JSON 含 `checkpoint_message`）
+### 步骤 2：人工检查点（仅当 JSON 含 `iteration_warning`）
 
-向用户展示 `checkpoint_message` 字段内容，等待回复：
+若 JSON 含 `iteration_warning`，向用户展示警告内容。
 
+**根据当前 `phase` 提供对应选项**（不同阶段支持不同的 outcome）：
+
+**若 `phase` 为 `"D"`（联合设计迭代守卫）**：
 - `yes` → 继续步骤 3
-- `skip` → 直接执行步骤 4
-- `stop` → 输出"已暂停，下次运行 `/praxis-research <project_path>` 继续。"，**退出循环**
+- `escalate` → 执行 `python3 $RUNNER advance <project_path> --outcome escalate`，输出结果，**回到步骤 1**
+- `stop` → 输出"已暂停"，**退出循环**
 
-若 JSON 含 `iteration_warning`，展示后同样等待用户确认（yes/stop）再继续。
+**若 `phase` 为 `"C"`（问题锐化迭代守卫）**：
+- `yes` → 继续步骤 3
+- `abandon` → 执行 `python3 $RUNNER advance <project_path> --outcome abandon`，输出结果，**回到步骤 1**
+- `stop` → 输出"已暂停"，**退出循环**
+
+**其他阶段**（通用迭代警告）：
+- `yes` → 继续步骤 3
+- `stop` → 输出"已暂停"，**退出循环**
+
+若 JSON 不含 `iteration_warning` → 直接进入步骤 3。
 
 ---
 
 ### 步骤 3：执行 Fork Agent
+
+**模型路由**：从 JSON 中读取 `model` 字段（单任务模式）或各 skill 条目的 `model` 字段（并行模式），传给 Agent tool 的 `model` 参数。
 
 **若 `action_type` 为 `"skill"`：**
 
@@ -63,6 +79,7 @@ python3 $RUNNER next <project_path>
 
 - `description`：JSON 的 `description` 字段
 - `prompt`：JSON 的 `fork_prompt` 字段（**原样传入，不修改**）
+- `model`：JSON 的 `model` 字段
 
 等待 fork agent 完成。
 
@@ -72,12 +89,15 @@ python3 $RUNNER next <project_path>
 
 - `description`：该 skill 的 `description` 字段
 - `prompt`：该 skill 的 `fork_prompt` 字段（**原样传入，不修改**）
+- `model`：该 skill 的 `model` 字段
 
 在单条消息中发出所有 Agent 调用，等待全部完成。
 
 > `role: "main"` 的 agent 写入 `phase-outcomes/<phase>.json`（决定路由）。
 > `role: "codex"` 的 agent 写入 `codex-reviews/<phase>-review.md`（仅供参考）。
 > 如果 Codex MCP 不可用，`role: "codex"` 的 agent 会自行跳过，不影响主流程。
+
+**错误处理**：如果 Agent tool 返回错误或失败，**不执行步骤 4**。向用户报告错误，**退出循环**。仅当 fork agent 成功完成时，才继续步骤 4。
 
 ---
 
@@ -98,22 +118,13 @@ python3 $RUNNER advance <project_path>
 
 ---
 
-## 研究模块完成时输出
+## 手动阶段退出时的输出
 
-当 `action_type` 为 `"manual"` 时，输出：
+当 `action_type` 为 `"manual"` 时，**直接输出 JSON 中的 `message` 字段内容**。
 
-```
-✅ 研究模块（R2→R8）已完成！
-   项目：<project_path>
+状态机已在 `message` 中填入了正确的绝对路径和可执行命令，无需二次替换。
 
-   下一步：
-   1. 进入 Codes/ 目录，按 code-todo.md 和 experiment-todo.md 进行编码与实验
-   2. 快速验证通过 → /praxis-goto <project_path> paper_writing 进入论文写作
-   3. 快速验证失败 → /praxis-conclude <project_path> 总结并重启研究
-```
-
-当 `action_type` 为 `"done"` 时，输出：
-
+当 `action_type` 为 `"done"` 时：
 ```
 🎉 Praxis Pipeline 完成！
    项目：<project_path>

@@ -15,9 +15,8 @@ model: opus
 
 ## 执行
 
-1. 运行 `echo $HOME` 确定 `HOME_DIR`，推导 `noesis_root = HOME_DIR/Research/Noesis`。
-2. 读取 `<noesis_root>/Praxis/skills/startup-skill.md`。
-3. **按照该 skill 文件的指令，在当前对话中直接与研究者交互执行**（无需 fork agent），将 `<project_name>` 和 `<noesis_root>` 替换为实际值。
+1. 读取 `~/Research/Noesis/Praxis/skills/start-skill.md`。
+2. **按照该 skill 文件的指令，在当前对话中直接与研究者交互执行**，将 `<project_name>` 替换为实际值。
 
 关键点：
 - 项目将创建在 `~/Research/<project_name>/`
@@ -28,6 +27,6 @@ model: opus
 
 告知研究者：
 ```
-Phase 1 完成。后续阶段由自动化运行器推进。
+Startup 完成。后续阶段由自动化运行器推进。
 运行：/praxis-research ~/Research/<project_name>
 ```

@@ -1,6 +1,5 @@
 ---
 description: "现有项目同化：将任意状态的科研项目纳入 Noesis 框架统一管理"
-model: sonnet
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 ---
 
@@ -40,6 +39,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, Agent
 
 ```
 同化完成。项目已纳入 Noesis 框架。
-查看当前状态：/praxis-status <project_path>
-继续研究流程：/praxis-research <project_path>
+查看当前状态：python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py status <project_path>
+若当前阶段为 W 且已初始化 Papers/paper-status.json：/praxis-paper <project_path>
+其他阶段继续研究流程：/praxis-research <project_path>
 ```

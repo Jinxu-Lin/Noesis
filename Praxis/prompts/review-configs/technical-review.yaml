@@ -1,0 +1,259 @@
+# Technical Review Configuration (Phase RT)
+# 技术审查：合并方法审查+实验审查，增加方法-实验对齐维度
+# 以顶会 reviewer 标准审查方法的技术正确性和实验设计的严谨性
+
+review_type: Technical Review
+phase_id: RT
+phase_name: "Technical Review (技术审查)"
+
+# ── 多视角辩论配置 ──────────────────────────────────────────────────────
+# RT 辩论焦点：理论正确性、评估协议、实验科学性、极端怀疑、工程可行性、反驳
+debate_agents:
+  - theorist        # 数学/理论正确性：逻辑闭合、理论保证、隐含假设
+  - methodologist   # 评估协议完整性：数据泄漏、超参选择、proxy 指标、ablation 覆盖
+  - empiricist      # 实验科学性：Dim 0→1 衔接、统计效力、可复现性、baseline 公平
+  - skeptic         # 极端怀疑：最弱组件、最可能失败点、替代解释
+  - pragmatist      # 工程可行性：计算资源、实现复杂度、时间估计
+  - contrarian      # 构建最强反驳：与探针结果的一致性、过拟合探针信号的风险
+
+debate_output_subdir: RT   # phase-outcomes/debate/RT/
+# ───────────────────────────────────────────────────────────────────────
+
+# SubAgent 需要读取的文档
+input_docs:
+  required:
+    - research/problem-statement.md
+    - research/method-design.md
+    - research/experiment-design.md
+    - research/probe-results.md
+    - research/contribution.md
+  optional:
+    - project-startup.md  # 供验证假设链一致性
+
+# 审查报告输出文件名
+output_doc: inner-reviews/technical-review.md
+
+# 审查维度（10 项，合并方法+实验审查）— 每项含明确评分标准和 DL 领域常见陷阱
+review_dimensions:
+  # ═══════════════════════════════════════════════════════════
+  # 方法侧（4 项）
+  # ═══════════════════════════════════════════════════════════
+  - name: 逻辑闭合
+    question: "Gap → Root Cause → Method → Why Solves，链条是否完整？"
+    criteria: >
+      每一环都能严格推导，无逻辑跳跃。
+      检查清单：
+      (1) Gap → Root Cause：是否有实验/分析支撑因果关系？还是仅仅是相关性观察？
+      (2) Root Cause → Method：方法设计是否直接针对 root cause？是否存在"解决方案寻找问题"的嫌疑？
+      (3) Method → Why Solves：方法如何从机制上解决 root cause？是否有理论保证或强直觉？
+      (4) 链条中是否存在隐含假设？这些假设在实践中是否成立？
+      DL 常见逻辑跳跃："X 是问题 → 我们用 attention/GNN/diffusion 解决" — 缺少 WHY 这个具体机制能解决此问题。
+    scoring_guide: >
+      Pass: 每一环都有严格的依据（理论 or 实证），无逻辑跳跃。
+      Revise: 链条方向正确但某一环依据不足，需要补充论证。
+      Block: 存在根本性逻辑断裂（如 method 不针对 root cause）。
+
+  - name: 组件必要性
+    question: "每个组件是否不可或缺？remove-one 分析"
+    criteria: >
+      每个组件都有明确的必要性论证。
+      检查清单：
+      (1) 方法有多少个独立组件？是否存在 Occam's Razor 违反（过度复杂）？
+      (2) 每个组件是否有独立的 motivation 和功能描述？
+      (3) 是否存在"炫技组件"——看起来 fancy 但可能对性能无贡献？
+      (4) 组件间是否有冗余？是否有两个组件解决同一个问题？
+      (5) 复杂度预算：新增组件带来的额外 compute/memory 成本是否与预期收益成比例？
+      DL 经验法则：如果 method description 超过 2 页（双栏），很可能存在不必要的组件。
+    scoring_guide: >
+      Pass: 每个组件有独立 motivation，移除任一个会导致可预测的性能下降。
+      Revise: 某些组件的必要性论证不充分，需要更强的 justification 或 simplification。
+      Block: 明显存在不必要的组件，方法过度工程化。
+
+  - name: 理论正确性
+    question: "数学推导是否正确？假设是否合理？"
+    criteria: >
+      公式推导无误，假设被明确声明。
+      检查清单：
+      (1) Loss function 设计：gradient 方向是否正确？是否存在 degenerate solution（如 collapse to trivial）？
+      (2) Bound / Guarantee：条件是否过强（实践中不满足）？bound 是否过松（实际无指导意义）？
+      (3) 隐含假设审计：i.i.d. 假设？Lipschitz continuity？Bounded gradients？这些在 DL 实践中常常不成立。
+      (4) 维度一致性：tensor 操作的 shape 是否匹配？broadcasting 是否正确？
+      (5) 数值稳定性：是否存在除以接近零的值？log 的输入是否保证为正？softmax 的数值范围？
+      DL 特有陷阱：很多 DL 方法的"理论分析"实际上依赖于不切实际的假设（如 overparameterization regime、infinite width limit），需要检查这些假设是否在 method 的实际使用场景下成立。
+    scoring_guide: >
+      Pass: 推导正确，假设明确且在目标场景下合理，数值稳定性已考虑。
+      Revise: 推导正确但假设需要更明确声明，或存在可修复的数值稳定性隐患。
+      Block: 存在推导错误或关键假设在目标场景下不成立。
+
+  - name: 与探针结果的一致性
+    question: "方法设计是否与探针实验的经验信号一致？"
+    criteria: >
+      方法应利用探针中发现的信号，不应忽视或矛盾。
+      检查清单：
+      (1) 探针实验揭示了哪些 positive signals？方法设计是否充分利用了这些信号？
+      (2) 探针实验揭示了哪些 negative signals / 失败模式？方法是否 address 了这些问题？
+      (3) 是否过度拟合探针信号——方法是否 specifically tuned for probe setting 而忽略了 generalization？
+      (4) 探针 setting 与完整实验 setting 的差距有多大？方法在 scale up 时是否需要 adaptation？
+      (5) 探针的 quantitative results 是否被合理地纳入了方法设计的 motivation？
+      DL 特有陷阱：在小 dataset / 简化 setting 上 work 的直觉在 scale up 后经常不成立（如 toy dataset 上有效的 regularization 在 large-scale 上反而 hurt）。
+    scoring_guide: >
+      Pass: 方法与探针信号一致，未过度拟合，scale-up 策略清晰。
+      Revise: 一致但某些探针发现被忽略，或 scale-up 策略不够明确。
+      Block: 方法与探针信号矛盾，或明显过度拟合探针 setting。
+
+  # ═══════════════════════════════════════════════════════════
+  # 实验侧（5 项）
+  # ═══════════════════════════════════════════════════════════
+  - name: RQ 覆盖度
+    question: "是否每个 claim 都有实验支撑？"
+    criteria: >
+      无遗漏的 claim-experiment 映射。
+      检查清单：
+      (1) 列出 contribution.md 中的每个 claim。
+      (2) 每个 claim 是否有至少一个对应实验？标注映射关系。
+      (3) 是否存在"orphan experiments"——实验结果不服务于任何 claim？
+      (4) 是否存在"overclaimed results"——实验结果被过度解读为更强的 claim？
+      (5) 定量 claim（如"提升 X%"）是否有明确的实验对应？
+      DL 特有问题：很多论文在 intro 中 claim "our method is general" 但只在一个 dataset/task 上验证。
+    scoring_guide: >
+      Pass: 每个 claim 有至少一个对应实验，无 overclaim。
+      Revise: 存在 1-2 个 claim-experiment 遗漏，但核心 claim 有覆盖。
+      Block: 核心 claim 缺少实验支撑，或存在系统性 overclaim。
+
+  - name: Baseline 公平性与时效性
+    question: "对比方法是否是当前最强？在线核查结果？"
+    criteria: >
+      不能只挑弱 baseline。
+      检查清单：
+      (1) Baseline 是否包含最近 12 个月的 SOTA？（Empiricist 负责在线核查）
+      (2) 所有 baseline 是否使用相同 backbone / pretrained weights / training budget？
+      (3) 是否给 baseline 做了 fair hyperparameter tuning？（不能只用 default config）
+      (4) 是否包含"方法的简化版本"作为 baseline（验证复杂度是否 justified）？
+      (5) 是否包含 simple but strong baseline（如 larger model、more data、ensembling）？
+      DL 特有陷阱：
+      - 用 ResNet-50 的 baseline 对比 ViT-L 的方法
+      - Baseline 用 ImageNet pretrain，method 用 更强的 pretrain（如 CLIP）
+      - Baseline 用 reported numbers（可能 suboptimal config），method 用 best-tuned config
+      - "Missing the obvious baseline"——有时最强的竞争者是一个简单方法的 careful tuning
+    scoring_guide: >
+      Pass: Baselines up-to-date（近 12 个月），fair comparison 条件满足，包含 simple strong baseline。
+      Revise: Baselines 基本合理但缺少 1-2 个重要方法，或公平性条件需要补充说明。
+      Block: Baselines 明显 cherry-picked 或 unfair comparison。
+
+  - name: Ablation 完整性
+    question: "是否能区分各组件的贡献？"
+    criteria: >
+      每个组件的必要性都可被验证。
+      检查清单：
+      (1) 是否有 remove-one ablation（移除每个组件看影响）？
+      (2) 是否能区分独立贡献 vs 交互效应？（仅 remove-one 不够时需要 add-one）
+      (3) 关键超参的 sensitivity analysis 是否包含？
+      (4) 是否有 qualitative analysis（visualization、case study）补充 quantitative ablation？
+      (5) Ablation 是否在所有主要数据集上都做了？还是只在最好的数据集上做？
+      DL 特有陷阱：
+      - 只展示 ablation 中 performance 下降的组件，隐藏 performance 不变的组件
+      - Ablation 在一个 dataset 上做，但 main results 在另一个 dataset 上报告
+      - 组件交互效应可能使得 remove-one ablation 误导（A+B > A, A+B > B，但 A 和 B 单独都无效果）
+    scoring_guide: >
+      Pass: 每个组件有 ablation，sensitivity analysis 覆盖关键超参，定量+定性结合。
+      Revise: Ablation 存在但不完整（缺少某些组件或某些数据集上的结果）。
+      Block: 缺少 ablation study 或 ablation 设计有 systematic bias。
+
+  - name: Dim 0 → Dim 1 衔接
+    question: "探针方案如何自然扩展为完整实验？"
+    criteria: >
+      扩展路径清晰，不存在 gap。
+      检查清单：
+      (1) 探针 setting 与完整实验 setting 的主要差异（data scale, model size, task complexity）是否被列出？
+      (2) 每个差异是否有对应的 scaling 策略？
+      (3) 是否存在"scale gap"——某些在 Dim 0 有效的技巧在 Dim 1 可能失效？
+      (4) Dim 1 实验是否 subsume Dim 0（即 Dim 0 结果可以作为 Dim 1 的一个数据点）？
+      (5) 从 Dim 0 到 Dim 1 是否需要新的工程 effort（如分布式训练、混合精度）？
+      DL 特有风险：
+      - 在 CIFAR-10 上 work 不代表在 ImageNet 上 work
+      - 在 short sequences 上 work 的方法在 long sequences 上可能 OOM
+      - 在 single GPU 上 debug 的方法在 multi-GPU 上可能有 synchronization issues
+    scoring_guide: >
+      Pass: Scale-up 路径清晰，差异已识别并有对应策略。
+      Revise: 路径方向正确但某些 scaling 挑战未被充分考虑。
+      Block: Dim 0 和 Dim 1 setting 差异过大，无清晰 bridge。
+
+  - name: 评估协议完整性
+    question: "实验协议是否能给出公正、无偏的评估？"
+    criteria: >
+      完整审计清单：
+      (1) Data split：训练/验证/测试集划分是否有 data leakage 风险？是否使用标准 split？
+          - 时序数据：是否存在 temporal leakage？
+          - 关联数据：train/test 中的样本是否有隐式关联（如同一用户、同一来源）？
+      (2) Hyperparameter selection：是否严格在 validation set 上完成？是否报告了搜索空间和策略？
+          - 测试集上的超参选择 = 数据泄漏（DL 论文中极为常见的问题）
+      (3) 随机种子策略：是否报告了多次运行的 mean ± std？最少 3 次，推荐 5 次。
+          - 单次运行 claim SOTA 在顶会中不被接受
+      (4) 评估指标：是否全面？是否可被 game？
+          - 只用 accuracy 不用 calibration / efficiency / fairness
+          - 只用 FID 不用 diversity / mode coverage
+          - 只用 BLEU/ROUGE 不用 human evaluation
+      (5) Compute budget：是否报告了 training cost（GPU hours）？方法的额外 compute 是否与收益成比例？
+      (6) Statistical testing：对于核心 claim，是否做了 significance test（如 paired t-test, bootstrap CI）？
+    scoring_guide: >
+      Pass: 所有审计项通过，实验协议足以保证结果可信。
+      Revise: 1-2 个审计项需要补充（如缺少 error bars 或 compute budget 报告）。
+      Block: 存在 data leakage 或 test-set hyperparameter selection。
+
+  # ═══════════════════════════════════════════════════════════
+  # 联合维度（1 项 — 核心新增）
+  # ═══════════════════════════════════════════════════════════
+  - name: 方法-实验对齐
+    question: "每个方法组件是否都有对应 ablation？每个实验是否都在验证明确的 claim？交叉引用是否一致？"
+    criteria: >
+      这是最关键的审查维度。
+      双向映射审查：
+      (1) Method → Experiment 方向：
+          - 每个方法组件是否有对应 ablation study？
+          - 每个理论 claim 是否有对应 empirical validation？
+          - 方法描述中的 "should improve X" 是否在实验中验证了 X？
+      (2) Experiment → Method 方向：
+          - 每个实验是否在验证一个明确的 claim？
+          - 实验 setup 中的 design choices 是否与方法描述一致？
+          - 评估指标是否 capture 了方法声称要优化的目标？
+      (3) 交叉引用一致性：
+          - method-design.md 中的交叉引用（→ experiment-design.md §xxx）是否指向正确位置？
+          - experiment-design.md 中的反向引用（← method-design.md §xxx）是否一一对应？
+          - 是否存在断裂链接或不一致？
+      DL 特有对齐问题：
+      - 方法声称 "improves training stability" 但没有 training curve 对比实验
+      - 方法声称 "reduces overfitting" 但没有 generalization gap 分析
+      - 方法引入 regularization term 但 ablation 中没有单独验证其贡献
+      - 方法声称 "efficient" 但没有 FLOPs/latency/memory 对比
+    scoring_guide: >
+      Pass: 双向映射完整，交叉引用一致，无遗漏。
+      Revise: 存在 1-2 个对齐遗漏但不影响核心 claims。
+      Block: 核心 claim 缺少实验对应，或交叉引用系统性不一致。
+
+# 战略预判引导
+strategic_foresight_hint: >
+  在战略预判中，重点回答：
+  1. 如果实验结果不达标，最可能的原因是方法的哪个组件？
+  2. 如果需要修改方法，最自然的替代组件是什么？
+  3. 如果方法-实验对齐发现遗漏，遗漏的 ablation 可能揭示什么？
+  4. 实现中最容易出 bug 的组件是什么？（gradient computation, loss balancing, data preprocessing）
+  5. 训练中最可能出问题的环节？（early divergence, late-stage overfitting, mode collapse）
+
+# 判定后的路由
+routing:
+  pass:
+    next_phase: "I"
+    message: "技术审查通过，进入实现规划（I）。"
+
+  revise:
+    next_phase: "D"
+    message: "技术问题需要修改，回到联合设计（D）。technical-review.md 将作为迭代输入。"
+
+  fundamental:
+    next_phase: "C"
+    message: "问题定义层面有误，回到问题锐化（C）重新审视方向。"
+
+  block:
+    continue_phase: "D"
+    continue_message: "需重大修改，返回联合设计（D）。"
+    abandon_message: "Exit Assessment Gate 判定 Abandon，进入知识回收（R）。"

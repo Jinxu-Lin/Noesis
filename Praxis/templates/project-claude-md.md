@@ -10,10 +10,10 @@
 
 ## 当前状态
 
-- **当前阶段**: Phase [X] ([阶段名称])
-- **执行模式**: 首次 / P[Y] Revise 迭代 / P8 L[N] 迭代
-- **下一步**: 运行 `/praxis-run <项目路径>` 继续自动化流程
-- **阶段历史**: P1 ✓ → P2 ✓ → P3 Pass → P4 ✓ → ...
+- **当前阶段**: [C/RS/P/D/RT/I/E/W/R] ([阶段名称])
+- **执行模式**: 首次 / RS-Revise / Probe-Pivot / RT-Revise / Execute-Iterate / Execute-Pivot
+- **下一步**: 运行 `/praxis-research <项目路径>` 继续自动化流程
+- **阶段历史**: C ✓ → RS Pass → P signal → D ✓ → ...
 
 > 阶段状态由 `pipeline-status.json` 权威记录，本节仅供人类快速查阅。
 
@@ -23,31 +23,32 @@
 
 | 文档 | 状态 | 说明 |
 |------|------|------|
-| `project-startup.md` | | Phase 1 — 项目知识基础 |
-| `research/gap-analysis.md` | | Phase 2 — 研究空白与研究问题 |
-| `research/method-design.md` | | Phase 4 — 方法设计与理论 |
-| `research/experiment-design.md` | | Phase 6 — 实验方案（含结果） |
+| `project-startup.md` | | S — 项目知识基础 |
+| `research/problem-statement.md` | | C — Gap + 攻击角度 + 探针方案 |
+| `research/probe-results.md` | | P — 探针实验结果 |
+| `research/method-design.md` | | D — 方法设计（含实验交叉引用） |
+| `research/experiment-design.md` | | D — 实验设计（含方法交叉引用） |
 | `research/contribution.md` | | 跨阶段 — 贡献跟踪 |
-| `research/result.md` | | 实验结果与洞察（如有） |
-| `iteration-log.md` | | 迭代历史（如有） |
+| `research/result.md` | | E — 实验结果与洞察（如有） |
+| `iteration-log.md` | | 版本变更历史（如有） |
 
 ## 迭代记录
 
-<!-- 如果项目经历了迭代，在此简要记录 -->
-| 轮次 | 级别 | 原因摘要 | 结果 |
-|------|------|---------|------|
+<!-- 由 iteration-log.md 记录完整历史，此处仅简要概览 -->
+| 版本 | 触发 | 变更 | 日期 |
+|------|------|------|------|
 | | | | |
 
 ---
 
-## Code/ 子目录
+## Codes/ 子目录
 
-> 以下内容在 Phase 8 (`/impl-setup`) 时填写。Phase 8 之前本节可留空。
+> 以下内容在 I（实现规划）时填写。I 之前本节可留空。
 
 ### 代码架构
 
 ```
-Code/
+Codes/
 ├── configs/           ← 实验配置（配置驱动实验）
 ├── src/
 │   ├── methods/       ← 核心方法实现
@@ -64,7 +65,6 @@ Code/
 |--------------------------|---------|------|
 | Component A | `src/methods/xxx.py` | |
 | Component B | `src/methods/yyy.py` | |
-| 整体 Pipeline | `src/methods/pipeline.py` | 组装各组件 |
 
 ### 环境配置
 
@@ -74,17 +74,9 @@ Code/
 # 数据准备
 ```
 
-**远程服务器**（P8 实验执行）：
+**远程服务器**（E 实验执行）：
 ```yaml
 # 在项目根目录创建 env.json（已加入 .gitignore，每台机器独立配置）
-# {
-#   "remote": {
-#     "host": "gpu-server-alias",
-#     "project_path": "/home/user/projects/<项目名>",
-#     "conda_env": "research",
-#     "gpu": "A100"
-#   }
-# }
 ```
 
 ### 运行命令
@@ -101,17 +93,11 @@ Code/
 - **实验结果**: 存储在 `experiments/[实验名]/[日期]/`
 - **重要**: 修改核心方法代码前，先读 research/method-design.md 中对应的理论部分
 
-### 关键实现决策记录
-
-| 决策 | 原因 | 对应 research/method-design.md 章节 |
-|------|------|--------------------------|
-| | | |
-
 ---
 
 ## Papers/ 子目录
 
-> 以下内容在 Phase 9 (`/paper-writing`) 时填写。Phase 9 之前本节可留空。
+> 以下内容在 W（论文写作）时填写。W 之前本节可留空。
 
 ### 论文结构
 
@@ -126,4 +112,3 @@ Papers/
 
 - **目标格式**: [会议/期刊模板]
 - **参考文献管理**: [BibTeX 文件路径]
-- **图表编号约定**: [如有]

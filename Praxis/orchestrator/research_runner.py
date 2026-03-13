@@ -1,11 +1,12 @@
-"""Research Pipeline Runner.
+"""Research Pipeline Runner — v2.
 
-Builds the next action (with full fork-agent prompt) for the research pipeline (R1→R11).
-Independent from the paper writing pipeline.
+Builds the next action (with full fork-agent prompt) for the research pipeline.
+v2: C → RS → P → D → RT → I → E → W → R → complete
 
 CLI:
     python research_runner.py next    <project_path>  → print action JSON (with fork_prompt)
     python research_runner.py advance <project_path>  → read outcome, advance state, print result
+    python research_runner.py advance <project_path> --outcome <outcome>  → manual advance
     python research_runner.py status  <project_path>  → print current status
 """
 
@@ -15,11 +16,17 @@ from pathlib import Path
 
 # Same package
 sys.path.insert(0, str(Path(__file__).parent))
-from research_state_machine import get_next_action, advance, get_status
+from research_state_machine import get_next_action, advance, get_status, PHASES
 
 PRAXIS_ROOT  = Path(__file__).parent.parent
 PROMPTS_DIR  = PRAXIS_ROOT / "prompts"
 LESSONS_DIR  = Path.home() / ".noesis" / "lessons"
+
+# Tier → Claude model mapping
+_TIER_MODEL = {
+    "heavy": "opus",
+    "standard": "sonnet",
+}
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -48,7 +55,7 @@ _TIER_PREAMBLE = {
 def _load_lessons(skill_name: str) -> str:
     """Load cross-project lessons for this skill type from ~/.noesis/lessons/.
 
-    Filters out [✗ ineffective] entries (injected before but didn't help).
+    Filters out [✗ ineffective] entries.
     Promotes [RECURRING] bullet points to the top of each section.
     """
     lessons_file = LESSONS_DIR / f"{skill_name}.md"
@@ -58,9 +65,8 @@ def _load_lessons(skill_name: str) -> str:
     if not content:
         return ""
 
-    # Process line by line: filter ineffective, sort recurring first within sections
-    recurring: list[str] = []  # bullet lines with [RECURRING]
-    normal: list[str] = []     # other bullet lines (not ineffective, not recurring)
+    recurring: list[str] = []
+    normal: list[str] = []
     result_lines: list[str] = []
 
     def flush_bullets() -> None:
@@ -72,17 +78,16 @@ def _load_lessons(skill_name: str) -> str:
     for line in content.splitlines():
         if line.startswith("- "):
             if "[✗ ineffective]" in line:
-                continue  # drop ineffective lessons entirely
+                continue
             elif "[RECURRING]" in line:
                 recurring.append(line)
             else:
                 normal.append(line)
         else:
-            # Non-bullet line: flush pending bullets first, then add this line
             flush_bullets()
             result_lines.append(line)
 
-    flush_bullets()  # flush any remaining bullets at end of file
+    flush_bullets()
 
     filtered = "\n".join(result_lines).strip()
     if not filtered:
@@ -91,28 +96,29 @@ def _load_lessons(skill_name: str) -> str:
     return (
         "\n\n---\n\n"
         "## 跨项目经验教训（自动注入）\n\n"
-        "> 以下教训来自历史项目的 Phase 11 Retrospective。[RECURRING] 为跨项目反复出现的高优先级问题。\n\n"
+        "> 以下教训来自历史项目的 Retrospective。[RECURRING] 为跨项目反复出现的高优先级问题。\n\n"
         + filtered
     )
 
 
 # ─────────────────────────────────────────────────────────────────
-# Prompt building
+# Prompt loading
 # ─────────────────────────────────────────────────────────────────
 
-def _load_prompt_content(prompt_name: str, skill_args: str) -> str:
-    """Load prompt file, prepending review config for review phases."""
+def _load_prompt_content(prompt_name: str, skill_args: str = "") -> str:
+    """Load prompt file. For review phases, prepend review config YAML."""
     prompt_file = PROMPTS_DIR / f"{prompt_name}-prompt.md"
     if not prompt_file.exists():
         return f"[ERROR: Prompt file not found: {prompt_file}]"
     content = prompt_file.read_text(encoding="utf-8")
 
-    if prompt_name == "1X-review" and skill_args:
-        config_file = PROMPTS_DIR / "review-configs" / f"{skill_args}-review.yaml"
+    # For review phases, prepend the review config
+    if prompt_name in ("strategic-review", "technical-review"):
+        config_file = PROMPTS_DIR / "review-configs" / f"{prompt_name}.yaml"
         if config_file.exists():
             cfg = config_file.read_text(encoding="utf-8")
             content = (
-                f"# 审查配置（{skill_args}-review.yaml）\n\n```yaml\n{cfg}\n```\n\n---\n\n"
+                f"# 审查配置（{prompt_name}.yaml）\n\n```yaml\n{cfg}\n```\n\n---\n\n"
                 + content
             )
     return content
@@ -127,109 +133,146 @@ def _load_reflect_prompt() -> str:
 
 
 # ─────────────────────────────────────────────────────────────────
-# Iteration context detection
+# Entry context → iteration injection
 # ─────────────────────────────────────────────────────────────────
 
-# Maps work phases to the review file produced by the preceding review phase.
-# Presence of this file → Revise mode.
-_PHASE_REVIEW_FILES: dict[str, str] = {
-    "R1": "inner-reviews/gap-review.md",
-    "R3": "inner-reviews/method-review.md",
-    "R5": "inner-reviews/experiment-review.md",
-}
+def _build_iteration_context(project_path: Path, phase: str,
+                              entry_context: dict | None, iter_count: int) -> str:
+    """Build iteration context injection block based on entry_context from status.
 
-# Maps work phases to downstream documents produced in later phases.
-# On Pivot restart, agent should read these for full iteration context.
-_PHASE_DOWNSTREAM_DOCS: dict[str, list[str]] = {
-    "R1": ["research/method-design.md", "research/experiment-design.md", "research/result.md"],
-    "R3": ["research/experiment-design.md", "research/result.md"],
-    "R5": ["research/result.md"],
-}
-
-
-def _build_iteration_context(project_path: Path, phase: str, iter_count: int) -> str:
-    """Detect execution mode from project state and return an injection block.
-
-    Three modes:
-      Revise    — review file present AND newer than iteration-log (fresh review feedback)
-      Pivot     — iteration-log.md present AND iter_count > 0 (hot-restart after coding failure)
-      首次执行  — neither condition met → empty string
-
-    When both files exist, the newer one wins: a fresh review file (written by R2/R4/R6)
-    means Revise mode; a newer iteration-log (written by /praxis-conclude) means Pivot mode.
+    v2 uses explicit entry_context from pipeline-status.json instead of
+    inferring mode from file existence.
     """
-    review_file_name = _PHASE_REVIEW_FILES.get(phase)
-    if not review_file_name:
+    if not entry_context:
+        if iter_count > 0:
+            # Has been here before but no explicit entry_context — check iteration-log
+            iter_log = project_path / "iteration-log.md"
+            if iter_log.exists():
+                return (
+                    f"\n## 迭代模式：Pivot（第 {iter_count + 1} 轮）\n\n"
+                    f"前序方向已排除，迭代日志：`{iter_log}`（必须全文读取）\n\n"
+                    f"执行要点：\n"
+                    f"- 理解所有已排除方向和根因\n"
+                    f"- **严禁**重复 iteration-log.md 中已排除的方向\n"
+                )
+        return ""  # first execution
+
+    mode = entry_context.get("mode", "first")
+
+    if mode == "first":
         return ""
 
-    review_file = project_path / review_file_name
-    iter_log    = project_path / "iteration-log.md"
+    if mode == "rs_revise":
+        review_file = project_path / "inner-reviews" / "strategic-review.md"
+        return (
+            f"\n## 迭代模式：RS-Revise（基于战略审查意见修改）\n\n"
+            f"战略审查已完成，意见文件：`{review_file}`（必须全文读取）\n\n"
+            f"执行要点：\n"
+            f"- 逐条理解审查意见，定位对应段落，针对性修改\n"
+            f"- **不从零开始**——保留已通过审查的内容\n"
+            f"- 更新文档 frontmatter 版本号（minor +1）\n"
+        )
 
-    # When both files exist, compare modification times to determine which is more recent
-    if review_file.exists() and iter_count > 0 and iter_log.exists():
-        if review_file.stat().st_mtime > iter_log.stat().st_mtime:
-            # Review file is newer → came from a fresh review cycle → Revise mode
-            return (
-                f"\n## 迭代模式：Revise（基于审查意见修改）\n\n"
-                f"前序审查已完成，意见文件：`{review_file}`（必须全文读取）\n\n"
-                f"执行要点：\n"
-                f"- 逐条理解每个 Revise / Block 级问题，定位对应段落，针对性修改\n"
-                f"- **不从零开始**——保留已通过审查的内容\n"
-                f"- Pass 级建议可选择性采纳\n"
-            )
-        # else: iteration-log is newer → /praxis-conclude hot-restart → fall through to Pivot
+    if mode == "probe_pivot":
+        probe_file = project_path / "research" / "probe-results.md"
+        iter_log = project_path / "iteration-log.md"
+        return (
+            f"\n## 迭代模式：Probe-Pivot（探针失败，换攻击角度）\n\n"
+            f"探针实验未获信号。\n"
+            f"- 探针结果：`{probe_file}`（必须全文读取）\n"
+            f"- 迭代日志：`{iter_log}`（如存在，必须读取）\n\n"
+            f"执行要点：\n"
+            f"- Gap 定义可能保留（如果探针失败是攻击角度的问题而非 Gap 的问题）\n"
+            f"- 重点重新设计 §2 攻击角度和 §3 探针方案\n"
+            f"- **严禁**重复已排除的攻击角度\n"
+            f"- 更新文档 frontmatter 版本号（major +1）\n"
+        )
 
-    # Pivot mode: iteration-log exists and is the most recent context source
-    if iter_count > 0 and iter_log.exists():
-        # Build downstream docs reference
+    if mode == "rt_revise":
+        review_file = project_path / "inner-reviews" / "technical-review.md"
+        return (
+            f"\n## 迭代模式：RT-Revise（基于技术审查意见修改）\n\n"
+            f"技术审查已完成，意见文件：`{review_file}`（必须全文读取）\n\n"
+            f"执行要点：\n"
+            f"- 读技术审查意见，定位需要修改的组件/实验\n"
+            f"- 保留未被质疑的部分，针对性修改\n"
+            f"- 确保方法-实验交叉引用保持一致\n"
+            f"- 更新文档 frontmatter 版本号（minor +1）\n"
+        )
+
+    if mode == "execute_iterate":
+        result_file = project_path / "research" / "result.md"
+        iter_log = project_path / "iteration-log.md"
+        return (
+            f"\n## 迭代模式：Execute-Iterate（方法层问题，修改失败组件）\n\n"
+            f"实验执行发现方法层问题。\n"
+            f"- 实验结果：`{result_file}`（必须全文读取）\n"
+            f"- 迭代日志：`{iter_log}`（必须全文读取）\n\n"
+            f"执行要点：\n"
+            f"- 理解哪些组件有问题，保留已验证有效的组件\n"
+            f"- 只重新设计失败组件及其对应实验\n"
+            f"- 读 iteration-log.md 确认已排除的替代方案\n"
+            f"- 更新文档 frontmatter 版本号（major +1）\n"
+        )
+
+    if mode == "execute_pivot":
+        result_file = project_path / "research" / "result.md"
+        iter_log = project_path / "iteration-log.md"
+        # Also reference downstream docs for context
+        downstream = []
+        for doc in ["research/method-design.md", "research/experiment-design.md",
+                     "research/result.md"]:
+            if (project_path / doc).exists():
+                downstream.append(doc)
+
         downstream_lines = ""
-        downstream_docs = _PHASE_DOWNSTREAM_DOCS.get(phase, [])
-        existing_docs = [d for d in downstream_docs if (project_path / d).exists()]
-        if existing_docs:
-            doc_list = "\n".join(f"  - `{d}`" for d in existing_docs)
+        if downstream:
+            doc_list = "\n".join(f"  - `{d}`" for d in downstream)
             downstream_lines = (
-                f"\n前序迭代产出文档（必须阅读以获取完整失败上下文）：\n{doc_list}\n"
-                f"\n> 这些文档记录了上一轮迭代的完整设计细节，"
-                f"比 iteration-log 摘要更详尽——优先从中理解失败全貌。\n"
+                f"\n前序迭代产出文档（参考，获取完整失败上下文）：\n{doc_list}\n"
             )
 
         return (
-            f"\n## 迭代模式：Pivot（第 {iter_count + 1} 轮热重启）\n\n"
-            f"前序方向已排除，迭代日志：`{iter_log}`（必须全文读取）\n"
+            f"\n## 迭代模式：Execute-Pivot（方向层问题，重新审视 Gap 和攻击角度）\n\n"
+            f"实验执行发现方向层问题，核心假设不成立。\n"
+            f"- 实验结果：`{result_file}`（如存在，必须全文读取）\n"
+            f"- 迭代日志：`{iter_log}`（必须全文读取）\n"
             f"{downstream_lines}\n"
             f"执行要点：\n"
-            f"- 理解所有已排除方向、失败层级（L2/L3/L4）和根因\n"
+            f"- Gap 定义和攻击角度都需要重新审视\n"
+            f"- 从失败中获得的关键洞察是最有价值的资产\n"
             f"- **严禁**重复 iteration-log.md 中已排除的方向\n"
-            f"- 根据失败层级决定改动范围（见 prompt 中的层级说明）\n"
+            f"- 更新文档 frontmatter 版本号（major +1）\n"
         )
 
-    # Revise mode: review file present from a fresh review cycle (not stale)
-    if review_file.exists():
-        return (
-            f"\n## 迭代模式：Revise（基于审查意见修改）\n\n"
-            f"前序审查已完成，意见文件：`{review_file}`（必须全文读取）\n\n"
-            f"执行要点：\n"
-            f"- 逐条理解每个 Revise / Block 级问题，定位对应段落，针对性修改\n"
-            f"- **不从零开始**——保留已通过审查的内容\n"
-            f"- Pass 级建议可选择性采纳\n"
-        )
+    return ""
 
-    return ""  # 首次执行 — no special context needed
 
+# ─────────────────────────────────────────────────────────────────
+# Outcome guides
+# ─────────────────────────────────────────────────────────────────
 
 _OUTCOME_GUIDES = {
     "work": (
         '- `"done"` — 正常完成'
     ),
-    "review": (
-        '- `"pass"` — 审查通过\n'
-        '- `"revise"` — 需要修改，回到前序工作阶段\n'
-        '- `"continue_R1"` / `"continue_R3"` '
-        '— Block + Exit Gate → Continue，目标 Phase 对应路由（R4 review 可用 continue_R1，R6 review 可用 continue_R3）\n'
-        '- `"abandon"` — Block + Exit Gate → Abandon，进入 R8 Retrospective'
+    "strategic_review": (
+        '- `"pass"` — 战略审查通过，进入探针实验\n'
+        '- `"revise"` — 需要修改，回到 C 问题锐化\n'
+        '- `"abandon"` — 放弃，进入 R 知识回收'
+    ),
+    "technical_review": (
+        '- `"pass"` — 技术审查通过，进入实现规划\n'
+        '- `"revise"` — 技术问题，回到 D 联合设计\n'
+        '- `"fundamental"` — 问题定义层面有误，回到 C 问题锐化\n'
+        '- `"abandon"` — 放弃，进入 R 知识回收'
     ),
 }
 
+
+# ─────────────────────────────────────────────────────────────────
+# Fork prompt building
+# ─────────────────────────────────────────────────────────────────
 
 def _build_fork_prompt(action: dict, project_path: Path) -> str:
     """Assemble the complete, self-contained prompt for the fork subagent."""
@@ -240,6 +283,7 @@ def _build_fork_prompt(action: dict, project_path: Path) -> str:
     outcome_type = action["outcome_type"]
     tier         = action.get("tier", "standard")
     iter_count   = action.get("iteration_count", 0)
+    entry_ctx    = action.get("entry_context")
 
     tier_preamble   = _TIER_PREAMBLE.get(tier, "")
     skill_content   = _load_prompt_content(skill_name, skill_args)
@@ -248,7 +292,7 @@ def _build_fork_prompt(action: dict, project_path: Path) -> str:
     outcome_guide   = _OUTCOME_GUIDES.get(outcome_type, '- `"done"`')
     outcome_file    = project_path / "phase-outcomes" / f"{phase}.json"
 
-    iter_context = _build_iteration_context(project_path, phase, iter_count)
+    iter_context = _build_iteration_context(project_path, phase, entry_ctx, iter_count)
 
     reflect_section = ""
     if reflect_content:
@@ -297,11 +341,7 @@ def _build_fork_prompt(action: dict, project_path: Path) -> str:
 # ─────────────────────────────────────────────────────────────────
 
 def _build_codex_prompt(codex_agent: str, action: dict, project_path: Path) -> str:
-    """Build the fork prompt for an optional parallel Codex/external-AI agent.
-
-    The Codex agent is informational only — it does NOT write to phase-outcomes/.
-    It writes its review to <project>/codex-reviews/<phase>-review.md.
-    """
+    """Build the fork prompt for an optional parallel Codex/external-AI agent."""
     phase       = action["phase"]
     description = action["description"]
     skill_args  = action.get("skill_args", "")
@@ -342,34 +382,54 @@ def _build_codex_prompt(codex_agent: str, action: dict, project_path: Path) -> s
 def cmd_next(project_path_str: str) -> dict:
     """Return next action with fully assembled fork_prompt."""
     project_path = Path(project_path_str).resolve()
+
+    if not project_path.is_dir():
+        return {
+            "action_type": "error",
+            "message": f"Project path does not exist: {project_path}",
+        }
+
     (project_path / "phase-outcomes").mkdir(exist_ok=True)
+    (project_path / "codex-reviews").mkdir(exist_ok=True)
 
     action = get_next_action(str(project_path))
 
     if action["action_type"] != "skill":
-        return action  # "done", "error", or "manual" — pass through as-is
+        return action  # "done", "error", or "manual" — pass through
+
+    # 清理当前阶段的旧 outcome 文件，防止 fork agent 崩溃时读到残留数据
+    phase = action["phase"]
+    stale_outcome = project_path / "phase-outcomes" / f"{phase}.json"
+    if stale_outcome.exists():
+        stale_outcome.unlink()
+
+    # 模型路由：tier → model
+    tier = action.get("tier", "standard")
+    model = _TIER_MODEL.get(tier, "sonnet")
 
     main_fork_prompt = _build_fork_prompt(action, project_path)
-    codex_agent = action.get("codex_agent")  # optional field from PHASES config
+    codex_agent = action.get("codex_agent")
 
     if codex_agent:
-        # Return parallel action: main agent + codex reviewer
         action["action_type"] = "skills_parallel"
         action["skills"] = [
             {
                 "role": "main",
                 "description": action["description"],
                 "fork_prompt": main_fork_prompt,
+                "model": model,
             },
             {
                 "role": "codex",
                 "description": f"Codex 外部审查: {action['description']}",
                 "fork_prompt": _build_codex_prompt(codex_agent, action, project_path),
+                "model": "sonnet",  # codex agent 只是 MCP 调度，不需要重模型
             },
         ]
     else:
         action["action_type"] = "skill"
         action["fork_prompt"] = main_fork_prompt
+        action["model"] = model
 
     action["project_path"] = str(project_path)
 
@@ -381,22 +441,55 @@ def cmd_next(project_path_str: str) -> dict:
             f"   回复 yes 继续，skip 跳过（标记为已完成），stop 退出。"
         )
 
-    # Iteration guard
-    if action.get("iteration_count", 0) >= 3:
+    # Iteration guards
+    entry_ctx = action.get("entry_context") or {}
+    phase = action["phase"]
+
+    # D回退 ≥ 2 次 → 强制升级到 C
+    if phase == "D" and entry_ctx.get("d_iteration_count", 0) >= 2:
         action["iteration_warning"] = (
-            f"⚠️  阶段 {action['phase']} 已迭代 {action['iteration_count']} 次，"
+            f"⚠️  D（联合设计）已迭代 {entry_ctx['d_iteration_count']} 次。\n"
+            f"   根据迭代守卫规则，建议升级到 C（问题锐化）重新审视方向。\n"
+            f"   继续 D 迭代？回复 yes 继续，escalate 升级到 C，stop 退出。"
+        )
+
+    # C回退 ≥ 3 次 → 触发 abandon 评估
+    if phase == "C" and entry_ctx.get("c_iteration_count", 0) >= 3:
+        action["iteration_warning"] = (
+            f"⚠️  C（问题锐化）已迭代 {entry_ctx['c_iteration_count']} 次。\n"
+            f"   根据迭代守卫规则，建议评估是否 abandon 项目。\n"
+            f"   回复 yes 继续迭代，abandon 放弃进入 R 知识回收，stop 退出。"
+        )
+
+    # General iteration warning
+    iter_count = action.get("iteration_count", 0)
+    if iter_count >= 3 and "iteration_warning" not in action:
+        action["iteration_warning"] = (
+            f"⚠️  阶段 {phase} 已迭代 {iter_count} 次，"
             f"可能陷入循环。请检查项目状态后决定是否继续。"
         )
 
     return action
 
 
-def cmd_advance(project_path_str: str) -> dict:
-    """Read phase-outcomes/<phase>.json, advance state machine, return result."""
+def cmd_advance(project_path_str: str, manual_outcome: str | None = None) -> dict:
+    """Read phase-outcomes/<phase>.json, advance state machine, return result.
+
+    If manual_outcome is provided, use it directly (for manual phases like P and E).
+    """
     project_path = Path(project_path_str).resolve()
     status = get_status(project_path)
-    phase = status.get("phase", "R1")
+    phase = status.get("phase", "C")
 
+    # Manual outcome override (for manual phases)
+    if manual_outcome:
+        result = advance(str(project_path), phase, manual_outcome)
+        if "error" in result:
+            return result
+        result["notes"] = f"manual advance with outcome: {manual_outcome}"
+        return result
+
+    # Read from outcome file
     outcome_file = project_path / "phase-outcomes" / f"{phase}.json"
 
     if not outcome_file.exists():
@@ -433,7 +526,7 @@ def _cli():
     args = sys.argv[1:]
     if len(args) < 2:
         print(json.dumps({
-            "error": "Usage: runner.py <next|advance|status> <project_path>"
+            "error": "Usage: runner.py <next|advance|status> <project_path> [--outcome <outcome>]"
         }))
         sys.exit(1)
 
@@ -442,7 +535,13 @@ def _cli():
     if cmd == "next":
         result = cmd_next(project_path)
     elif cmd == "advance":
-        result = cmd_advance(project_path)
+        # Check for --outcome flag
+        manual_outcome = None
+        if "--outcome" in args:
+            idx = args.index("--outcome")
+            if idx + 1 < len(args):
+                manual_outcome = args[idx + 1]
+        result = cmd_advance(project_path, manual_outcome)
     elif cmd == "status":
         result = get_status(Path(project_path).resolve())
     else:

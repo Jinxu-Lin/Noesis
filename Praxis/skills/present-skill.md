@@ -15,6 +15,22 @@
 因此 presentation.md 不是研究文档的线性摘要，而是**为"15分钟讨论"重新排列信息优先级的独立文档**。
 最重要的 section 是 Open Questions，不是 Our Approach。
 
+### 面向非专业听众的沟通原则
+
+导师和合作者未必了解你方法中的每一个技术细节。好的 presentation 需要在严谨和可理解之间找到平衡：
+
+**先传达直觉，再展示细节**：
+- 每一个技术概念，先用一句自然语言解释"它在干什么"，再（可选地）给出技术定义
+- 例如，不要直接写 "我们使用了 Rotary Position Embedding 来替代绝对位置编码"，而是写 "我们改用了一种随相对距离变化的位置编码方式（RoPE），让模型更好地理解词与词之间的距离关系"
+
+**用类比建立桥梁**：
+- DL 中的很多概念可以用直觉类比传达，例如："attention 机制让模型在处理每个词时，选择性地'关注'其他相关的词，类似于人阅读时会回看前文的关键段落"
+- 但类比必须准确，不能为了通俗化而引入错误的暗示
+
+**数字比文字有力**：
+- "我们的方法显著更快" 远不如 "我们的方法推理速度是 baseline 的 3.2 倍，训练时间减少 40%"
+- "性能有所提升" 远不如 "在 MMLU 上从 78.3% 提升到 82.1%（+3.8%）"
+
 ---
 
 ## Step 0：热启动检测
@@ -47,12 +63,12 @@
 **按存在情况读取**：
 - `<project_path>/project-startup.md` ← P1 产出
 - `<project_path>/research/contribution.md` ← 贡献跟踪
-- `<project_path>/research/gap-analysis.md` ← P2 产出
-- `<project_path>/inner-reviews/gap-review.md` ← P3 产出（含评审意见）
+- `<project_path>/research/problem-statement.md` ← P2 产出
+- `<project_path>/inner-reviews/strategic-review.md` ← P3 产出（含评审意见）
 - `<project_path>/research/method-design.md` ← P4 产出
-- `<project_path>/inner-reviews/method-review.md` ← P5 产出（含评审意见）
+- `<project_path>/inner-reviews/technical-review.md` ← P5 产出（含评审意见）
 - `<project_path>/research/experiment-design.md` ← P6 产出
-- `<project_path>/inner-reviews/experiment-review.md` ← P7 产出（含评审意见）
+- `<project_path>/inner-reviews/technical-review.md` ← P7 产出（含评审意见）
 - `<project_path>/Codes/code-todo.md` ← P8 产出
 - `<project_path>/Codes/experiment-todo.md` ← P8 产出（实验 checklist）
 - `<project_path>/iteration-log.md` ← 迭代历史（如有失败迭代）
@@ -103,7 +119,7 @@ status_snapshot: [从 phase-outcomes/*.json 压缩生成，格式：P1:done | P2
 **每次生成都完整重写此节。**
 
 ```markdown
-## 📍 Project Snapshot
+## Project Snapshot
 
 **项目**: [名称] | **阶段**: [当前阶段描述] | **目标**: [venue 和截稿日，若已知]
 **本次更新**: [日期]  [热启动时追加：| 距上次 presentation: X 天]
@@ -118,6 +134,20 @@ status_snapshot: [从 phase-outcomes/*.json 压缩生成，格式：P1:done | P2
 ```
 
 **内容来源**：pipeline-status.json、phase-outcomes notes、S4 内容的提炼
+
+#### 议题优先级排序原则
+
+讨论时间有限，议题的排序直接决定了会议效率。优先级应该这样排：
+
+1. **阻塞性决策**（最高优先级）：如果不做决定，后续工作完全无法推进。例如："需要在两种方法架构中选择一种，它们需要不同的代码基础设施"
+2. **需要导师专业领域知识的问题**：研究者自己无法判断的问题，例如："这个 baseline 选择是否足够公平？领域内是否有更强的 baseline 我们遗漏了？"
+3. **有时间窗口的问题**：例如 deadline 相关、计算资源预约、合作者协调
+4. **信息同步**（最低优先级）：进展更新、计划调整等。如果时间不够，这些可以通过文字沟通
+
+**不值得在会议上讨论的问题**（应自行解决）：
+- 纯工程问题（代码 bug、环境配置）
+- 已有足够证据可以自行判断的设计决策
+- 文档格式和流程规范问题
 
 ---
 
@@ -144,9 +174,17 @@ status_snapshot: [从 phase-outcomes/*.json 压缩生成，格式：P1:done | P2
 ```
 
 **内容来源**：
-- 主：`research/gap-analysis.md`（Gap 陈述节、根因分析节、Research Questions 节）
+- 主：`research/problem-statement.md`（Gap 陈述节、根因分析节、Research Questions 节）
 - 辅：`project-startup.md`（研究动机节）
 - 注意：若 P3 曾有 Revise，使用最终修订版的 gap 陈述（不是初稿）
+
+#### 表达技巧
+
+问题陈述是 presentation 中决定导师"是否继续认真听"的部分。需要在 30 秒内让读者理解"为什么这重要"：
+
+- **避免**："现有方法存在一些不足" → 太模糊
+- **应该**："GPT-4 在处理超过 32K token 的文档时，回答准确率从 90% 降到 52%（Lost-in-the-Middle 现象），这直接限制了 LLM 在法律合同分析和科学文献综述中的应用" → 具体、有数字、有应用场景
+- **根因分析要指向技术层面**：不只是"性能下降了"，而是"因为 self-attention 的 softmax 分母随序列长度增大导致注意力权重被过度分散" → 暗示了解决方案的方向
 
 ---
 
@@ -180,6 +218,18 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 - 辅：`research/contribution.md`（方法贡献节）
 - 辅（有迭代时）：`iteration-log.md` 最新 Entry 的"当前版本快照"
 
+#### 表达技巧
+
+方法是 presentation 中最容易写得"对内行太简单、对外行太复杂"的部分。关键是分层表达：
+
+- **第一层（所有人都应理解）**：核心 idea 的直觉，用类比或图示。例如："我们不让模型一次看完整篇文档，而是教它像人一样'分段阅读、逐步整合'——先理解每个段落，再把段落之间的关系拼接起来"
+- **第二层（技术同行应理解）**：因果论证和组件分工。例如："具体来说，我们引入了一个层次化 attention 机制：局部 attention 处理段落内的 token 交互（O(n)），全局 attention 处理段落间的语义关系（O(n/k)），总复杂度从 O(n^2) 降到 O(n*k)"
+- **第三层（细节，留给 Q&A）**：具体的数学公式、实现细节、超参数选择。这些写在 method-design.md 中，presentation 中不展开
+
+**与现有方法的对比要公平但鲜明**：
+- 不要贬低 baseline："X 方法很差" → 应该说 "X 方法在 Y 场景下表现良好，但其设计假设（Z）在 W 场景下不成立"
+- 突出**本质区别**而非**表面区别**：不是"我们用了 3 层而他们用了 2 层"，而是"我们显式建模了 X 关系，而他们假设 X 是可忽略的"
+
 ---
 
 ### S3: Validation Design（验证体系）
@@ -203,7 +253,7 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 
 **内容来源**：
 - 主：`research/experiment-design.md`（RQ 与实验映射表、Baselines 节、Dim 0 节）
-- 辅：`inner-reviews/experiment-review.md`（确认实验设计通过；注意审查意见可能修改了实验）
+- 辅：`inner-reviews/technical-review.md`（确认实验设计通过；注意审查意见可能修改了实验）
 
 ---
 
@@ -253,11 +303,27 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 
 **内容来源**（按优先级）：
 1. `phase-outcomes/*.json` 的 `notes` 字段
-2. `inner-reviews/gap-review.md`、`inner-reviews/method-review.md`、`inner-reviews/experiment-review.md` 中 Revise/Block 意见
+2. `inner-reviews/strategic-review.md`、`inner-reviews/technical-review.md`、`inner-reviews/technical-review.md` 中 Revise/Block 意见
 3. `iteration-log.md` 中的"建议方向"（失败迭代的教训）
 4. `research/method-design.md` 风险评估节、`research/experiment-design.md` 风险与预案节
 
 **每个 DECISION NEEDED 问题必须包含"我们的倾向"**，不把决策完全甩给导师。
+
+#### DL 研究中常见的需要讨论的决策类型
+
+以下是 DL 研究中频繁出现的需要导师/合作者输入的决策类型，生成 S4 时可参照：
+
+**方法选择类**：
+- "在 X 和 Y 两种架构之间，X 理论上更优但实现复杂度高，Y 更简单但可能不够强" — 需要权衡创新性 vs 可行性
+- "核心组件是否需要理论保证？还是 empirical evidence 就够了？" — 取决于目标 venue 的偏好
+
+**实验设计类**：
+- "Baseline 列表中是否需要包含 Z？Z 是最近的 concurrent work，加入会增加 2 周工作量" — 时间 vs 完备性的 trade-off
+- "是否需要在更大规模（如 13B 模型）上验证？" — 取决于可用计算资源和贡献 claim 的强度
+
+**论文定位类**：
+- "投 A 会议还是 B 会议？" — 取决于审稿人预期和竞争强度
+- "核心贡献应该 pitch 为 efficiency improvement 还是 quality improvement？" — 取决于哪个 angle 更有竞争力
 
 ---
 
@@ -270,7 +336,7 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 ```markdown
 ## Current Progress
 
-**阶段历史**：[P1 ✓ → P2 ✓ → P3 Pass → 当前：P4]
+**阶段历史**：[P1 → P2 → P3 Pass → 当前：P4]
 **当前工作**：[当前阶段描述]
 **关键待决**：[来自 S4 的最主要问题，1句]
 ```
@@ -297,7 +363,7 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 
 | 实验 | 状态 | 主要指标 | 备注 |
 |------|------|---------|------|
-| Dim 0 快速验证 | ✅通过 / ⚠️低于预期 / ❌失败 / 🔄进行中 | [数值或—] | |
+| Dim 0 快速验证 | 通过 / 低于预期 / 失败 / 进行中 | [数值或—] | |
 | [Dim 1 主实验] | [状态] | [数值或—] | |
 | [消融实验] | 待做 | — | |
 
@@ -352,7 +418,7 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 
 **内容来源**：
 - 主：research/contribution.md（全部贡献条目）
-- 辅：inner-reviews/method-review.md、inner-reviews/experiment-review.md（审查者认可的贡献点）
+- 辅：inner-reviews/technical-review.md、inner-reviews/technical-review.md（审查者认可的贡献点）
 - coding/paper_writing 阶段：research/experiment-design.md 或 Papers/ 的实际结果数字
 
 ---
@@ -369,7 +435,7 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 **假设**：[假设陈述]
 **设置**：[数据集规模 + 关键配置]
 **结果**：[数值]
-**结论**：✅ 成立 / ⚠️ 部分成立（[条件]）/ ❌ 不成立 / 🔄 进行中
+**结论**：成立 / 部分成立（[条件]）/ 不成立 / 进行中
 **分析**：[1-3句，为什么出现这个结果]
 
 ### Dim 1: [实验名称]
@@ -390,6 +456,22 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 - 主：research/experiment-design.md（各 Dim 模板的"实际结果"字段）
 - 主：Codes/experiment-todo.md（checkbox 状态 + 实验配置备注）
 - 辅：iteration-log.md（历次迭代的实验数据快照，若有）
+
+#### 结果展示的表达技巧
+
+实验结果是 presentation 中最"硬"的部分，但展示方式直接决定了导师对项目信心的判断：
+
+**结果表的设计原则**：
+- 最重要的 metric 放在最左列（视线首先落到的位置）
+- 你的方法用**加粗**标识
+- 如果某个数字特别关键（如证明了核心假设），用脚注解释其含义
+- 多个数据集/任务的结果如果趋势一致，可以合并为一张表；如果趋势不一致，必须分开展示并讨论差异原因
+
+**分析部分的关键**：
+- 不要只罗列数字——导师要的是"这些数字说明了什么"
+- 如果结果符合预期：说明"这验证了我们的假设 H1"
+- 如果结果不符合预期：这是最有价值的讨论点，应该在 S4 中展开。不要试图掩饰或弱化不符合预期的结果——导师能看出来，坦诚面对反而更有信服力
+- 如果不同实验的结果矛盾：指出矛盾并提出可能的解释，这是需要讨论的核心议题
 
 ---
 
@@ -469,11 +551,15 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 
 - [ ] 已读取 pipeline-status.json 确定当前阶段
 - [ ] 热启动时已完成变更分析，确定哪些 Section 需要更新
-- [ ] S0 Snapshot 已生成（含今日议题）
+- [ ] S0 Snapshot 已生成（含今日议题，按优先级排序）
 - [ ] S1-S3 按存在的源文档生成（不存在的文档对应的 Section 不强行生成）
+- [ ] S1 问题陈述能在 30 秒内让读者理解"为什么这重要"
+- [ ] S2 方法描述包含直觉层（自然语言）和技术层（组件表），分层清晰
 - [ ] S4 Open Questions 经过过滤逻辑，只包含真正需要讨论的问题，每个问题含"我们的倾向"
+- [ ] S4 中的问题按阻塞性/领域知识需求/时效性排序，而非简单列举
 - [ ] S5 Current Progress 使用了与当前阶段匹配的变体
 - [ ] S6-S9 按阶段感知规则选择性生成
+- [ ] S7 实验结果（若有）包含分析而非仅罗列数字
 - [ ] 文件头部 YAML frontmatter 已正确写入（热启动时已更新 update_history）
 - [ ] presentation.md 已写入 `<project_path>/presentation.md`
 
@@ -483,3 +569,4 @@ Gap 根因是 [X] → 因此我们设计了 [Y] → 理论上这会带来 [Z]
 - presentation.md 已生成/更新，路径 `<project_path>/presentation.md`
 - 本次更新了哪些 Section（热启动时）
 - S4 中有几个待讨论问题（提示今日议题数量）
+- 建议的会议时间分配：例如 "建议 15 分钟中，前 8 分钟聚焦 S4 的 2 个 DECISION NEEDED 问题，后 7 分钟同步进展和下一步"

@@ -125,7 +125,7 @@ Noesis 当前面向 **本地 macOS + Claude Code + GitHub** 的工作流设计�
 
 - 多机协作通过 `git push` / `git pull` 完成
 - 所有路径统一使用 `~`，避免硬编码用户名
-- R7 之后的编码与实验可通过 SSH MCP 在远程 GPU 服务器执行
+- I 之后的编码与实验可通过 SSH MCP 在远程 GPU 服务器执行
 - Noesis 仓库本身**不是具体项目仓库**，而是中央方法库与执行框架
 
 ---
@@ -279,9 +279,8 @@ Episteme/
 
 | Praxis 阶段 | 消费内容 |
 |-------------|----------|
-| `R1 Gap Discovery` | `Gaps & Assumptions` |
-| `R3 Method Design` | `Methods Bank` |
-| `R5 Experiment Design` | `Experimental Patterns` + `Reusable Resources` |
+| `C Crystallize` | `Gaps & Assumptions` |
+| `D Joint Design` | `Methods Bank` + `Experimental Patterns` + `Reusable Resources` |
 
 ---
 
@@ -310,8 +309,8 @@ Startup → Research → Code → Paper → Evolution
 | 命令 | 作用 |
 |------|------|
 | `/praxis-start <project_name>` | 交互式立项与项目脚手架创建 |
-| `/praxis-research <project_path>` | 自动推进 `R1→R8` |
-| `/praxis-conclude <project_path>` | 编码失败后总结并重置阶段 |
+| `/praxis-research <project_path>` | 自动推进 `C→R`（C→I 自动化，P/E/W 手动） |
+| `/praxis-conclude <project_path>` | 实验失败后总结并分层回退 |
 | `/praxis-paper <project_path>` | 自动推进 `P1→P7` |
 | `/praxis-assimilate <project_path>` | 将现有项目同化进 Noesis |
 | `/praxis-present <project_path>` | 生成用于汇报的 `presentation.md` |
@@ -369,7 +368,7 @@ Startup 并行调用 6 个辩论 Agent：
 - `phase-outcomes/`
 - `pipeline-evolution-log.md`
 
-并将主研究状态设置为 `R1`。
+并将主研究状态设置为 `C`。
 
 ---
 
@@ -392,96 +391,96 @@ Research 模块由：
 
 | Phase | 内容 | Tier | Codex | 主要出口 |
 |------|------|------|-------|----------|
-| `R1` | Gap Discovery | heavy | — | `done → R2` |
-| `R2` | Gap Review | heavy | ✓ | `pass / revise / abandon` |
-| `R3` | Method Design | heavy | — | `done → R4` |
-| `R4` | Method Review | heavy | ✓ | `pass / revise / continue_R1 / abandon` |
-| `R5` | Experiment Design | heavy | — | `done → R6` |
-| `R6` | Experiment Review | heavy | ✓ | `pass / revise / continue_R3 / abandon` |
-| `R7` | Impl Planning | standard | — | `done → R8` |
-| `R8` | Retrospective | heavy | — | `done → coding` |
+| `C` | Crystallize（问题锐化） | heavy | — | `done → RS` |
+| `RS` | Strategic Review（战略审查）🔒 | heavy | ✓ | `pass / revise / abandon` |
+| `P` | Probe（探针实验）🔧 | — | — | `signal / pivot / abandon` |
+| `D` | Joint Design（联合设计） | heavy | — | `done → RT` |
+| `RT` | Technical Review（技术审查）🔒 | heavy | ✓ | `pass / revise / fundamental / abandon` |
+| `I` | Implementation（实现规划） | standard | — | `done → E` |
+| `E` | Execution（实验执行）🔧 | — | — | `success / iterate_method / iterate_direction / abandon` |
+| `W` | Paper Writing（论文写作）🔧 | — | — | `done → R` |
+| `R` | Retrospective（知识回收） | heavy | — | `done → complete` |
 
 ### 9.2 每个阶段在做什么
 
 | 阶段 | 核心输出 |
 |------|----------|
-| `R1` | `research/gap-analysis.md` |
-| `R2` | `inner-reviews/gap-review.md` + 路由决策 |
-| `R3` | `research/method-design.md` |
-| `R4` | `inner-reviews/method-review.md` + 路由决策 |
-| `R5` | `research/experiment-design.md` |
-| `R6` | `inner-reviews/experiment-review.md` + 路由决策 |
-| `R7` | `Codes/code-todo.md` + `Codes/experiment-todo.md` |
-| `R8` | `retrospective.md` |
+| `C` | `research/problem-statement.md`（Gap + 攻击角度 + 探针方案） |
+| `RS` | `inner-reviews/strategic-review.md` + 路由决策 |
+| `P` | `research/probe-results.md`（手动） |
+| `D` | `research/method-design.md` + `research/experiment-design.md`（交叉引用） |
+| `RT` | `inner-reviews/technical-review.md` + 路由决策 |
+| `I` | `Codes/code-todo.md` + `Codes/experiment-todo.md` |
+| `E` | `research/result.md`（手动） |
+| `W` | 独立论文 pipeline（`/praxis-paper`） |
+| `R` | `research/retrospective.md` |
 
 ### 9.3 Research 模块的几个关键特征
 
-#### 1. 它不是线性直出，而是带审查门的推进
+#### 1. 决策性质驱动的阶段拆分
 
-`R2 / R4 / R6` 都是独立评审阶段。  
-审查结果会直接决定是否进入下一阶段、打回修改、切回更早阶段或放弃当前方向。
+v2 按**决策性质**而非文档类型组织阶段：
 
-#### 2. 它不是单一 Agent 角色
+- **C（Crystallize）**：战略决策 — Gap、攻击角度、探针方案三者循环耦合，必须同时设计
+- **D（Joint Design）**：技术决策 — 方法与实验同步设计，通过交叉引用保持对齐
 
-研究阶段使用不同 tier：
+#### 2. 探针实验前置经验信号
 
-| Tier | 模型定位 | 典型阶段 |
-|------|----------|----------|
-| `standard` | AI Co-Author | `R7` |
-| `heavy` | 严格独立审查者 / 决策者 | `R1-R6`, `R8` |
-| `codex` | 外部第三方视角 | `R2`, `R4`, `R6` |
+P 阶段在战略审查通过后、联合设计前执行。用最小成本验证核心直觉是否有经验信号。
+这避免了走完完整设计后才发现核心假设不成立的高成本返工。
 
-Codex 并行审查是 **non-blocking** 的：  
+#### 3. 两种差异化审查
+
+- **RS（战略审查）**：4 个 debater（Contrarian, Comparativist, Pragmatist, Interdisciplinary），回答"方向对不对"
+- **RT（技术审查）**：6 个 debater（Theorist, Methodologist, Empiricist, Skeptic, Pragmatist, Contrarian），回答"做法对不对"
+
+#### 4. 分层回退
+
+v2 不再统一回退到起点，而是按失败根因层次回退：
+
+- 方法层问题 → 回退到 D（保留 problem-statement.md）
+- 方向层问题 → 回退到 C（重新审视 Gap 和攻击角度）
+- 迭代守卫：D 回退 ≥ 2 次强制升级到 C；C 回退 ≥ 3 次触发 abandon 评估
+
+#### 5. 6 种迭代上下文模式
+
+Runner 根据转换来源自动注入上下文（`first / rs_revise / probe_pivot / rt_revise / execute_iterate / execute_pivot`），
+让 Agent 精确知道为什么回到当前阶段、应该修改什么、应该避免什么。
+
+Codex 并行审查是 **non-blocking** 的：
 MCP 不可用时不会阻塞主流程，结果仅写入 `codex-reviews/` 供参考。
 
-#### 3. 它支持带记忆的迭代
+### 9.4 R（Retrospective）的位置
 
-Runner 会自动识别两种迭代上下文：
+`R Retrospective` 发生在：
 
-- **Revise 模式**：存在上一轮 review 文档，要求在已有成果上修改
-- **Pivot 模式**：存在 `iteration-log.md`，要求在被排除方向之外重启
+**W（论文写作）完成之后，或 abandon 时**
 
-这样可以减少两类常见浪费：
-
-- 每次 revise 都从零重写
-- 每次失败后又走回已经被否掉的路径
-
-### 9.4 R8 的位置为什么特殊
-
-`R8 Retrospective` 发生在：
-
-**R7 完成之后、coding 开始之前**
-
-它不是项目结束后的总结，而是研究设计阶段的知识回收。  
-它的作用是把研究设计中的判断、风险与中间经验先沉淀下来，再进入人工编码与实验。
+它是流程末尾的知识回收阶段。因为此时已有完整实验结果，可以基于实际验证标记知识资产为 `[✓ validated]` / `[✗ refuted]` / `[~ partially validated]`。
 
 ---
 
-## 10. Module 3：Code
+## 10. 手动阶段：P / E / W
 
-Code 阶段是人工主导阶段，不由状态机自动完成。
+研究流程中有三个手动阶段，不由状态机自动完成。
 
-进入条件：
+### 10.1 P（探针实验）
 
-- `R8` 完成
-- 主状态进入 `coding`
+进入条件：RS 战略审查通过。
 
-### 10.1 Code 阶段的输入
+- 参考 `research/problem-statement.md` §3 探针方案
+- 将结果写入 `research/probe-results.md`
+- 通过 `advance --outcome signal/pivot/abandon` 推进
 
-`R7` 产出的：
+### 10.2 E（实验执行）
 
-- `Codes/code-todo.md`
-- `Codes/experiment-todo.md`
-- `Codes/CLAUDE.md`（如已生成）
+进入条件：I 实现规划完成。
 
-### 10.2 Code 阶段的两种出口
+参考 `Codes/code-todo.md` 与 `Codes/experiment-todo.md` 进行编码与实验。
 
 #### 情况 A：验证成功
 
-进入论文写作阶段：
-
-- 主状态进入 `paper_writing`
-- 然后运行 `/praxis-paper <project_path>`
+通过 `advance --outcome success` 进入 W（论文写作）。
 
 #### 情况 B：验证失败
 
@@ -493,25 +492,26 @@ Code 阶段是人工主导阶段，不由状态机自动完成。
 
 `/praxis-conclude` 会：
 
-- 分析失败层级
-- 追加 `iteration-log.md`
-- 将项目重置到合理研究阶段
+- 诊断失败层次（执行层 / 方法层 / 方向层）
+- 追加 `iteration-log.md` + 更新 `research/result.md`
+- 按层次分层回退
 
-失败层级与回退关系：
+失败层次与回退关系：
 
-| 失败层级 | 含义 | 回退位置 |
+| 失败层次 | 含义 | 回退位置 |
 |----------|------|----------|
-| `L2` | 需要换组件 | `R3` |
-| `L3` | 需要换框架 | `R3` |
-| `L4` | 需要换方向 | `R1` |
+| 执行层 | 调参/bug，不需要改方法 | 继续在 E |
+| 方法层 | 方法组件有问题 | D（联合设计） |
+| 方向层 | 攻击角度或 Gap 定义有问题 | C（问题锐化） |
 
-之后重新运行：
+之后重新运行 `/praxis-research <project_path>` 完成热重启。
 
-```bash
-/praxis-research <project_path>
-```
+### 10.3 W（论文写作）
 
-完成热重启。
+进入条件：E 实验验证成功。
+
+运行 `/praxis-paper <project_path>` 启动独立论文 pipeline。
+完成后通过 `advance --outcome done` 进入 R（知识回收）。
 
 ---
 
@@ -571,7 +571,7 @@ Noesis 先用 `P1` 建立叙事脊柱和符号表，再用 `P2` 分章节写作�
 
 Paper 阶段的基本原则是：
 
-- 从 `research/gap-analysis.md`、`research/method-design.md`、`research/experiment-design.md` 和 `Codes/` 提取素材
+- 从 `research/problem-statement.md`、`research/method-design.md`、`research/experiment-design.md` 和 `Codes/` 提取素材
 - 保持 `Gap → 根因 → 方法 → 验证 → 贡献` 的叙事一致性
 - 不在论文阶段凭空发明研究贡献
 
@@ -712,6 +712,7 @@ Runner 会在后续项目的相同阶段自动注入 lessons，并自动过滤�
 python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py status  <project_path>
 python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py next    <project_path>
 python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py advance <project_path>
+python3 ~/Research/Noesis/Praxis/orchestrator/research_runner.py advance <project_path> --outcome <outcome>
 python3 ~/Research/Noesis/Praxis/orchestrator/research_state_machine.py init-phase <project_path> <phase>
 ```
 
@@ -780,16 +781,16 @@ python3 ~/Research/Noesis/Praxis/orchestrator/paper_state_machine.py init-phase 
 ├── pipeline-status.json
 ├── project-startup.md
 ├── research/
-│   ├── gap-analysis.md
+│   ├── problem-statement.md
+│   ├── probe-results.md
 │   ├── method-design.md
 │   ├── experiment-design.md
 │   ├── contribution.md
-│   └── result.md
+│   ├── result.md
+│   └── retrospective.md
 ├── inner-reviews/
-│   ├── gap-review.md
-│   ├── method-review.md
-│   └── experiment-review.md
-├── retrospective.md
+│   ├── strategic-review.md
+│   └── technical-review.md
 ├── iteration-log.md
 ├── pipeline-evolution-log.md
 ├── phase-outcomes/
@@ -861,7 +862,7 @@ Noesis 不通过“扫描目录结构猜测状态”来决定流程位置。
 
 以下阶段都在上下文隔离的独立审查中完成：
 
-- `R2 / R4 / R6`
+- `RS / RT`
 - `P3 / P5 / P7`
 
 它的目的不是增加复杂度，而是降低确认偏误。
