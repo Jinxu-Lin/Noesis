@@ -124,7 +124,7 @@ python3 $RUNNER advance <project_path>
    下一步：
    1. 检查 Papers/latex/main.pdf，确认格式和内容
    2. 查看 Papers/project-review/synthesis.md，了解项目审查结论
-   3. 运行 /praxis-goto <project_path> R11 进入项目回顾
+   3. 通过 advance --outcome done 推进主流程进入 R（Retrospective）
    4. 运行 /praxis-evolve <project_path> 提取经验教训
 ```
 

@@ -11,7 +11,7 @@ model: opus
 /praxis-evolve <project_path>
 ```
 
-`<project_path>` 是已完成研究项目的绝对路径。通常在 Phase R11 Retrospective 完成后运行。
+`<project_path>` 是已完成研究项目的绝对路径。通常在 Phase R（Retrospective）完成后运行。
 
 ---
 

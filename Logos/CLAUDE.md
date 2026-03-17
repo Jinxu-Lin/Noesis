@@ -19,14 +19,13 @@ Logos（知识积累）
             │
             ↓  知识注入
     Praxis（研究执行）
-    R1 → R2 → R3 → R4 → R5 → R6 → R7 → R8 → coding → R11
+    C → RS → P → D → RT → I → E → W → R
                 （独立）P1 → P2 → P3 → P4 → P5 → P6 → P7
 ```
 
 Logos 产出的知识库被 Praxis 在以下阶段消费：
-- **R2 Gap Discovery** ← Gaps & Assumptions
-- **R4 Method Design** ← Methods Bank
-- **R6 Experiment Design** ← Experimental Patterns + Reusable Resources
+- **C Crystallize（问题锐化）** ← Gaps & Assumptions + Cross-Paper Connections
+- **D Joint Design（联合设计）** ← Methods Bank + Experimental Patterns + Reusable Resources
 
 ## Paths
 
@@ -128,7 +127,7 @@ Episteme/
 - **Gaps & Assumptions** — 显式 limitation + 隐式可质疑假设（最高价值，含可攻击性评估）
 - **Experimental Patterns** — baselines、metrics、消融策略、数据集
 - **Cross-Paper Connections** — 与已有论文的互补/矛盾/可结合关系（对照整个 KB 建立）
-- **Reusable Resources** — GitHub 代码、数据集、预训练模型（为 R8 实现阶段提供工程起点）
+- **Reusable Resources** — GitHub 代码、数据集、预训练模型（为 I 实现规划和 E 实验执行阶段提供工程起点）
 
 完整流程：
 1. git pull KB → 重复检查 → 预读准备

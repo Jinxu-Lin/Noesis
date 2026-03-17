@@ -131,7 +131,7 @@ Noesis 用 `lessons`、`pipeline-evolution-log` 和 `/praxis-evolve` 把经验�
 | 指标 | 含义 | 对研究者的价值 |
 |------|------|----------------|
 | **2** | 独立子系统 | 知识积累与研究执行解耦，不把“读论文”和“做项目”混成一个大 prompt |
-| **15** | 自动化阶段 | `R1-R8` 研究阶段 + `P1-P7` 论文阶段，覆盖从问题定义到论文定稿 |
+| **16** | 研究与论文阶段 | `C→RS→P→D→RT→I→E→W→R` 研究阶段 + `P1-P7` 论文阶段，覆盖从问题定义到论文定稿 |
 | **9** | Slash Commands | 从论文发现、项目孵化到汇报展示，都有稳定入口 |
 | **6** | Startup 辩论角色 | 在正式投入前先做方向压力测试，减少无效迭代 |
 | **3** | Agent Tier | `standard`、`heavy`、`codex` 各司其职，不让所有任务共享同一种智能角色 |
@@ -176,9 +176,8 @@ Noesis 最核心的差异，不在于“能不能自动写点东西”，而在�
 
 | Praxis 阶段 | 消费的知识资产 |
 |-------------|----------------|
-| **R1 Gap Discovery** | `Gaps & Assumptions` |
-| **R3 Method Design** | `Methods Bank` |
-| **R5 Experiment Design** | `Experimental Patterns` + `Reusable Resources` |
+| **C Crystallize（问题锐化）** | `Gaps & Assumptions` + `Cross-Paper Connections` |
+| **D Joint Design（联合设计）** | `Methods Bank` + `Experimental Patterns` + `Reusable Resources` |
 
 ### Praxis: 把研究从想法推进到论文
 
@@ -189,27 +188,28 @@ Noesis 最核心的差异，不在于“能不能自动写点东西”，而在�
 | 模块 | 命令 | 作用 |
 |------|------|------|
 | **Startup** | `/praxis-start <project_name>` | 交互式立项，六维辩论压力测试，创建项目脚手架 |
-| **Research** | `/praxis-research <project_path>` | 自动推进 `R1→R8`，完成 Gap、Method、Experiment 与知识回收 |
-| **Code** | 人工阶段 | 研究者主导编码与实验，失败时通过 `/praxis-conclude` 热重启 |
+| **Research** | `/praxis-research <project_path>` | 自动推进 `C→RS→P→D→RT→I→E→W→R`，完成问题锐化、审查、联合设计与知识回收 |
+| **Code** | 人工阶段 | 研究者主导编码与实验（E 阶段），失败时通过 `/praxis-conclude` 分层回退热重启 |
 | **Paper** | `/praxis-paper <project_path>` | 独立推进 `P1→P7`，完成大纲、写作、审查、LaTeX 与项目级终审 |
 | **Evolution** | `/praxis-evolve <project_path>` | 提取 lessons，并推动 Noesis 框架本身演进 |
 
-#### 研究阶段 `R1-R8`
+#### 研究阶段 `C→RS→P→D→RT→I→E→W→R`
 
 ```text
-R1 Gap Discovery
-→ R2 Gap Review
-→ R3 Method Design
-→ R4 Method Review
-→ R5 Experiment Design
-→ R6 Experiment Review
-→ R7 Impl Planning
-→ R8 Retrospective
-→ coding
+C   Crystallize（问题锐化：Gap + 攻击角度 + 探针方案）
+→ RS  Strategic Review（战略审查：4 debaters + Codex）
+→ P   Probe（探针实验：手动，最小成本验证核心直觉）
+→ D   Joint Design（联合设计：方法 + 实验同步设计）
+→ RT  Technical Review（技术审查：6 debaters + Codex）
+→ I   Implementation（实现规划）
+→ E   Execution（实验执行：手动）
+→ W   Paper Writing（论文写作：独立 paper pipeline）
+→ R   Retrospective（知识回收）
 ```
 
-其中 `R2 / R4 / R6` 是独立评审关口，支持并行引入 **Codex 外部视角**。  
-审查结果不会只生成意见，而会直接决定路由：`pass`、`revise`、`continue`、`abandon`。
+其中 `RS / RT` 是独立评审关口，支持并行引入 **Codex 外部视角**。
+审查结果不会只生成意见，而会直接决定路由：`pass`、`revise`、`fundamental`、`abandon`。
+`P / E / W` 为手动阶段，研究者控制关键判断节点。
 
 #### 论文阶段 `P1-P7`
 
@@ -343,7 +343,7 @@ Noesis 当前面向 **本地 macOS + Claude Code + GitHub** 的研究工作流�
 
 - **本地运行**：Noesis 与项目文档主要在本机维护
 - **多机同步**：通过 GitHub 在多台 Mac 之间同步
-- **远程实验**：R7 之后的实验可通过 SSH MCP 在远程 GPU 服务器执行
+- **远程实验**：I 之后的实验可通过 SSH MCP 在远程 GPU 服务器执行
 - **路径策略**：统一使用 `~`，避免用户名硬编码
 
 ---
@@ -368,9 +368,9 @@ Noesis 不依赖“猜测项目当前在哪一步”，而是依赖显式状态�
 
 | Tier | 角色定位 | 典型阶段 |
 |------|----------|----------|
-| `standard` | AI Co-Author / Writer | R7、P2、P4、P6 |
-| `heavy` | 独立审稿人 / 严格决策者 | R1-R6、R8、P1、P3、P5、P7 |
-| `codex` | 外部第三方视角 | R2、R4、R6、P3、P7 |
+| `standard` | AI Co-Author / Writer | I、P2、P4、P6 |
+| `heavy` | 独立审稿人 / 严格决策者 | C、RS、D、RT、R、P1、P3、P5、P7 |
+| `codex` | 外部第三方视角 | RS、RT、P3、P7 |
 
 ### 自动经验注入
 

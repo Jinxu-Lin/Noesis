@@ -279,7 +279,7 @@ Episteme/
 
 | Praxis 阶段 | 消费内容 |
 |-------------|----------|
-| `C Crystallize` | `Gaps & Assumptions` |
+| `C Crystallize` | `Gaps & Assumptions` + `Cross-Paper Connections` |
 | `D Joint Design` | `Methods Bank` + `Experimental Patterns` + `Reusable Resources` |
 
 ---
