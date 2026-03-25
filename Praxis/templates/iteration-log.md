@@ -27,6 +27,6 @@
 - **触发**: [审查指出了什么问题]
 - **变更文档**: [文档名] (X.Y)
 - **修改内容**: [简要描述修改了什么]
-- **审查参考**: inner-reviews/[strategic/technical]-review.md
+- **审查参考**: Reviews/research-formalize/round-N/synthesis.md 或 Reviews/research-design/round-N/synthesis.md
 
 -->

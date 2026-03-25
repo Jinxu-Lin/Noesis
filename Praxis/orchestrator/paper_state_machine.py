@@ -234,6 +234,15 @@ def _cli():
         path = Path(args[1])
         status = {"phase": "P1", "revision_rounds": 0}
         save_status(path, status)
+        # Update top-level pipeline-status.json
+        pipeline_file = path / "pipeline-status.json"
+        if pipeline_file.exists():
+            pipeline = json.loads(pipeline_file.read_text(encoding="utf-8"))
+        else:
+            pipeline = {"module_history": []}
+        pipeline["active_module"] = "paper"
+        pipeline["last_updated"] = datetime.now().isoformat()
+        pipeline_file.write_text(json.dumps(pipeline, indent=2, ensure_ascii=False), encoding="utf-8")
         result = {"initialized": True, "phase": "P1", "project": str(path)}
 
     elif cmd == "init-phase" and len(args) >= 3:

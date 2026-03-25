@@ -20,18 +20,6 @@ description: "Praxis 论文写作模块：自动化执行 P1→P7 论文写作�
 
 ---
 
-## 前置检查
-
-检查项目主 pipeline 状态：
-
-```bash
-python3 <noesis_path>/Praxis/orchestrator/research_runner.py status <project_path>
-```
-
-确认当前 phase 为 `W`。如果不是，向用户展示当前状态并询问是否继续。
-
----
-
 ## 主循环
 
 这是一个**纯机械循环**。不做任何解释，不补充任何步骤，严格按以下 5 步重复执行。
@@ -122,9 +110,9 @@ python3 $RUNNER advance <project_path>
    项目审查：<project_path>/Papers/project-review/synthesis.md
 
    下一步：
-   1. 检查 Papers/latex/main.pdf，确认格式和内容
-   2. 查看 Papers/project-review/synthesis.md，了解项目审查结论
-   3. 通过 advance --outcome done 推进主流程进入 R（Retrospective）
+   1. 检查论文是否含 {{PENDING}} 占位符 → 运行 /praxis-paper-fill 填入实验数据
+   2. 检查 Papers/latex/main.pdf，确认格式和内容
+   3. 查看 Papers/project-review/synthesis.md，了解项目审查结论
    4. 运行 /praxis-evolve <project_path> 提取经验教训
 ```
 
@@ -138,3 +126,5 @@ python3 $RUNNER advance <project_path>
 - P3 的 5 角色审查在 main fork agent 中顺序执行；Codex 外部审查以独立并行 agent 同步进行
 - P7 的 Critic + Supervisor 在 main fork agent 中顺序执行；Codex 外部审查以独立并行 agent 同步进行
 - Codex 并行 agent 的结果为**参考信息**，不影响 Pass/Revise 路由决策
+- Paper 模块可以在实验完成前启动（design_review 通过后即可）——此时 Method 等章节正常写作，实验数据使用 `{{PENDING:...}}` 占位符
+- 实验完成后运行 `/praxis-paper-fill` 填入数据，然后从 P3 重新审查

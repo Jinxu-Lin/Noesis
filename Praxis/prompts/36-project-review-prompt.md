@@ -1,309 +1,217 @@
-# Skill: Project-Level Review (项目级审查) — Phase P7
+# Skill: Project-Level Review (P7)
 
-## 触发场景
-P6 LaTeX 编译完成后，对**整个研究项目**（不仅是论文）进行多视角审查。
+## Mission
+Conduct adversarial and supervisory review of the entire research project (not just the paper), with special attention to proxy metric gaming, then synthesize actionable submission guidance.
 
-## 输入
-- `Papers/latex/main.tex` — 最终论文
-- `Papers/paper.md` — 完整论文 Markdown
-- `Papers/review.md` — P5 终审报告
-- `Papers/critique/summary.md` — P3 审查汇总
-- `research/contribution.md` — 贡献列表
-- `research/problem-statement.md` — Gap 分析
-- `research/method-design.md` — 方法设计
-- `research/experiment-design.md` — 实验设计
-- `Codes/` — 代码与实验结果（如存在）
+## Input
+- `Papers/latex/main.tex`, `Papers/paper.md`
+- `Papers/review.md`, `Papers/critique/summary.md`
+- `research/contribution.md`, `research/problem-statement.md`
+- `research/method-design.md`, `research/experiment-design.md`
+- `Codes/_Results/` -- experiment results (if available)
 
-## 执行流程
+## Step 1: Critic Review (Adversary)
 
-本阶段依次执行 **3 个审查角色**，每个角色产出独立报告，最后综合。
+Adopt a **harsh academic critic** persona. Your goal: **find reasons to reject this paper**. If you cannot find sufficient reasons, the paper passes.
 
----
+### 1.1 Logic Holes
+- Circular reasoning, causation/correlation confusion, unsupported inference jumps, selective argumentation
 
-### Step 1: Critic 审查（攻击者视角）
+### 1.2 Methodology Issues
+- Missing control variables, confounders (model capacity, data volume, training time), insufficient sample size, p-hacking risk
 
-以**严苛的学术批评者**身份，攻击性地寻找项目弱点。你的目标不是"评价论文"，而是**找到让这篇论文被 reject 的理由**。如果找不到足够强的理由，那说明论文确实过关了。
+### 1.3 Proxy Metric Gaming (Critical -- highest risk in AI-assisted research)
 
-**审查维度**：
+Check each item:
+- **Metric-quality alignment**: does metric improvement correspond to actual output quality improvement? (e.g., BLEU up but text less natural? PSNR up but visual quality down?)
+- **Degenerate output detection**: mode collapse, repetitive output, conservative predictions, over-optimizing easy samples?
+- **Cross-validation with secondary metrics**: diversity, human judgment, downstream task performance? Single-metric reliance = high gaming risk.
+- **Improvement magnitude reasonableness**: >30% in a mature field from method innovation alone is suspicious. Does improvement scale match innovation scale?
+- **Actual output inspection**: beyond aggregate statistics, are sample outputs/predictions representative or cherry-picked?
 
-1. **逻辑漏洞**：
-   - 循环论证："我们的方法好因为实验结果好，实验结果好因为我们的方法好"
-   - 因果/相关混淆：方法 A 和性能提升同时出现，但提升是否真的来自 A？
-   - 不支撑的推理跳跃：论文声称"因此..."但前提和结论之间缺少推理步骤
-   - 选择性论证：只讨论支持自己的证据，忽略反面证据
+### 1.4 Writing Issues
+- Unfalsifiable qualitative claims, over-claiming on small improvements, missing applicability conditions, argument-structure mismatch
 
-2. **方法论问题**：
-   - 缺失的控制变量：多个变化同时引入，无法归因
-   - 混淆因子：性能提升可能来自模型容量增大、数据增多、训练时间更长等非方法因素
-   - 样本量不足：在太少的数据集或太少的样本上验证
-   - p-hacking 风险：是否在多个指标/设置中选择性报告有利结果？
+### 1.5 Novelty Deep Assessment
+- Contribution level: new problem definition > new paradigm > new module > new combination > new finding
+- Side-by-side technical diff with closest prior work
+- If "A + B" combination: what is the insight? Why not A+C or B+D?
+- Premature obsolescence risk (e.g., tied to a soon-replaced backbone)
 
-3. **Proxy Metric Gaming（自动科研系统的核心风险）**：
+### 1.6 Reproducibility Risk
+- Sensitivity to init/hyperparameters, training instability, framework/hardware dependence
 
-   这是 AI 辅助科研最容易出现的问题——**优化了指标但没有真正解决问题**。必须逐条检查：
+### 1.7 Missing Baselines / Ablations
+- Most obvious baseline present? Simplest-replacement ablation done? Oracle/upper-bound/lower-bound experiments?
 
-   - **指标与真实质量的对齐度**：
-     - Claim 的指标改进是否真的对应了输出质量的提升？
-     - 例：BLEU score 提升但生成文本实际上更不自然？PSNR 提升但图像视觉质量下降？
-     - 是否存在 "Goodhart's Law" 现象——当指标成为目标，它就不再是好指标？
-
-   - **退化输出检测**：
-     - 模型是否通过重复输出、保守预测、模式崩塌来刷高指标？
-     - 生成类任务：输出是否多样？是否有 mode collapse？
-     - 分类/检测类任务：是否在简单样本上过度优化而忽略困难样本？
-
-   - **二级指标交叉验证**：
-     - 除了主指标，是否有辅助指标（多样性、人类判断、下游任务性能）交叉验证？
-     - 如果只有单一自动指标，gaming 风险极高
-
-   - **改进幅度合理性**：
-     - >30% 的改进需要特别审视——这在成熟领域几乎不可能仅靠方法创新
-     - 改进是否与方法的创新程度匹配？（简单修改带来巨大提升很可疑）
-
-   - **实际样本检查**：
-     - 不仅看汇总统计，还要检查实际的输出样本/预测结果
-     - Case study 中的样本是否有代表性？还是精心挑选的？
-
-4. **写作问题**：
-   - 模糊声明：无法证伪的定性表述（"our method effectively captures..."——怎么定义 effectively？）
-   - 过度声明：提升 1-2% 但声称 "significantly outperforms"
-   - 缺失限制条件：每个方法都有适用范围，是否明确说明？
-   - 结构混乱：论证逻辑与章节结构不匹配
-
-5. **新颖性深度评估**：
-   - 贡献的"新"是什么层次？新问题定义 > 新方法范式 > 新模块设计 > 新组合方式 > 新实验发现
-   - 与最接近的 prior work 做 side-by-side 技术对比——差异是否 substantial？
-   - 如果方法是"A 方法 + B 技巧"，A+B 的组合 insight 是什么？为什么不是 A+C 或 B+D？
-   - 贡献是否"过早老化"？（例如基于某个很快被替代的 backbone，如果换成新 backbone 还有效吗？）
-
-6. **可复现性风险**：
-   - 方法是否对初始化、超参数极其敏感？（"works only with this specific learning rate"）
-   - 训练是否不稳定？（NaN、collapse、需要多次尝试才能成功）
-   - 结果是否依赖特定框架版本/硬件？
-
-7. **缺失 Baselines / Ablations**：
-   - 最明显的 baseline 是什么？论文是否包含了？
-   - 如果把每个新组件换成最简单的替代品，性能如何？（这就是最基本的 ablation）
-   - 是否缺少 oracle / upper-bound / lower-bound 实验帮助理解方法的改进空间？
-
-**产出**：`Papers/project-review/critic.md`
+**Output**: `Papers/project-review/critic.md`
 
 ```markdown
 # Critic Review Report
 
-## 总体评价
-- **攻击强度**: X / 10（问题严重程度）
-- **核心弱点**: （2-3句概括）
-- **最可能导致 reject 的理由**: （1句话）
+## Overall
+- **Attack Strength**: X / 10
+- **Core Weakness**: (2-3 sentences)
+- **Most Likely Reject Reason**: (1 sentence)
 
-## 问题清单（按严重程度排序）
-
-### [Critical] 问题标题
-- **位置**: 论文章节 / 研究文档
-- **问题**: 具体描述
-- **证据**: 引用原文或数据
-- **审稿人可能的攻击方式**: （模拟审稿人的措辞）
-- **建议修复**: 具体方案
+## Issues (by severity)
+### [Critical] ...
+- **Location**: ...
+- **Problem**: ...
+- **Evidence**: ...
+- **Simulated Reviewer Attack**: ...
+- **Suggested Fix**: ...
 
 ### [Major] ...
-
 ### [Minor] ...
 
-## Proxy Metric Gaming 检查
-- **检查结果**: 通过 / 存在风险
-- **详细分析**: ...
-- **建议的交叉验证方式**: ...
+## Proxy Metric Gaming Check
+- **Result**: Pass / At Risk
+- **Analysis**: ...
+- **Suggested Cross-Validation**: ...
 
-## 缺失的 Baselines / Ablations
-1. ...（说明缺失的理由和影响）
+## Missing Baselines / Ablations
+1. ...
 
-## "致命一击"测试
-如果审稿人只能提一个最致命的问题，那会是什么？论文对此有防御吗？
+## "Kill Shot" Test
+Single most fatal question a reviewer could ask. Does the paper have a defense?
 ```
 
----
+## Step 2: Supervisor Review (Quality Assessor)
 
-### Step 2: Supervisor 审查（监督者视角）
+Adopt a **senior professor** persona evaluating whether student work merits submission. Independent from Critic -- your own assessment.
 
-以**独立第三方监督者**身份，进行全面质量评估。你不是研究团队成员——你是一个资深教授，在评估学生的工作是否值得投稿。你关心的是**整体科研质量**，而非某个具体细节。
+### 2.1 Contribution-Evidence Consistency
+- Per `research/contribution.md`: each claim has sufficient argumentation (Method) and validation (Experiments)?
+- Claim strength matches evidence strength?
+- Contribution inflation (packaging engineering as contribution)?
 
-**审查维度**：
+### 2.2 Problem Quality
+- From `research/problem-statement.md`: Gap real and important? Clearly defined and falsifiable? Field impact?
 
-1. **研究贡献与实验证据的一致性**：
-   - 回到 `research/contribution.md`，逐条检查每个 contribution claim
-   - 每个 claim 在论文中是否有充分的论证（Method）和验证（Experiments）？
-   - Claim 的措辞强度是否与证据强度匹配？（Strong claim 需要 strong evidence）
-   - 是否存在"contribution inflation"——把普通的工程步骤包装成贡献？
+### 2.3 Method-Problem Fit
+- Method targets Gap's root cause, or generic "apply transformer" approach?
+- Complexity proportional to problem difficulty?
+- Unfair advantage (larger model/more data without proper comparison)?
 
-2. **问题质量评估**：
-   - 从 `research/problem-statement.md` 回溯：这个 Gap 是否真的存在且重要？
-   - Gap 的定义是否清晰且可验证？（一个好的 Gap 应该可以用实验证伪）
-   - 解决这个 Gap 对领域的价值是什么？影响面有多大？
+### 2.4 Experiment Sufficiency
+- Answers "does it work" + "why does it work" + "when doesn't it work"?
+- Settings support generalization claims?
+- Sufficient analysis for reader to understand method behavior?
 
-3. **方法-问题匹配度**：
-   - 方法的设计是否确实针对了 Gap 的根因？还是"用 transformer 解决一切"式的通用套路？
-   - 方法的复杂度是否与问题的难度匹配？（过度工程化的简单问题解决方案不是好的贡献）
-   - 方法是否有 unfair advantage？（例如使用了更大的模型/更多的数据但不公平比较）
+### 2.5 Risk Assessment
+- List 3-5 most likely reviewer challenges
+- For each: current defense adequate? Suggested supplement if not.
 
-4. **实验充分性的独立评估**：
-   - 实验是否回答了所有关键问题？（不仅是"方法是否 work"，还有"为什么 work"、"什么时候不 work"）
-   - 实验设置是否能让结论推广到更广泛的场景？
-   - 是否有足够的分析让读者理解方法的行为？
+### 2.6 Best Practices Checklist
+- [ ] Reproducible (details complete)
+- [ ] Statistical significance reported
+- [ ] Ablations cover key components
+- [ ] Compared with recent SOTA (1-2 years)
+- [ ] Limitations explicitly stated
+- [ ] Code/data release planned
+- [ ] Ethics considered (if applicable)
 
-5. **风险评估（预判审稿人质疑）**：
-   - 列出 3-5 个审稿人最可能提出的质疑
-   - 对每个质疑，评估论文是否有足够的防御
-   - 如果没有防御，建议如何补充
-
-6. **最佳实践检查**：
-   - [ ] 实验可复现（细节完整）
-   - [ ] 统计显著性报告（多次运行、误差报告）
-   - [ ] Ablation 覆盖关键组件
-   - [ ] 与 SOTA 充分比较（最近 1-2 年的工作）
-   - [ ] 限制条件明确声明
-   - [ ] 代码/数据开源计划说明
-   - [ ] 伦理考虑（如涉及偏见、隐私等）
-
-**产出**：`Papers/project-review/supervisor.md`
+**Output**: `Papers/project-review/supervisor.md`
 
 ```markdown
 # Supervisor Review Report
 
-## 总体评价
-- **项目质量评分**: X / 10
-- **核心评价**: （2-3句概括）
-- **投稿准备度**: 准备就绪 / 需改进 / 不建议投稿
-- **如果你是 AC，你会如何决策**: Accept / Borderline / Reject + 理由
+## Overall
+- **Quality Score**: X / 10
+- **Core Assessment**: (2-3 sentences)
+- **Submission Readiness**: Ready / Needs Improvement / Do Not Submit
+- **AC Decision Simulation**: Accept / Borderline / Reject + reasoning
 
-## 分维度评分
+## Dimension Scores
+| Dimension | Score | Brief |
+|-----------|-------|-------|
+| Problem Quality | X/10 | ... |
+| Method-Problem Fit | X/10 | ... |
+| Method Rigor | X/10 | ... |
+| Experiment Sufficiency | X/10 | ... |
+| Presentation | X/10 | ... |
+| Overall Contribution | X/10 | ... |
 
-| 维度 | 评分 | 简评 |
-|------|------|------|
-| 研究问题质量 | X/10 | ... |
-| 方法-问题匹配度 | X/10 | ... |
-| 方法严谨性 | X/10 | ... |
-| 实验充分性 | X/10 | ... |
-| 论文表达 | X/10 | ... |
-| 整体贡献 | X/10 | ... |
+## Contribution-Evidence Audit
+| Claim | Argumentation | Validation | Evidence Strength | Assessment |
+|-------|-------------|-----------|-------------------|-----------|
+| C1 | S3.X | Tab.1 | Strong/Medium/Weak | ... |
 
-## Contribution-Evidence 审计
+## Risk Assessment: Most Likely Reviewer Challenges
+1. **Challenge**: ...
+   **Current Defense**: adequate / insufficient
+   **Suggested Supplement**: ...
 
-| Contribution Claim | 论证位置 | 验证位置 | 证据强度 | 评价 |
-|-------------------|---------|---------|---------|------|
-| C1: ... | §3.X | Tab.1 | Strong/Medium/Weak | ... |
-| ... | ... | ... | ... | ... |
-
-## 问题清单
-
-| 严重程度 | 阶段 | 描述 | 建议 |
-|----------|------|------|------|
-| critical | ... | ... | ... |
-| major | ... | ... | ... |
-| minor | ... | ... | ... |
-
-## 风险评估：审稿人最可能的质疑
-1. **质疑**: ...
-   **当前防御**: 有 / 不足
-   **建议补充**: ...
-2. ...
-
-## 最佳实践检查
-- [ ] 实验可复现
-- [ ] 统计显著性报告
-- [ ] Ablation 覆盖关键组件
-- [ ] 与 SOTA 充分比较
-- [ ] 限制条件明确声明
-
-## 改进建议（按优先级）
+## Improvement Suggestions (prioritized)
 1. ...
 ```
 
----
+## Step 3: External Review (Optional)
 
-### Step 3: 外部审查（可选）
+If external AI MCP available, request independent third-party review: overlooked risks, assumption holes, methodology flaws, scoring 1-10. Save to `Papers/project-review/external.md`. Non-blocking on failure.
 
-如果系统配置了外部 AI MCP（如 Codex / GPT-5.4），调用外部模型进行独立第三方审查，获取不同 AI 系统的差异化视角。
+## Step 4: Synthesis
 
-**检查 MCP 可用性**：尝试调用外部 AI MCP tool。如果不可用，跳过本步骤并在 synthesis 中注明。
+Combine Critic, Supervisor, and External (if available) into `Papers/project-review/synthesis.md`:
 
-**外部审查要求**：
-- 以独立第三方视角评审（不受 Claude 生态偏见影响）
-- 指出被忽略的风险、假设漏洞、方法论缺陷
-- 提供具体改进建议
-- 打分 1-10 并给出理由
-
-**产出**：`Papers/project-review/external.md`（如不可用则不生成）
-
----
-
-### Step 4: 综合审查报告
-
-综合 Critic、Supervisor、外部审查（如有）的结果，生成统一的审查综合报告。
-
-**综合时的关键思考**：
-- **共识问题权重加倍**：如果多个审查角色独立指出同一问题，该问题的严重性升级
-- **分歧需要裁决**：不同审查角色意见冲突时，给出裁决和理由
-- **Proxy Metric Gaming 一票否决**：如果 Critic 发现了 metric gaming 且无法反驳，直接标记为 Critical
-
-**产出**：`Papers/project-review/synthesis.md`
+**Synthesis rules**:
+- **Consensus issues: weight doubled** -- multiple roles flagging same issue means reviewers almost certainly will too
+- **Conflicts: adjudicate** with reasoning
+- **Proxy Metric Gaming: veto power** -- confirmed gaming with no rebuttal = automatic Critical
 
 ```markdown
 # Project Review Synthesis
 
-## 审查概要
+## Review Summary
+| Role | Status | Core Finding |
+|------|--------|-------------|
+| Critic | Done | ... |
+| Supervisor | Done | ... |
+| External | Done / Skipped | ... |
 
-| 审查角色 | 执行状态 | 核心发现 |
-|----------|----------|----------|
-| Critic | ✓ | ... |
-| Supervisor | ✓ | ... |
-| External | ✓ / 跳过 | ... |
+## Composite Assessment
+- **Supervisor Score**: X / 10
+- **Critic Attack Strength**: X / 10 (higher = more problems)
+- **Submission Recommendation**: Ready / Needs Revision / Do Not Submit
 
-## 综合评分
-- **Supervisor 评分**: X / 10
-- **Critic 攻击强度**: X / 10（越高问题越多）
-- **综合投稿建议**: 可投稿 / 需改进 / 不建议投稿
-
-## Critical Issues（必须解决）
-（汇总所有审查者标记为 Critical 的问题，去重合并）
+## Critical Issues (must resolve)
 1. ...
 
-## Major Issues（建议解决）
+## Major Issues (should resolve)
 1. ...
 
-## 共识与分歧
-### 多位审查者一致指出的问题
-- ...（这些问题审稿人几乎一定会提出）
+## Consensus and Conflicts
+### Issues flagged by multiple reviewers
+- ... (reviewers will almost certainly raise these)
 
-### 审查者间的分歧
-- 分歧点: ...
-- 裁决: ...
-- 理由: ...
+### Reviewer disagreements
+- Conflict: ... | Decision: ... | Rationale: ...
 
-## Proxy Metric Gaming 综合判定
-- **状态**: 通过 / 存在风险 / 确认存在
-- **详细说明**: ...
-- **如果存在风险，建议的验证方式**: ...
+## Proxy Metric Gaming Verdict
+- **Status**: Pass / At Risk / Confirmed
+- **Details**: ...
+- **If at risk, suggested validation**: ...
 
-## 投稿策略建议
-- **当前状态**: 可投稿 / 需小修 / 需大修 / 不建议投稿
-- **目标会议/期刊适配度**: ...
-- **预估审稿结果**: ...
-- **核心行动项**（按优先级）:
-  1. ...
-- **如果被拒，最可能的原因**: ...
-- **Rebuttal 时需要准备的关键回应**: ...
+## Submission Strategy
+- **Current State**: Ready / Minor revision / Major revision / Do not submit
+- **Venue Fit**: ...
+- **Predicted Outcome**: ...
+- **Action Items** (prioritized): 1. ...
+- **Most Likely Rejection Reason**: ...
+- **Rebuttal Preparation**: key responses to prepare
 ```
 
-## AI Co-Author 关键行为
-- **Critic 与 Supervisor 角色分离**——即使是同一个 Agent 执行，也要严格切换视角，不要混合两种角色
-- **Critic 要真正攻击**——不是走形式，要假设自己是最严苛的审稿人，目标是找到论文被拒的理由
-- **Supervisor 要独立判断**——不受 Critic 结论影响，做自己的独立评估
-- **Proxy Metric Gaming 是重点**——自动科研系统最容易出现指标刷分，必须认真检查。逐条过 gaming 检查清单
-- **综合报告要有决策价值**——最终 synthesis 要给出明确的行动建议，不是简单堆砌。想象你是向研究者传达"投还是不投"的决策
-- **预判 Rebuttal**：不仅指出问题，还要预判审稿人可能的追问，帮助研究者提前准备 rebuttal 策略
+## Key Behaviors
+- **Critic and Supervisor are separate roles** -- strict perspective switching, no mixing
+- **Critic genuinely attacks** -- not performative. Goal: find the reject reason.
+- **Supervisor independently assesses** -- not influenced by Critic's findings
+- **Proxy Metric Gaming is priority** -- highest risk in AI-assisted research. Go through the checklist methodically.
+- **Synthesis has decision value** -- clear "submit or not" recommendation with reasoning, not just issue aggregation
+- **Anticipate rebuttal** -- beyond identifying problems, predict reviewer follow-ups to help prepare rebuttal strategy
 
-## 输出
-- `Papers/project-review/critic.md` — Critic 审查报告
-- `Papers/project-review/supervisor.md` — Supervisor 审查报告
-- `Papers/project-review/external.md` — 外部审查报告（可选）
-- `Papers/project-review/synthesis.md` — 综合审查报告
+## Output
+- `Papers/project-review/critic.md`
+- `Papers/project-review/supervisor.md`
+- `Papers/project-review/external.md` (optional)
+- `Papers/project-review/synthesis.md`

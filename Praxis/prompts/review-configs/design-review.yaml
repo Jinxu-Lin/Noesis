@@ -1,0 +1,183 @@
+# Design Review Configuration (Phase: design_review)
+# 以顶会 reviewer 标准审查方法技术正确性和实验设计严谨性
+
+review_type: Design Review
+phase_id: design_review
+phase_name: "Design Review (设计审查)"
+
+# ── 多视角辩论配置 ──
+debate_agents:
+  - theorist        # 数学/理论正确性：逻辑闭合、理论保证、隐含假设
+  - methodologist   # 评估协议完整性：数据泄漏、超参选择、ablation 覆盖
+  - empiricist      # 实验科学性：探针→完整实验衔接、baseline 公平、可复现性
+  - skeptic         # 极端怀疑：最弱组件、最可能失败点、替代解释
+  - pragmatist      # 工程可行性：计算资源匹配、实现复杂度、时间估计
+  - contrarian      # 构建最强反驳：过拟合探针信号风险、攻击角度逻辑漏洞
+
+debate_output_subdir: "research-design"   # Reviews/research-design/round-N/
+
+# SubAgent 需要读取的文档
+input_docs:
+  required:
+    - research/problem-statement.md
+    - research/method-design.md
+    - research/experiment-design.md
+    - Codes/_Results/probe_result.md
+  optional:
+    - project.md                    # §1.4 计算资源约束验证
+    - iteration-log.md              # 迭代历史
+
+# 审查维度（10 项：方法 4 + 实验 5 + 联合 1）
+review_dimensions:
+  # ═══ 方法侧（4 项）═══
+  - name: 逻辑闭合
+    question: "Gap → Root Cause → Method → Why Solves 链条是否完整？"
+    criteria: >
+      每环严格推导，无逻辑跳跃。
+      检查：(1) Gap→RC 有实验/分析支撑因果关系；
+      (2) RC→Method 直接针对 root cause，攻击角度→组件映射完整；
+      (3) Method→Why Solves 有机制解释；
+      (4) 隐含假设在实践中是否成立。
+      DL 常见跳跃："X 是问题 → 我们用 attention 解决" — 缺少 WHY。
+    scoring_guide: >
+      Pass: 每环有严格依据，无逻辑跳跃。
+      Revise: 方向正确但某环依据不足。
+      Block: 根本性逻辑断裂。
+
+  - name: 组件必要性
+    question: "每个组件是否不可或缺？"
+    criteria: >
+      检查：(1) 独立组件数，Occam's Razor 是否违反；
+      (2) 每个组件有独立 motivation；
+      (3) 是否存在"炫技组件"；
+      (4) 组件间冗余；
+      (5) 新增 compute/memory 成本与预期收益是否成比例。
+    scoring_guide: >
+      Pass: 每个组件有独立 motivation，移除导致可预测性能下降。
+      Revise: 某些组件必要性论证不充分。
+      Block: 明显存在不必要组件，过度工程化。
+
+  - name: 理论正确性
+    question: "数学推导是否正确？假设是否合理？"
+    criteria: >
+      检查：(1) Loss function gradient 方向、degenerate solution；
+      (2) Bound 条件过强/过松；
+      (3) 隐含假设（i.i.d.、Lipschitz、bounded gradients）；
+      (4) Tensor shape 一致性；
+      (5) 数值稳定性（除零、log 输入为正）。
+    scoring_guide: >
+      Pass: 推导正确，假设明确且合理。
+      Revise: 正确但假设需更明确声明，或可修复的数值隐患。
+      Block: 推导错误或关键假设不成立。
+
+  - name: 与探针结果的一致性
+    question: "方法设计是否与探针经验信号一致？"
+    criteria: >
+      检查：(1) 探针 positive signals 被充分利用；
+      (2) negative signals 被 address；
+      (3) 是否过拟合探针 setting；
+      (4) 探针与完整实验 setting 差距；
+      (5) 定量结果合理纳入设计 motivation。
+    scoring_guide: >
+      Pass: 一致，未过拟合，scale-up 策略清晰。
+      Revise: 一致但某些探针发现被忽略。
+      Block: 与探针矛盾或明显过拟合。
+
+  # ═══ 实验侧（5 项）═══
+  - name: RQ 覆盖度
+    question: "每个 claim 是否都有实验支撑？"
+    criteria: >
+      检查：(1) 每个 RQ 至少一个对应实验；
+      (2) 无 orphan experiments；
+      (3) 无 overclaimed results；
+      (4) 定量 claim 有明确实验对应。
+    scoring_guide: >
+      Pass: 每个 RQ 有对应实验，无 overclaim。
+      Revise: 1-2 个遗漏但核心 RQ 有覆盖。
+      Block: 核心 RQ 缺实验支撑或系统性 overclaim。
+
+  - name: Baseline 公平性与时效性
+    question: "对比方法是否当前最强？比较条件是否公平？"
+    criteria: >
+      检查：(1) 包含近 12 月 SOTA；
+      (2) 相同 backbone/pretrained weights/training budget；
+      (3) Baseline 有 fair tuning；
+      (4) 包含方法简化版；
+      (5) 包含 simple but strong baseline。
+    scoring_guide: >
+      Pass: Up-to-date，fair comparison 满足。
+      Revise: 基本合理但缺 1-2 个重要方法。
+      Block: Cherry-picked 或 unfair comparison。
+
+  - name: Ablation 完整性
+    question: "是否能区分各组件的贡献？"
+    criteria: >
+      检查：(1) Remove-one ablation；
+      (2) 核心组件 parameter-matched ablation；
+      (3) 关键超参 sensitivity analysis；
+      (4) Qualitative analysis 补充；
+      (5) 在所有主要数据集上做 ablation。
+    scoring_guide: >
+      Pass: 每个组件有 ablation + sensitivity analysis。
+      Revise: 存在但不完整。
+      Block: 缺少 ablation 或设计有 systematic bias。
+
+  - name: 探针 → 完整实验衔接
+    question: "探针方案如何自然扩展为完整实验？"
+    criteria: >
+      检查：(1) 主要差异已列出；
+      (2) 每个差异有 scaling 策略；
+      (3) scale gap 评估；
+      (4) 新增工程 effort 识别。
+    scoring_guide: >
+      Pass: Scale-up 路径清晰，差异已识别。
+      Revise: 方向正确但某些挑战未充分考虑。
+      Block: 差异过大，无清晰 bridge。
+
+  - name: 评估协议完整性
+    question: "实验协议能否给出公正无偏的评估？"
+    criteria: >
+      检查：(1) Data split 无 leakage；
+      (2) 超参选择严格在 validation set；
+      (3) 多次运行 mean ± std；
+      (4) 指标全面且不可 game；
+      (5) 总 GPU 时间在 §1.4 约束内；
+      (6) 核心 claim 有 significance test。
+    scoring_guide: >
+      Pass: 所有审计项通过。
+      Revise: 1-2 项需补充。
+      Block: Data leakage 或 test-set hyperparameter selection。
+
+  # ═══ 联合维度（1 项）═══
+  - name: 方法-实验对齐
+    question: "每个组件是否都有对应 ablation？每个实验是否验证明确 claim？交叉引用一致？"
+    criteria: >
+      最关键审查维度。双向映射：
+      (1) Method→Experiment：每个组件有 ablation、每个 claim 有 validation、"should improve X" 在实验中验证了 X；
+      (2) Experiment→Method：每个实验验证明确 claim、setup 与方法描述一致、指标 capture 声称优化的目标；
+      (3) 交叉引用一致：双向引用无断裂。
+    scoring_guide: >
+      Pass: 双向映射完整，交叉引用一致。
+      Revise: 1-2 个对齐遗漏不影响核心。
+      Block: 核心 claim 缺实验对应或系统性不一致。
+
+# 战略预判引导
+strategic_foresight_hint: >
+  重点回答：(1) 结果不达标最可能哪个组件？(2) 最自然的替代组件？
+  (3) 遗漏 ablation 可能揭示什么？(4) 最易出 bug 的组件？
+  (5) 训练最可能出问题的环节？(6) 计算预算最可能超支的环节？
+
+# 判定后路由
+routing:
+  pass:
+    next_phase: "blueprint"
+    message: "设计审查通过，进入实现蓝图（blueprint）。"
+  revise:
+    next_phase: "design"
+    message: "技术问题需要修改，回到联合设计（design）。审查意见将作为迭代输入。"
+  fundamental:
+    next_phase: "formalize"
+    message: "问题定义层面有误，回到问题锐化（formalize）重新审视方向。"
+  abandon:
+    next_phase: "complete"
+    message: "致命技术问题，终止研究模块。"

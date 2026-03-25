@@ -1,6 +1,6 @@
 # Research Proposal: [项目名称]
 
-> 基于 `project-startup.md` 的知识基础，本文档定义研究问题并提出解决方案。
+> 基于 `project.md` 的知识基础，本文档定义研究问题并提出解决方案。
 > 本文档是论文叙事的蓝图——如果 Proposal 说服不了自己，论文也说服不了审稿人。
 
 ---
@@ -10,7 +10,7 @@
 ### 1. Research Gap
 
 #### 1.1 现有方法概述
-<!-- 简要回顾现有方法的核心思路（详细分析见 project-startup.md） -->
+<!-- 简要回顾现有方法的核心思路（详细分析见 project.md） -->
 
 
 #### 1.2 Gap 陈述
@@ -91,7 +91,7 @@
 ---
 
 ## Metadata
-- **基于**: `project-startup.md`
+- **基于**: `project.md`
 - **状态**: Draft / Under Discussion / Finalized
 - **目标会议/期刊**:
 - **关键里程碑**:

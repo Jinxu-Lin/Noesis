@@ -1,0 +1,99 @@
+# Init Module Review Configuration (Phase: review)
+# Init 模块六维辩论审查：审查 project.md §1-§3 的方向可行性
+# Used by init-review-prompt.md via init_runner.py
+
+review_type: Init Review
+phase_id: review
+phase_name: "Init Review (初始方向审查)"
+
+# ── 多视角辩论配置 ──────────────────────────────────────────────────────
+# 辩论焦点：问题真实性、根因深度、方法可信度、假设脆弱性、探针充分性、可行性、创新性
+debate_agents:
+  - innovator         # 创新潜力：方法新颖性、差异化空间
+  - pragmatist        # 可行性约束：GPU 资源、时间预算、ROI
+  - theorist          # 理论正确性：逻辑闭合、隐含假设、数学基础
+  - contrarian        # 最强反驳：方向致命缺陷、替代解释
+  - interdisciplinary # 跨领域视角：替代框定、借鉴机会
+  - empiricist        # 实验科学性：探针设计、pass/fail 标准合理性
+
+debate_output_subdir: "init"   # Reviews/init/round-N/
+# ───────────────────────────────────────────────────────────────────────
+
+# SubAgent 需要读取的文档
+input_docs:
+  required:
+    - project.md                        # §1-§3：Overview、Problem & Approach、Validation Strategy
+  optional:
+    - Reviews/init/round-N/synthesis.md # 上一轮 review（第 2+ 轮）
+
+# 审查报告输出目录模式
+output_dir: "Reviews/init/round-{review_round}"
+
+# 审查维度（7 项）
+review_dimensions:
+  - name: 问题真实性
+    question: "§2.2 定义的问题是否真实存在且重要？"
+    scoring_guide: >
+      Pass: 问题有实证支撑，影响面广，非人为构造。
+      Revise: 问题存在但定义不够精确或重要性论证不充分。
+      Stop: 问题不存在或已被解决。
+
+  - name: Root Cause 质量
+    question: "§2.3 的根因分析是否足够深入（>=3 层 Why），是否区分了 symptom 和 cause？"
+    scoring_guide: >
+      Pass: 根因分析深入，因果链清晰，与问题定义一致。
+      Revise: 方向正确但停留在 symptom 层面，需进一步追问。
+      Stop: 根因是后验合理化，与问题定义不匹配。
+
+  - name: 方法可信度
+    question: "§2.4 的攻击方向是否与 Root Cause 有因果匹配？"
+    scoring_guide: >
+      Pass: 攻击方向直接针对 root cause，有先验支撑。
+      Revise: 匹配但支撑不足，需补充论证。
+      Stop: 攻击方向与 root cause 不匹配。
+
+  - name: 假设脆弱性
+    question: "§2.5 的核心假设是否充分，支撑强度评估是否诚实？"
+    scoring_guide: >
+      Pass: 假设明确、支撑评估诚实、风险可控。
+      Revise: 假设不完整或支撑强度被高估。
+      Stop: 核心假设明显不成立。
+
+  - name: Probe 充分性
+    question: "§3 的验证方案是否能区分方向对/错，pass 标准是否合理？"
+    scoring_guide: >
+      Pass: 探针设计能有效验证核心假设，pass/fail 标准清晰合理。
+      Revise: 探针方向正确但区分度不足或标准过于宽松。
+      Stop: 探针无法验证核心假设。
+
+  - name: 计算可行性
+    question: "§1.4 的资源是否支撑 probe 和后续实验？"
+    scoring_guide: >
+      Pass: 资源充足或有合理的资源优化策略。
+      Revise: 资源紧张但有降低需求的可行方案。
+      Stop: 资源明显不足，无变通余地。
+
+  - name: 创新性
+    question: "相对于 baseline（§2.1），proposed approach 是否有实质新贡献？"
+    scoring_guide: >
+      Pass: 有实质新贡献，差异化明确。
+      Revise: 新贡献存在但需更清晰阐述差异化。
+      Stop: 与已有方法无实质区别。
+
+# 判定后路由
+routing:
+  pass:
+    next_phase: "probe_impl"
+    message: "Init review 通过，进入探针实现（probe_impl）。"
+
+  revise:
+    next_phase: "start"
+    message: "需要修改，回到核心分析（start）。synthesis.md 将作为迭代输入。"
+
+  hold:
+    next_phase: "hold"
+    message: "暂停，等待外部条件变化。"
+
+  stop:
+    next_phase: "complete"
+    message: "Init review 判定终止，进入 complete。"

@@ -1,114 +1,53 @@
 # [项目名称]
 
-> 项目入口文档。自动化运行器通过 Noesis 路径定位 Praxis orchestrator。
+> Claude 进入项目时先读本文件，再按需查阅具体文档。
 
-## 项目概览
+## 项目概述
 
-- **一句话描述**: [本项目做什么]
-- **目标会议/期刊**: [如有]
-- **Noesis 路径**: `~/Research/Noesis`（跨机器自动适配，勿硬编码用户名）
+- **Topic**: [一句话：这个项目研究什么]
+- **Problem**: [现有方法做了X，但因为Y所以存在Z问题 — init/start 完成后填入]
+- **Approach**: [核心直觉，1-2 句 — init/start 完成后填入]
+- **Target**: [目标会议/期刊 + DDL]
+
+## 资源约束
+
+- **GPU**: [类型 × 数量]
+- **远程服务器**: [如有]
+- **Timeline**: [DDL / 可用时间窗口]
+
+> 所有分析、设计和实验规划必须在上述约束内。
 
 ## 当前状态
 
-- **当前阶段**: [C/RS/P/D/RT/I/E/W/R] ([阶段名称])
-- **执行模式**: 首次 / RS-Revise / Probe-Pivot / RT-Revise / Execute-Iterate / Execute-Pivot
-- **下一步**: 运行 `/praxis-research <项目路径>` 继续自动化流程
-- **阶段历史**: C ✓ → RS Pass → P signal → D ✓ → ...
+- **模块**: [init / research / paper]
+- **阶段**: [当前阶段名]（[一句话描述]）
+- **下一步**: [具体命令]
 
-> 阶段状态由 `pipeline-status.json` 权威记录，本节仅供人类快速查阅。
+> 权威状态由 `Docs/*-module-status.json` 记录。本节仅供快速查阅。
 
 ## 关键文档
 
-按阅读优先级排列（AI 进入项目时按此顺序阅读）：
+| 文档 | 说明 | 产出阶段 |
+|------|------|---------|
+| `project.md` | 项目介绍书（idea、问题、方法、假设、probe 设计、review） | Init |
+| `Codes/_Results/probe_result.md` | 探针实验结果 | Init / probe_impl |
+| `research/problem-statement.md` | 正式 Gap + RQ + 攻击角度 | Research / formalize |
+| `research/method-design.md` | 方法设计（组件、公式、因果论证） | Research / design |
+| `research/experiment-design.md` | 实验设计（baselines、ablations、metrics） | Research / design |
+| `Codes/experiment-todo.md` | 实验执行清单（blueprint 产出） | Research / blueprint |
+| `Codes/_Results/experiment_result.md` | 正式实验结果 | Research / implement |
+| `research/retrospective.md` | 知识回收 | Research / retrospective |
+| `Papers/` | 论文写作 | Paper module |
 
-| 文档 | 状态 | 说明 |
-|------|------|------|
-| `project-startup.md` | | S — 项目知识基础 |
-| `research/problem-statement.md` | | C — Gap + 攻击角度 + 探针方案 |
-| `research/probe-results.md` | | P — 探针实验结果 |
-| `research/method-design.md` | | D — 方法设计（含实验交叉引用） |
-| `research/experiment-design.md` | | D — 实验设计（含方法交叉引用） |
-| `research/contribution.md` | | 跨阶段 — 贡献跟踪 |
-| `research/result.md` | | E — 实验结果与洞察（如有） |
-| `iteration-log.md` | | 版本变更历史（如有） |
+## Noesis 系统
 
-## 迭代记录
+- **路径**: `~/Research/Noesis`
+- **状态文件**: `Docs/init-module-status.json`、`Docs/research-module-status.json`、`Papers/paper-status.json`
+- **CLI 参考**: `~/Research/Noesis/Praxis/CLAUDE.md`
 
-<!-- 由 iteration-log.md 记录完整历史，此处仅简要概览 -->
-| 版本 | 触发 | 变更 | 日期 |
-|------|------|------|------|
-| | | | |
+## 代码约束
 
----
-
-## Codes/ 子目录
-
-> 以下内容在 I（实现规划）时填写。I 之前本节可留空。
-
-### 代码架构
-
-```
-Codes/
-├── configs/           ← 实验配置（配置驱动实验）
-├── src/
-│   ├── methods/       ← 核心方法实现
-│   ├── evaluation/    ← 评估 pipeline
-│   ├── data/          ← 数据处理
-│   └── utils/         ← 工具函数
-├── scripts/           ← 运行脚本
-└── experiments/       ← 实验结果
-```
-
-### 方法组件 → 代码映射
-
-| research/method-design.md 中的组件 | 代码文件 | 说明 |
-|--------------------------|---------|------|
-| Component A | `src/methods/xxx.py` | |
-| Component B | `src/methods/yyy.py` | |
-
-### 环境配置
-
-**本地**：
-```bash
-# 依赖安装
-# 数据准备
-```
-
-**远程服务器**（E 实验执行）：
-```yaml
-# 在项目根目录创建 env.json（已加入 .gitignore，每台机器独立配置）
-```
-
-### 运行命令
-
-```bash
-# 训练
-# 评估
-# 消融
-```
-
-### 开发约定
-
-- **配置管理**: [yaml / hydra / argparse]
-- **实验结果**: 存储在 `experiments/[实验名]/[日期]/`
-- **重要**: 修改核心方法代码前，先读 research/method-design.md 中对应的理论部分
-
----
-
-## Papers/ 子目录
-
-> 以下内容在 W（论文写作）时填写。W 之前本节可留空。
-
-### 论文结构
-
-```
-Papers/
-├── main.tex
-├── figures/
-└── ...
-```
-
-### 写作约定
-
-- **目标格式**: [会议/期刊模板]
-- **参考文献管理**: [BibTeX 文件路径]
+- `Codes/core/` 深内核（可复用） | `Codes/experiments/` 浅包装（按实验）
+- `Codes/_Data/` 生成数据（gitignore） | `Codes/_Results/` 实验结果（md，提交 Git）
+- 外部数据: `~/Resources/Datasets/` 或 `~/Resources/Models/`
+- **每次修改后 commit + push**

@@ -1,0 +1,174 @@
+# Formalize Review Configuration (Phase: formalize_review)
+# 问题形式化审查：审查 Gap 定义 + RQ 严格性 + 攻击角度 + 探针整合
+# 以顶会 AC 视角审查形式化后的研究方向战略价值
+
+review_type: Formalize Review
+phase_id: formalize_review
+phase_name: "Formalize Review (问题形式化审查)"
+
+# ── 多视角辩论配置 ──────────────────────────────────────────────────────
+# 辩论焦点：方向判断、Gap 系统性、RQ 可证伪性、探针整合质量、跨域替代
+debate_agents:
+  - contrarian        # 构建最强反驳：Gap 真实性、攻击角度致命缺陷、探针替代解释
+  - comparativist     # 文献对照 + 在线搜索：Gap 新颖性、近期竞争工作
+  - pragmatist        # 可行性约束：GPU 资源匹配、时间预算合理性、ROI 评估
+  - interdisciplinary # 跨领域视角：替代问题框定、替代攻击角度、RQ 理论价值
+
+debate_output_subdir: "research-formalize"   # Reviews/research-formalize/round-N/
+# ───────────────────────────────────────────────────────────────────────
+
+# SubAgent 需要读取的文档
+input_docs:
+  required:
+    - research/problem-statement.md
+  optional:
+    - project.md                        # Startup 产出，验证形式化是否有实质提升
+    - Codes/_Results/probe_result.md    # 探针结果，独立审视整合质量
+
+# 审查报告输出目录模式
+output_dir: "Reviews/research-formalize/round-{review_round}"
+
+# 审查维度（7 项）— 每项含评分标准和常见陷阱
+review_dimensions:
+  - name: Gap 真实性与推导系统性
+    question: "Gap 是否真实存在？候选推导是否系统性（而非灵感式）？"
+    criteria: >
+      Gap 必须有实证支撑且推导路径清晰。
+      检查清单：
+      (1) Gap 候选列表是否基于 6 大 DL Gap 模式做了系统性扫描？还是只列了直觉想到的 1-2 个？
+      (2) 选定 Gap 是否有实证支撑（failure cases / 实验数据），而非纯理论推测？
+      (3) 是否存在已有方法的 minor modification 就能解决的可能？
+      (4) Gap 是否是技术限制的自然结果（如 transformer 的 O(n²)），而非需要"解决"的问题？
+      (5) 与 Startup §2.2 对比：形式化是否有实质性深化？还是简单重复？
+      常见陷阱：把已解决的问题重新包装；把 trade-off 当作 gap；Gap 候选列表走过场。
+    scoring_guide: >
+      Pass: Gap 有实证，推导系统，比 Startup 有实质深化，无已知解决方案。
+      Revise: Gap 存在但推导不够系统，或与 Startup 区分度不足。
+      Abandon: Gap 已被解决或是伪问题。
+
+  - name: Gap 重要性与贡献天花板
+    question: "解决这个 gap 对领域影响多大？完美解决能发到什么级别？"
+    criteria: >
+      影响力是否足以支撑一篇论文。
+      检查清单：
+      (1) 受影响 downstream tasks 多少？影响面窄还是广？
+      (2) 性能提升预期：marginal (1-2%) 还是 substantial (5%+)?
+      (3) 完美 work 时最高发到什么 venue？oral 潜力还是 borderline poster？
+      (4) 是否存在 ceiling effect——完美解决提升空间也有限？
+      常见陷阱："Incremental improvement" 是最常见 reject 原因。
+    scoring_guide: >
+      Pass: 可产生 substantial 影响，天花板为 top venue poster 或以上。
+      Revise: 影响面有限，需扩大 scope 或重新框定。
+      Abandon: 天花板明显低于目标 venue 要求。
+
+  - name: Gap 新颖性 + 竞争态势
+    question: "近期有无竞争工作？竞争窗口多大？"
+    criteria: >
+      结合 comparativist 在线核查结果判定。
+      检查清单：
+      (1) arXiv 近 6 月有直接竞争？差异化足够？
+      (2) 大组（Google/Meta/DeepMind/OpenAI）在相关方向发力？
+      (3) 竞争窗口：3 月（紧急）还是 12 月（从容）？
+      (4) Concurrent submission 风险？
+      (5) 方向热度趋势：上升期 vs 饱和期 vs 衰退期。
+      常见陷阱：低估竞争；高估差异化。
+    scoring_guide: >
+      Pass: 无直接竞争或有明确差异化，窗口 >= 6 月。
+      Revise: 部分竞争但差异化方向清晰，需在 problem-statement 中明确 positioning。
+      Abandon: 高度相似工作已存在，差异化空间不足。
+
+  - name: Root Cause 深度
+    question: "根因分析是否到位？还能再追问一层？"
+    criteria: >
+      根因应直接指向攻击角度选择。
+      检查清单：
+      (1) Root cause 是否停留在症状层面？
+      (2) 能否追问 "why?" 至少两次而不到达 trivial 结论？
+      (3) Root cause 有实验验证（diagnostic experiments、visualization、ablation）？
+      (4) Root cause 与攻击角度因果关系是否严格？
+      (5) 探针结果支持 root cause 分析？还是暗示不同 root cause？
+      常见陷阱：太浅；post-hoc rationalization。
+    scoring_guide: >
+      Pass: 有实验依据，因果链清晰，与探针一致，直接导向攻击角度。
+      Revise: 方向正确但不够深入，或与探针一致性需更明确论证。
+      Abandon: 是症状描述或与探针矛盾。
+
+  - name: 攻击角度可信度
+    question: "攻击思路直觉上能 work 吗？与 root cause 匹配吗？"
+    criteria: >
+      攻击角度必须与 root cause 类型逻辑一致。
+      检查清单：
+      (1) 直接针对 root cause？还是绕过的 workaround？
+      (2) 有先验理由相信 work？（理论依据/类比/探针初步结果）
+      (3) 是否过于复杂？simple > complex。
+      (4) 是否存在已知 failure mode 使此角度注定失败？
+      (5) 当前 GPU 资源下可行？
+      常见陷阱：hammer-nail 问题；描述超过 2 段话（越界成方法设计）。
+    scoring_guide: >
+      Pass: 直接匹配 root cause，有先验支撑，novelty 充分，资源可行。
+      Revise: 匹配但支撑不足，或 novelty/可行性需更清晰论证。
+      Abandon: 与 root cause 不匹配，或存在已知 failure mode。
+
+  - name: RQ 可回答性与可证伪性
+    question: "RQ 能被实验验证？有明确否证条件？"
+    criteria: >
+      需有验证路径和否证条件。
+      检查清单：
+      (1) RQ 足够具体到可设计实验？
+      (2) 否证条件明确？什么结果会让作者放弃？
+      (3) RQ 回答有独立价值？方法不 work 时实验结果是否提供 insight？
+      (4) 是否存在 tautology 风险？
+      (5) Sub-RQs 可独立验证？覆盖核心 claim 各方面？
+      常见陷阱：太 vague；否证条件缺失。
+    scoring_guide: >
+      Pass: 具体、可实验验证、有否证条件、失败也有信息价值。
+      Revise: 方向正确但需更具体否证条件或成功标准。
+      Abandon: 不可证伪或 tautologically true。
+
+  - name: 探针结果整合质量
+    question: "探针结果完整、公正地整合了？有选择性偏差？"
+    criteria: >
+      探针结果是形式化的实证基础，必须严肃对待。
+      检查清单：
+      (1) §4 是否覆盖 probe_result.md 所有关键发现？
+      (2) 负面信号（未验证假设、意外失败）坦诚整合？
+      (3) 正面信号是否过度解读？（探针 setting 与完整实验差距多大？）
+      (4) 意外发现认真对待了？（可能暗示更好方向）
+      (5) 攻击角度选择与探针结果一致？
+      常见陷阱：cherry-picking；忽视负面信号；toy setting 成功论证方向可行性。
+    scoring_guide: >
+      Pass: 完整整合，负面信号坦诚讨论，攻击角度与探针一致。
+      Revise: 不完整或轻微选择性偏差，需补充负面信号讨论。
+      Abandon: 关键结果被忽视，或攻击角度与探针直接矛盾。
+
+# 风险-回报评估引导（融入综合判定）
+risk_reward_hint: >
+  最终判定中显式评估风险-回报比：
+  - 成功概率（基于方向难度、攻击角度可信度、探针信号强度）
+  - 成功时影响力（基于 Gap 重要性、贡献天花板）
+  - 高风险高回报 = 可接受（需后续实验快速验证）
+  - 高风险低回报 = 不可接受（Abandon）
+  - 低风险低回报 = 不值得做（Revise，提升贡献天花板）
+
+# 战略预判引导
+strategic_foresight_hint: >
+  战略预判重点回答：
+  1. 进入 design 后最可能的方法设计困难？
+  2. 需换攻击角度时，§3.1 备选中哪个最有潜力？
+  3. 竞争核查中的相似工作是否提示"差异化 pivot"方向？
+  4. 最大的 "unknown unknown"？
+  5. 6 个月后回头看，最可能的 regret？
+
+# 判定后路由
+routing:
+  pass:
+    next_phase: "design"
+    message: "问题形式化审查通过，进入联合设计（design）。"
+
+  revise:
+    next_phase: "formalize"
+    message: "需要修改，回到问题形式化（formalize）。synthesis.md 将作为迭代输入。"
+
+  abandon:
+    next_phase: "complete"
+    message: "Exit Assessment Gate 判定 Abandon，进入 complete。"
